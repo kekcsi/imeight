@@ -31,33 +31,42 @@
 			background: black;
 			color: orange;
 		}
-		#tile-editor {
+		table#tile-editor {
 			position: absolute;
 			left: 768px;
-			top: 48px;
+			top: 64px;
+			border-spacing: 2px;
 			border: 1px solid orange;
+			margin: 0;
+			padding: 0;
+			table-layout: fixed;
 		}
-		#tile-editor td {
-			width: 24px;
-			height: 24px;
+		table#tile-editor td {
+			width: 22px;
+			height: 22px;
 			border: 0 none;
+			margin: 1px;
+			padding: 0;
 			text-align: center;
 			background: black;
 			cursor: crosshair;
 		}
-		#palette {
+		table#palette {
 			position: absolute;
 			left: 768px;
 			top: 0;
+			border-spacing: 2px;
 			border: 1px solid orange;
-			border-spacing: 0;
-		}
-		#palette td {
-			width: 16px;
-			height: 24px;
-			border: 0 none;
-			padding: 1px;
 			margin: 0;
+			padding: 0;
+			table-layout: fixed;
+		}
+		table#palette td {
+			width: 14px;
+			height: 18px;
+			border: 0 none;
+			margin: 0;
+			padding: 1px;
 			text-align: center;
 			background: black;
 			cursor: pointer;
@@ -69,6 +78,7 @@
 			border: 1px solid orange;
 			display: none;
 			border-collapse: collapse;
+			table-layout: fixed;
 		}
 		#color-chooser tr.tall td {
 			width: 12px;
@@ -86,6 +96,8 @@
 		td.button {
 			background: #302800 !important;
 			cursor: pointer !important;
+			font-size: 14px;
+			font-family: Consolas, monospace;
 		}
 		.sprite {
 			position: absolute;
@@ -97,6 +109,8 @@
 		var editorPal = [0, 4, 9, 13, 18, 22, 27, 31, 135, 151, 167, 183, 199, 215, 231, 247]
 		var editorData = []
 		var editorIDs = ["tile-editor", "mult-editor", "mono-editor"]
+		var sizes = [144, 576, 576]
+		var columnCounts = [12, 24, 24]
 		
 		//edit modez
 		var DRAW = 0
@@ -235,18 +249,19 @@
 					var c = possibleColors[cdef]
 
 					//do the fill
-					var top = Math.min(Math.floor(rectStart/12), Math.floor(pixIdx/12))
-					var bottom = Math.max(Math.floor(rectStart/12), Math.floor(pixIdx/12))
-					var left = Math.min(rectStart%12, pixIdx%12)
-					var right = Math.max(rectStart%12, pixIdx%12)
+					var cc = columnCounts[editor]
+					var top = Math.min(Math.floor(rectStart/cc), Math.floor(pixIdx/cc))
+					var bottom = Math.max(Math.floor(rectStart/cc), Math.floor(pixIdx/cc))
+					var left = Math.min(rectStart%cc, pixIdx%cc)
+					var right = Math.max(rectStart%cc, pixIdx%cc)
 					for(var row = top; row <= bottom; ++row) {
 						for(var col = left; col <= right; ++col) {
-							editorData[12*row + col] = selColorIdx
+							editorData[cc*row + col] = selColorIdx
 						}
 					}
 					
 					//refresh visuals
-					for(var i = 0; i < 144; ++i) {
+					for(var i = 0; i < sizes[editor]; ++i) {
 						var colorIdx = editorData[i]
 						var cdef = editorPal[colorIdx]
 						var c = possibleColors[cdef]
@@ -269,8 +284,8 @@
 					var offset = rollFrom - pixIdx
 
 					//do the roll on the data and refresh visuals
-					for(var i = 0; i < 144; ++i) {
-						editorData[i] = origData[(i + offset + 144)%144]
+					for(var i = 0; i < sizes[editor]; ++i) {
+						editorData[i] = origData[(i + offset + sizes[editor])%sizes[editor]]
 						var colorIdx = editorData[i]
 						var cdef = editorPal[colorIdx]
 						var c = possibleColors[cdef]
@@ -353,7 +368,12 @@
 			<td data-idx="13">&nbsp;</td>
 			<td data-idx="14">&nbsp;</td>
 			<td data-idx="15">&nbsp;</td>
-			<td style="width: 64px" class="button">Store...</td>
+		</tr>
+		<tr>
+			<td class="button" colspan="4" style="text-decoration: underline">Pal 0</td>
+			<td class="button" colspan="4">Pal 1</td>
+			<td class="button" colspan="4">Pal 2</td>
+			<td class="button" colspan="4">Pal 3</td>
 		</tr>
 	</table>
 	<table id="tile-editor">
@@ -529,9 +549,8 @@
 			<td colspan="2" id="edit-mode-button-draw" onclick="editMode(DRAW)" class="button">Draw</td>
 			<td colspan="2" id="edit-mode-button-fill" onclick="editMode(FILL)" class="button">Fill</td>
 			<td colspan="2" id="edit-mode-button-roll" onclick="editMode(ROLL)" class="button">Roll</td>
-			<td colspan="2" onclick="editorFlip(HORZ, TILE)" class="button">Flip H</td>
-			<td colspan="1" onclick="editorFlip(VERT, TILE)" class="button">V</td>
-			<td colspan="3" onclick="pixmapStore(TILE)" class="button">Store...</td>
+			<td colspan="3" onclick="editorFlip(HORZ, TILE)" class="button">Flip H</td>
+			<td colspan="3" onclick="editorFlip(VERT, TILE)" class="button">Flip V</td>
 		</tr>
 	</table>
 	<table id="color-chooser">
