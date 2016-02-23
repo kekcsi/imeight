@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>imeight developer</title>
+	<script>
+		var DEBUG = true
+	</script>
+	<script type="text/javascript" src="memory.js"></script>
+	<script type="text/javascript" src="font.js"></script>
+	<script type="text/javascript" src="pixmap-array.js"></script>
+	<script type="text/javascript" src="palettes.js"></script>
+	<script type="text/javascript" src="tiles.js"></script>
+	<script type="text/javascript" src="text.js"></script>
+	<script type="text/javascript" src="sprites.js"></script>
+	<style type="text/css">
+		#tile-layer {
+			position: absolute;
+			left: 0;
+			top: 0;
+			z-index: 0;
+		}
+		#text-layer {
+			position: absolute;
+			left: 0;
+			top: 0;
+			z-index: 2;
+		}
+		body {
+			background: black;
+			color: orange;
+		}
+		#tile-editor {
+			position: absolute;
+			left: 768px;
+			top: 48px;
+			border: 1px solid orange;
+		}
+		#tile-editor td {
+			width: 24px;
+			height: 24px;
+			border: 0 none;
+			text-align: center;
+			background: black;
+			cursor: crosshair;
+		}
+		#palette {
+			position: absolute;
+			left: 768px;
+			top: 0;
+			border: 1px solid orange;
+			border-spacing: 0;
+		}
+		#palette td {
+			width: 16px;
+			height: 24px;
+			border: 0 none;
+			padding: 1px;
+			margin: 0;
+			text-align: center;
+			background: black;
+			cursor: pointer;
+		}
+		#color-chooser {
+			position: absolute;
+			left: 768px;
+			top: 0;
+			border: 1px solid orange;
+			display: none;
+			border-collapse: collapse;
+		}
+		#color-chooser tr.tall td {
+			width: 12px;
+			height: 48px;
+		}
+		#color-chooser td {
+			width: 48px;
+			height: 12px;
+			border: 0;
+			margin: 0;
+			text-align: center;
+			background: black;
+			cursor: pointer;
+		}
+		td.button {
+			background: #302800 !important;
+			cursor: pointer !important;
+		}
+		.sprite {
+			position: absolute;
+			z-index: 3;
+		}
+	</style>
+	<script type="text/javascript">
+		var selColorIdx = 7
+		var editorPal = [0, 4, 9, 13, 18, 22, 27, 31, 135, 151, 167, 183, 199, 215, 231, 247]
+		var editorData = []
+		var editorIDs = ["tile-editor", "mult-editor", "mono-editor"]
+		
+		//edit modez
+		var DRAW = 0
+		var FILL = 1
+		var ROLL = 2
+		
+		//axes to flip a pixmap around
+		var HORZ = [1, 0]
+		var VERT = [0, 1]
+		
+		//possible pixmap interpretations
+		var TILE = 0 //16-color tile (12 by 12 pixels)
+		var MULT = 1 //multicolor sprite (24 by 24 pixels)
+		var MONO = 2 //monochrome sprite (24 by 24 pixels)
+
+		function init() {
+			paletteInit()
+			tileInit()
+			
+			for(var i = 0; i < 21504; ++i) {
+				writeMemory(i, 0)
+			}
+			setInterval(updateDirtyMirrors, 1000/25)
+			
+			//developer only
+			var cells = document.getElementById("color-chooser").getElementsByTagName("td")
+			for(var i = 0; i < 256; ++i) {
+				var c = possibleColors[i]
+				cells[i].style.backgroundColor = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
+
+				cells[i].addEventListener("click", function(ev) {
+					colorChosen(ev.target.dataset.idx)
+				})
+			}
+
+			cells = document.getElementById("palette").getElementsByTagName("td")
+			for(var i = 0; i < 16; ++i) {
+				var cdef = editorPal[i]
+				var c = possibleColors[cdef]
+				cells[i].style.backgroundColor = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
+				cells[i].style.color = "rgb(" + (255 - c[0]) + "," + (255 - c[1]) + "," + (255 - c[2]) + ")"
+
+				cells[i].addEventListener("click", function(ev) {
+					palClicked(ev.target.dataset.idx)
+				})
+			}
+
+			var cells = document.getElementById(editorIDs[TILE]).getElementsByTagName("td")
+			for(var i = 0; i < 144; ++i) {
+				editorData[i] = 0
+
+				cells[i].addEventListener("mousedown", function(ev) {
+					editCB(ev.target.dataset.idx, TILE, true)
+					ev.preventDefault()
+				})
+
+				cells[i].addEventListener("mouseup", function(ev) {
+					editCB(ev.target.dataset.idx, TILE, false)
+					ev.preventDefault()
+				})
+
+				cells[i].addEventListener("mouseover", function(ev) {
+					if(ev.buttons > 0) {
+						editCB(ev.target.dataset.idx, TILE, true)
+						ev.preventDefault()
+					}
+				})
+			}
+			
+			editMode(DRAW)
+		}
+
+		function palClicked(i) {
+			if(i != selColorIdx) {
+				var cells = document.getElementById("palette").getElementsByTagName("td")
+				cells[selColorIdx].innerHTML = "&nbsp;"
+				cells[selColorIdx].style.padding = "1px"
+				cells[selColorIdx].style.border = "0 none"
+				selColorIdx = i
+				cells[selColorIdx].innerHTML = "&check;"
+				cells[selColorIdx].style.padding = "0"
+				cells[selColorIdx].style.border = "1px solid orange"
+			} else {
+				document.getElementById("color-chooser").style.display = "block"
+				document.getElementById("palette").style.display = "none"
+				document.getElementById("tile-editor").style.display = "none"
+			}
+		}
+		
+		function colorChosen(cdef) {
+			var cells = document.getElementById("palette").getElementsByTagName("td")
+			var c = possibleColors[cdef]
+			editorPal[selColorIdx] = cdef
+			cells[selColorIdx].style.backgroundColor = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
+			cells[selColorIdx].style.color = "rgb(" + (255 - c[0]) + "," + (255 - c[1]) + "," + (255 - c[2]) + ")"
+
+			document.getElementById("color-chooser").style.display = "none"
+			document.getElementById("palette").style.display = "block"
+			document.getElementById("tile-editor").style.display = "block"
+			
+			//refresh editor
+			cells = document.getElementById("tile-editor").getElementsByTagName("td")
+			for(var pixIdx = 0; pixIdx < 144; ++pixIdx) {
+				if(editorData[pixIdx] == selColorIdx) {
+					cells[pixIdx].style.backgroundColor = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
+				}
+			}
+		}
+
+		var editCB //function - depends on current edit mode
+		
+		//freehand draw
+		var drawCB = function (pixIdx, editor, button) {
+			var cells = document.getElementById(editorIDs[editor]).getElementsByTagName("td")
+			var cdef = editorPal[selColorIdx]
+			var c = possibleColors[cdef]
+			cells[pixIdx].style.backgroundColor = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
+
+			editorData[pixIdx] = selColorIdx
+		}
+
+		var rectStart = null
+		var origData
+
+		//rectangle fill
+		var fillCB = function (pixIdx, editor, button) {
+			if(button) {
+				if(rectStart === null) {
+					rectStart = pixIdx
+					origData = editorData.slice() //backup
+				} else {
+					editorData = origData.slice() //restore
+					
+					var cells = document.getElementById(editorIDs[editor]).getElementsByTagName("td")
+					var cdef = editorPal[selColorIdx]
+					var c = possibleColors[cdef]
+
+					//do the fill
+					var top = Math.min(Math.floor(rectStart/12), Math.floor(pixIdx/12))
+					var bottom = Math.max(Math.floor(rectStart/12), Math.floor(pixIdx/12))
+					var left = Math.min(rectStart%12, pixIdx%12)
+					var right = Math.max(rectStart%12, pixIdx%12)
+					for(var row = top; row <= bottom; ++row) {
+						for(var col = left; col <= right; ++col) {
+							editorData[12*row + col] = selColorIdx
+						}
+					}
+					
+					//refresh visuals
+					for(var i = 0; i < 144; ++i) {
+						var colorIdx = editorData[i]
+						var cdef = editorPal[colorIdx]
+						var c = possibleColors[cdef]
+						cells[i].style.backgroundColor = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
+					}
+				}
+			} else { //released
+				rectStart = null
+			}
+		}
+
+		var rollFrom = null
+
+		var rollCB = function (pixIdx, editor, button) {
+			if(button) {
+				if((rollFrom !== null) && (rollFrom != pixIdx)) {
+					var cells = document.getElementById(editorIDs[editor]).getElementsByTagName("td")
+
+					origData = editorData.slice()
+					var offset = rollFrom - pixIdx
+
+					//do the roll on the data and refresh visuals
+					for(var i = 0; i < 144; ++i) {
+						editorData[i] = origData[(i + offset + 144)%144]
+						var colorIdx = editorData[i]
+						var cdef = editorPal[colorIdx]
+						var c = possibleColors[cdef]
+
+						cells[i].style.backgroundColor = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
+					}
+
+				}
+
+				rollFrom = pixIdx
+			} else { //released
+				rollFrom = null
+			}
+		}
+
+		function editMode(mode) {
+			document.getElementById("edit-mode-button-draw").style.textDecoration = ((mode == DRAW) ? "underline" : "none")
+			document.getElementById("edit-mode-button-fill").style.textDecoration = ((mode == FILL) ? "underline" : "none")
+			document.getElementById("edit-mode-button-roll").style.textDecoration = ((mode == ROLL) ? "underline" : "none")
+
+			switch(mode) {
+				case DRAW:
+					editCB = drawCB
+					break
+				case FILL:
+					editCB = fillCB
+					break
+				case ROLL:
+					editCB = rollCB
+					break
+			}
+		}
+		
+		function editorFlip(axis, editor) {
+			var cells = document.getElementById(editorIDs[editor]).getElementsByTagName("td")
+
+			origData = editorData.slice()
+
+			for(var i = 0; i < 12; ++i) {
+				for(var j = 0; j < 12; ++j) {
+					var destIdx = 12*i + j
+
+					i0 = (axis[1]?(11 - i):i)
+					j0 = (axis[0]?(11 - j):j)
+
+					editorData[destIdx] = origData[12*i0 + j0]
+
+					var colorIdx = editorData[destIdx]
+					var cdef = editorPal[colorIdx]
+					var c = possibleColors[cdef]
+
+					cells[destIdx].style.backgroundColor = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
+				}
+			}
+		}
+
+		function pixmapStore() {
+		}
+	</script>
+</head>
+
+<body onload="init()">
+	<canvas id="tile-layer" width="768" height="432"></canvas>
+	<canvas id="text-layer" width="768" height="432"></canvas>
+	<table id="palette">
+		<tr>
+			<td data-idx="0">&nbsp;</td>
+			<td data-idx="1">&nbsp;</td>
+			<td data-idx="2">&nbsp;</td>
+			<td data-idx="3">&nbsp;</td>
+			<td data-idx="4">&nbsp;</td>
+			<td data-idx="5">&nbsp;</td>
+			<td data-idx="6">&nbsp;</td>
+			<td data-idx="7" style="padding: 0; border: 1px solid orange">&check;</td>
+			<td data-idx="8">&nbsp;</td>
+			<td data-idx="9">&nbsp;</td>
+			<td data-idx="10">&nbsp;</td>
+			<td data-idx="11">&nbsp;</td>
+			<td data-idx="12">&nbsp;</td>
+			<td data-idx="13">&nbsp;</td>
+			<td data-idx="14">&nbsp;</td>
+			<td data-idx="15">&nbsp;</td>
+			<td style="width: 64px" class="button">Store...</td>
+		</tr>
+	</table>
+	<table id="tile-editor">
+		<tr>
+			<td data-idx="0"></td>
+			<td data-idx="1"></td>
+			<td data-idx="2"></td>
+			<td data-idx="3"></td>
+			<td data-idx="4"></td>
+			<td data-idx="5"></td>
+			<td data-idx="6"></td>
+			<td data-idx="7"></td>
+			<td data-idx="8"></td>
+			<td data-idx="9"></td>
+			<td data-idx="10"></td>
+			<td data-idx="11"></td>
+		</tr>  
+		<tr>   
+			<td data-idx="12"></td>
+			<td data-idx="13"></td>
+			<td data-idx="14"></td>
+			<td data-idx="15"></td>
+			<td data-idx="16"></td>
+			<td data-idx="17"></td>
+			<td data-idx="18"></td>
+			<td data-idx="19"></td>
+			<td data-idx="20"></td>
+			<td data-idx="21"></td>
+			<td data-idx="22"></td>
+			<td data-idx="23"></td>
+		</tr>  
+		<tr>   
+			<td data-idx="24"></td>
+			<td data-idx="25"></td>
+			<td data-idx="26"></td>
+			<td data-idx="27"></td>
+			<td data-idx="28"></td>
+			<td data-idx="29"></td>
+			<td data-idx="30"></td>
+			<td data-idx="31"></td>
+			<td data-idx="32"></td>
+			<td data-idx="33"></td>
+			<td data-idx="34"></td>
+			<td data-idx="35"></td>
+		</tr>  
+		<tr>   
+			<td data-idx="36"></td>
+			<td data-idx="37"></td>
+			<td data-idx="38"></td>
+			<td data-idx="39"></td>
+			<td data-idx="40"></td>
+			<td data-idx="41"></td>
+			<td data-idx="42"></td>
+			<td data-idx="43"></td>
+			<td data-idx="44"></td>
+			<td data-idx="45"></td>
+			<td data-idx="46"></td>
+			<td data-idx="47"></td>
+		</tr>  
+		<tr>   
+			<td data-idx="48"></td>
+			<td data-idx="49"></td>
+			<td data-idx="50"></td>
+			<td data-idx="51"></td>
+			<td data-idx="52"></td>
+			<td data-idx="53"></td>
+			<td data-idx="54"></td>
+			<td data-idx="55"></td>
+			<td data-idx="56"></td>
+			<td data-idx="57"></td>
+			<td data-idx="58"></td>
+			<td data-idx="59"></td>
+		</tr>  
+		<tr>   
+			<td data-idx="60"></td>
+			<td data-idx="61"></td>
+			<td data-idx="62"></td>
+			<td data-idx="63"></td>
+			<td data-idx="64"></td>
+			<td data-idx="65"></td>
+			<td data-idx="66"></td>
+			<td data-idx="67"></td>
+			<td data-idx="68"></td>
+			<td data-idx="69"></td>
+			<td data-idx="70"></td>
+			<td data-idx="71"></td>
+		</tr>  
+		<tr>   
+			<td data-idx="72"></td>
+			<td data-idx="73"></td>
+			<td data-idx="74"></td>
+			<td data-idx="75"></td>
+			<td data-idx="76"></td>
+			<td data-idx="77"></td>
+			<td data-idx="78"></td>
+			<td data-idx="79"></td>
+			<td data-idx="80"></td>
+			<td data-idx="81"></td>
+			<td data-idx="82"></td>
+			<td data-idx="83"></td>
+		</tr>  
+		<tr>   
+			<td data-idx="84"></td>
+			<td data-idx="85"></td>
+			<td data-idx="86"></td>
+			<td data-idx="87"></td>
+			<td data-idx="88"></td>
+			<td data-idx="89"></td>
+			<td data-idx="90"></td>
+			<td data-idx="91"></td>
+			<td data-idx="92"></td>
+			<td data-idx="93"></td>
+			<td data-idx="94"></td>
+			<td data-idx="95"></td>
+		</tr>  
+		<tr>   
+			<td data-idx="96"></td>
+			<td data-idx="97"></td>
+			<td data-idx="98"></td>
+			<td data-idx="99"></td>
+			<td data-idx="100"></td>
+			<td data-idx="101"></td>
+			<td data-idx="102"></td>
+			<td data-idx="103"></td>
+			<td data-idx="104"></td>
+			<td data-idx="105"></td>
+			<td data-idx="106"></td>
+			<td data-idx="107"></td>
+		</tr>  
+		<tr>   
+			<td data-idx="108"></td>
+			<td data-idx="109"></td>
+			<td data-idx="110"></td>
+			<td data-idx="111"></td>
+			<td data-idx="112"></td>
+			<td data-idx="113"></td>
+			<td data-idx="114"></td>
+			<td data-idx="115"></td>
+			<td data-idx="116"></td>
+			<td data-idx="117"></td>
+			<td data-idx="118"></td>
+			<td data-idx="119"></td>
+		</tr>  
+		<tr>   
+			<td data-idx="120"></td>
+			<td data-idx="121"></td>
+			<td data-idx="122"></td>
+			<td data-idx="123"></td>
+			<td data-idx="124"></td>
+			<td data-idx="125"></td>
+			<td data-idx="126"></td>
+			<td data-idx="127"></td>
+			<td data-idx="128"></td>
+			<td data-idx="129"></td>
+			<td data-idx="130"></td>
+			<td data-idx="131"></td>
+		</tr>  
+		<tr>   
+			<td data-idx="132"></td>
+			<td data-idx="133"></td>
+			<td data-idx="134"></td>
+			<td data-idx="135"></td>
+			<td data-idx="136"></td>
+			<td data-idx="137"></td>
+			<td data-idx="138"></td>
+			<td data-idx="139"></td>
+			<td data-idx="140"></td>
+			<td data-idx="141"></td>
+			<td data-idx="142"></td>
+			<td data-idx="143"></td>
+		</tr>
+		<tr>
+			<td colspan="2" id="edit-mode-button-draw" onclick="editMode(DRAW)" class="button">Draw</td>
+			<td colspan="2" id="edit-mode-button-fill" onclick="editMode(FILL)" class="button">Fill</td>
+			<td colspan="2" id="edit-mode-button-roll" onclick="editMode(ROLL)" class="button">Roll</td>
+			<td colspan="2" onclick="editorFlip(HORZ, TILE)" class="button">Flip H</td>
+			<td colspan="1" onclick="editorFlip(VERT, TILE)" class="button">V</td>
+			<td colspan="3" onclick="pixmapStore(TILE)" class="button">Store...</td>
+		</tr>
+	</table>
+	<table id="color-chooser">
+		<tr class="tall">
+			<td data-idx="0"></td>
+			<td data-idx="1"></td>
+			<td data-idx="2"></td>
+			<td data-idx="3"></td>
+			<td data-idx="4"></td>
+			<td data-idx="5"></td>
+			<td data-idx="6"></td>
+			<td data-idx="7"></td>
+			<td data-idx="8"></td>
+			<td data-idx="9"></td>
+			<td data-idx="10"></td>
+			<td data-idx="11"></td>
+			<td data-idx="12"></td>
+			<td data-idx="13"></td>
+			<td data-idx="14"></td>
+			<td data-idx="15"></td>
+			<td data-idx="16"></td>
+			<td data-idx="17"></td>
+			<td data-idx="18"></td>
+			<td data-idx="19"></td>
+			<td data-idx="20"></td>
+			<td data-idx="21"></td>
+			<td data-idx="22"></td>
+			<td data-idx="23"></td>
+			<td data-idx="24"></td>
+			<td data-idx="25"></td>
+			<td data-idx="26"></td>
+			<td data-idx="27"></td>
+			<td data-idx="28"></td>
+			<td data-idx="29"></td>
+			<td data-idx="30"></td>
+			<td data-idx="31"></td>
+		</tr>                        
+		<tr class="tall">            
+			<td data-idx="32"></td>
+			<td data-idx="33"></td>
+			<td data-idx="34"></td>
+			<td data-idx="35"></td>
+			<td data-idx="36"></td>
+			<td data-idx="37"></td>
+			<td data-idx="38"></td>
+			<td data-idx="39"></td>
+			<td data-idx="40"></td>
+			<td data-idx="41"></td>
+			<td data-idx="42"></td>
+			<td data-idx="43"></td>
+			<td data-idx="44"></td>
+			<td data-idx="45"></td>
+			<td data-idx="46"></td>
+			<td data-idx="47"></td>
+			<td data-idx="48"></td>
+			<td data-idx="49"></td>
+			<td data-idx="50"></td>
+			<td data-idx="51"></td>
+			<td data-idx="52"></td>
+			<td data-idx="53"></td>
+			<td data-idx="54"></td>
+			<td data-idx="55"></td>
+			<td data-idx="56"></td>
+			<td data-idx="57"></td>
+			<td data-idx="58"></td>
+			<td data-idx="59"></td>
+			<td data-idx="60"></td>
+			<td data-idx="61"></td>
+			<td data-idx="62"></td>
+			<td data-idx="63"></td>
+		</tr>                        
+		<tr class="tall">            
+			<td data-idx="64"></td>
+			<td data-idx="65"></td>
+			<td data-idx="66"></td>
+			<td data-idx="67"></td>
+			<td data-idx="68"></td>
+			<td data-idx="69"></td>
+			<td data-idx="70"></td>
+			<td data-idx="71"></td>
+			<td data-idx="72"></td>
+			<td data-idx="73"></td>
+			<td data-idx="74"></td>
+			<td data-idx="75"></td>
+			<td data-idx="76"></td>
+			<td data-idx="77"></td>
+			<td data-idx="78"></td>
+			<td data-idx="79"></td>
+			<td data-idx="80"></td>
+			<td data-idx="81"></td>
+			<td data-idx="82"></td>
+			<td data-idx="83"></td>
+			<td data-idx="84"></td>
+			<td data-idx="85"></td>
+			<td data-idx="86"></td>
+			<td data-idx="87"></td>
+			<td data-idx="88"></td>
+			<td data-idx="89"></td>
+			<td data-idx="90"></td>
+			<td data-idx="91"></td>
+			<td data-idx="92"></td>
+			<td data-idx="93"></td>
+			<td data-idx="94"></td>
+			<td data-idx="95"></td>
+		</tr>                        
+		<tr class="tall">            
+			<td data-idx="96"></td>
+			<td data-idx="97"></td>
+			<td data-idx="98"></td>
+			<td data-idx="99"></td>
+			<td data-idx="100"></td>
+			<td data-idx="101"></td>
+			<td data-idx="102"></td>
+			<td data-idx="103"></td>
+			<td data-idx="104"></td>
+			<td data-idx="105"></td>
+			<td data-idx="106"></td>
+			<td data-idx="107"></td>
+			<td data-idx="108"></td>
+			<td data-idx="109"></td>
+			<td data-idx="110"></td>
+			<td data-idx="111"></td>
+			<td data-idx="112"></td>
+			<td data-idx="113"></td>
+			<td data-idx="114"></td>
+			<td data-idx="115"></td>
+			<td data-idx="116"></td>
+			<td data-idx="117"></td>
+			<td data-idx="118"></td>
+			<td data-idx="119"></td>
+			<td data-idx="120"></td>
+			<td data-idx="121"></td>
+			<td data-idx="122"></td>
+			<td data-idx="123"></td>
+			<td data-idx="124"></td>
+			<td data-idx="125"></td>
+			<td data-idx="126"></td>
+			<td data-idx="127"></td>
+		</tr>                        
+		<tr>                         
+			<td data-idx="128" colspan="4"></td>
+			<td data-idx="129" colspan="4"></td>
+			<td data-idx="130" colspan="4"></td>
+			<td data-idx="131" colspan="4"></td>
+			<td data-idx="132" colspan="4"></td>
+			<td data-idx="133" colspan="4"></td>
+			<td data-idx="134" colspan="4"></td>
+			<td data-idx="135" colspan="4"></td>
+		</tr>                        
+		<tr>                         
+			<td data-idx="136" colspan="4"></td>
+			<td data-idx="137" colspan="4"></td>
+			<td data-idx="138" colspan="4"></td>
+			<td data-idx="139" colspan="4"></td>
+			<td data-idx="140" colspan="4"></td>
+			<td data-idx="141" colspan="4"></td>
+			<td data-idx="142" colspan="4"></td>
+			<td data-idx="143" colspan="4"></td>
+		</tr>                        
+		<tr>                         
+			<td data-idx="144" colspan="4"></td>
+			<td data-idx="145" colspan="4"></td>
+			<td data-idx="146" colspan="4"></td>
+			<td data-idx="147" colspan="4"></td>
+			<td data-idx="148" colspan="4"></td>
+			<td data-idx="149" colspan="4"></td>
+			<td data-idx="150" colspan="4"></td>
+			<td data-idx="151" colspan="4"></td>
+		</tr>                        
+		<tr>                         
+			<td data-idx="152" colspan="4"></td>
+			<td data-idx="153" colspan="4"></td>
+			<td data-idx="154" colspan="4"></td>
+			<td data-idx="155" colspan="4"></td>
+			<td data-idx="156" colspan="4"></td>
+			<td data-idx="157" colspan="4"></td>
+			<td data-idx="158" colspan="4"></td>
+			<td data-idx="159" colspan="4"></td>
+		</tr>                        
+		<tr>                         
+			<td data-idx="160" colspan="4"></td>
+			<td data-idx="161" colspan="4"></td>
+			<td data-idx="162" colspan="4"></td>
+			<td data-idx="163" colspan="4"></td>
+			<td data-idx="164" colspan="4"></td>
+			<td data-idx="165" colspan="4"></td>
+			<td data-idx="166" colspan="4"></td>
+			<td data-idx="167" colspan="4"></td>
+		</tr>                        
+		<tr>                         
+			<td data-idx="168" colspan="4"></td>
+			<td data-idx="169" colspan="4"></td>
+			<td data-idx="170" colspan="4"></td>
+			<td data-idx="171" colspan="4"></td>
+			<td data-idx="172" colspan="4"></td>
+			<td data-idx="173" colspan="4"></td>
+			<td data-idx="174" colspan="4"></td>
+			<td data-idx="175" colspan="4"></td>
+		</tr>                        
+		<tr>                         
+			<td data-idx="176" colspan="4"></td>
+			<td data-idx="177" colspan="4"></td>
+			<td data-idx="178" colspan="4"></td>
+			<td data-idx="179" colspan="4"></td>
+			<td data-idx="180" colspan="4"></td>
+			<td data-idx="181" colspan="4"></td>
+			<td data-idx="182" colspan="4"></td>
+			<td data-idx="183" colspan="4"></td>
+		</tr>                        
+		<tr>                         
+			<td data-idx="184" colspan="4"></td>
+			<td data-idx="185" colspan="4"></td>
+			<td data-idx="186" colspan="4"></td>
+			<td data-idx="187" colspan="4"></td>
+			<td data-idx="188" colspan="4"></td>
+			<td data-idx="189" colspan="4"></td>
+			<td data-idx="190" colspan="4"></td>
+			<td data-idx="191" colspan="4"></td>
+		</tr>                        
+		<tr>                         
+			<td data-idx="192" colspan="4"></td>
+			<td data-idx="193" colspan="4"></td>
+			<td data-idx="194" colspan="4"></td>
+			<td data-idx="195" colspan="4"></td>
+			<td data-idx="196" colspan="4"></td>
+			<td data-idx="197" colspan="4"></td>
+			<td data-idx="198" colspan="4"></td>
+			<td data-idx="199" colspan="4"></td>
+		</tr>                        
+		<tr>                         
+			<td data-idx="200" colspan="4"></td>
+			<td data-idx="201" colspan="4"></td>
+			<td data-idx="202" colspan="4"></td>
+			<td data-idx="203" colspan="4"></td>
+			<td data-idx="204" colspan="4"></td>
+			<td data-idx="205" colspan="4"></td>
+			<td data-idx="206" colspan="4"></td>
+			<td data-idx="207" colspan="4"></td>
+		</tr>                        
+		<tr>                         
+			<td data-idx="208" colspan="4"></td>
+			<td data-idx="209" colspan="4"></td>
+			<td data-idx="210" colspan="4"></td>
+			<td data-idx="211" colspan="4"></td>
+			<td data-idx="212" colspan="4"></td>
+			<td data-idx="213" colspan="4"></td>
+			<td data-idx="214" colspan="4"></td>
+			<td data-idx="215" colspan="4"></td>
+		</tr>                        
+		<tr>                         
+			<td data-idx="216" colspan="4"></td>
+			<td data-idx="217" colspan="4"></td>
+			<td data-idx="218" colspan="4"></td>
+			<td data-idx="219" colspan="4"></td>
+			<td data-idx="220" colspan="4"></td>
+			<td data-idx="221" colspan="4"></td>
+			<td data-idx="222" colspan="4"></td>
+			<td data-idx="223" colspan="4"></td>
+		</tr>                        
+		<tr>                         
+			<td data-idx="224" colspan="4"></td>
+			<td data-idx="225" colspan="4"></td>
+			<td data-idx="226" colspan="4"></td>
+			<td data-idx="227" colspan="4"></td>
+			<td data-idx="228" colspan="4"></td>
+			<td data-idx="229" colspan="4"></td>
+			<td data-idx="230" colspan="4"></td>
+			<td data-idx="231" colspan="4"></td>
+		</tr>                        
+		<tr>                         
+			<td data-idx="232" colspan="4"></td>
+			<td data-idx="233" colspan="4"></td>
+			<td data-idx="234" colspan="4"></td>
+			<td data-idx="235" colspan="4"></td>
+			<td data-idx="236" colspan="4"></td>
+			<td data-idx="237" colspan="4"></td>
+			<td data-idx="238" colspan="4"></td>
+			<td data-idx="239" colspan="4"></td>
+		</tr>                        
+		<tr>                         
+			<td data-idx="240" colspan="4"></td>
+			<td data-idx="241" colspan="4"></td>
+			<td data-idx="242" colspan="4"></td>
+			<td data-idx="243" colspan="4"></td>
+			<td data-idx="244" colspan="4"></td>
+			<td data-idx="245" colspan="4"></td>
+			<td data-idx="246" colspan="4"></td>
+			<td data-idx="247" colspan="4"></td>
+		</tr>                        
+		<tr>                         
+			<td data-idx="248" colspan="4"></td>
+			<td data-idx="249" colspan="4"></td>
+			<td data-idx="250" colspan="4"></td>
+			<td data-idx="251" colspan="4"></td>
+			<td data-idx="252" colspan="4"></td>
+			<td data-idx="253" colspan="4"></td>
+			<td data-idx="254" colspan="4"></td>
+			<td data-idx="255" colspan="4"></td>
+		</tr>
+	</table>
+</body>
+</html>
