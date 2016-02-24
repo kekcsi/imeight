@@ -1,0 +1,17 @@
+TO DO
+
+render text layer
+keyboard input
+onscreen text editing
+render sprites
+(music)
+
+[developer]
+
+pixmap array editor
+tile layer editor
+assembly monitor
+mono sprite editor (extract from spr-editor.html)
+(design + do color sprite editor)
+text layer save/load
+(music editor)
