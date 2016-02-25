@@ -158,8 +158,9 @@
 				})
 			}
 
-			var cells = document.getElementById(editorIDs[TILE]).getElementsByTagName("td")
-			for(var i = 0; i < 144; ++i) {
+			var table = document.getElementById(editorIDs[TILE])
+			cells = table.getElementsByTagName("td")
+			for(var i = 0; i < sizes[TILE]; ++i) {
 				editorData[i] = 0
 
 				cells[i].addEventListener("mousedown", function(ev) {
@@ -179,6 +180,14 @@
 					}
 				})
 			}
+
+			table.addEventListener("mouseleave", function(ev) {
+				rollFrom = null
+			})
+
+			table.rows[12].addEventListener("mouseenter", function(ev) {
+				rollFrom = null
+			})
 			
 			editMode(DRAW)
 		}
@@ -212,8 +221,8 @@
 			document.getElementById("tile-editor").style.display = "block"
 			
 			//refresh editor
-			cells = document.getElementById("tile-editor").getElementsByTagName("td")
-			for(var pixIdx = 0; pixIdx < 144; ++pixIdx) {
+			cells = document.getElementById(editorIDs[TILE]).getElementsByTagName("td")
+			for(var pixIdx = 0; pixIdx < sizes[TILE]; ++pixIdx) {
 				if(editorData[pixIdx] == selColorIdx) {
 					cells[pixIdx].style.backgroundColor = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
 				}
@@ -292,7 +301,6 @@
 
 						cells[i].style.backgroundColor = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
 					}
-
 				}
 
 				rollFrom = pixIdx
@@ -323,15 +331,16 @@
 			var cells = document.getElementById(editorIDs[editor]).getElementsByTagName("td")
 
 			origData = editorData.slice()
+			var cc = columnCounts[editor]
 
-			for(var i = 0; i < 12; ++i) {
-				for(var j = 0; j < 12; ++j) {
-					var destIdx = 12*i + j
+			for(var i = 0; i < sizes[editor]/cc; ++i) {
+				for(var j = 0; j < cc; ++j) {
+					var destIdx = cc*i + j
 
 					i0 = (axis[1]?(11 - i):i)
 					j0 = (axis[0]?(11 - j):j)
 
-					editorData[destIdx] = origData[12*i0 + j0]
+					editorData[destIdx] = origData[cc*i0 + j0]
 
 					var colorIdx = editorData[destIdx]
 					var cdef = editorPal[colorIdx]
@@ -340,9 +349,6 @@
 					cells[destIdx].style.backgroundColor = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
 				}
 			}
-		}
-
-		function pixmapStore() {
 		}
 	</script>
 </head>

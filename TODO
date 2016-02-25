@@ -8,10 +8,61 @@ render sprites
 
 [developer]
 
-pixmap array editor
+Pal 1 Pal 2 buttons
+fix roll algorithm (line wrap issue)
+fix roll jump issue (jump when mouse leaves and starts to roll again)
+pixmap array map
 tile layer editor
 assembly monitor
 mono sprite editor (extract from spr-editor.html)
 (design + do color sprite editor)
 text layer save/load
+font editor
 (music editor)
+
+*****
+
+MULT editor mockup
+
+	,---- cycle button P0 P1 P2 P3 to select palette for the region
+	|
+	v
+	P1  ######################## \
+	##  # 24×24 pixel editor ### |
+	##  ######################## |
+	##  ######################## |
+	##  ######################## > region A: rows 0..5
+	##  ######################## |
+	##  ######################## |
+	##  ######################## |
+	##  ######################## /
+	P1  ######################## \
+	##  ######################## |
+	##  ######################## |
+	##  ######################## |
+	##  ######################## > region B: rows 6..11
+	##  ######################## |
+	##  ######################## |
+	##  ######################## |
+	##  ######################## /
+	P1  ######################## \
+	##  ######################## |
+	##  ######################## |
+	##  ######################## |
+	##  ######################## > region C: rows 12..17
+	##  ######################## |
+	##  ######################## |
+	##  ######################## |
+	##  ######################## /
+	P3  ######################## \
+	##  ######################## |
+	##  ######################## |
+	##  ######################## |
+	##  ######################## > region D: rows 18..23
+,-->##  ######################## |
+|	##  ######################## |
+|	##  ######################## |
+|	##  ######################## /
+|
+`------ 16-color palette, select drawing color by clicking, 
+        highlight current drawing color, re-click to change LUT entry
