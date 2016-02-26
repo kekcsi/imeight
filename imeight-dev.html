@@ -40,6 +40,7 @@
 			margin: 0;
 			padding: 0;
 			table-layout: fixed;
+			width: 290px; //force width to match the palette's even on strange zoom levels
 		}
 		table#tile-editor td {
 			width: 22px;
@@ -60,6 +61,7 @@
 			margin: 0;
 			padding: 0;
 			table-layout: fixed;
+			width: 290px; //force width to match the editor's even on strange zoom levels
 		}
 		table#palette td {
 			width: 14px;
@@ -68,7 +70,6 @@
 			margin: 0;
 			padding: 1px;
 			text-align: center;
-			background: black;
 			cursor: pointer;
 		}
 		#color-chooser {
@@ -287,7 +288,7 @@
 		var rollCB = function (pixIdx, editor, button) {
 			if(button) {
 				if((rollFrom !== null) && (rollFrom != pixIdx)) {
-					var cells = document.getElementById(editorIDs[editor]).getElementsByTagName("td")
+					/*var cells = document.getElementById(editorIDs[editor]).getElementsByTagName("td")
 
 					origData = editorData.slice()
 					var offset = rollFrom - pixIdx
@@ -300,7 +301,33 @@
 						var c = possibleColors[cdef]
 
 						cells[i].style.backgroundColor = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
+					}*/
+					var cells = document.getElementById(editorIDs[editor]).getElementsByTagName("td")
+
+					origData = editorData.slice()
+					var cc = columnCounts[editor]
+					var rc = sizes[editor]/cc
+					var offset = rollFrom - pixIdx
+					var hOffset = offset%cc
+					var vOffset = (offset/cc) >> 0
+
+					for(var i = 0; i < rc; ++i) {
+						for(var j = 0; j < cc; ++j) {
+							var destIdx = cc*i + j
+
+							i0 = (i + vOffset + rc)%rc
+							j0 = (j + hOffset + cc)%cc
+
+							editorData[destIdx] = origData[cc*i0 + j0]
+
+							var colorIdx = editorData[destIdx]
+							var cdef = editorPal[colorIdx]
+							var c = possibleColors[cdef]
+
+							cells[destIdx].style.backgroundColor = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
+						}
 					}
+
 				}
 
 				rollFrom = pixIdx
@@ -337,8 +364,8 @@
 				for(var j = 0; j < cc; ++j) {
 					var destIdx = cc*i + j
 
-					i0 = (axis[1]?(11 - i):i)
-					j0 = (axis[0]?(11 - j):j)
+					i0 = (axis[1]?(cc - 1 - i):i)
+					j0 = (axis[0]?(cc - 1 - j):j)
 
 					editorData[destIdx] = origData[cc*i0 + j0]
 
