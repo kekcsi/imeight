@@ -72,3 +72,15 @@ MULT editor mockup
 * color cell either border or padding: 1px; width: 32px; height: 10px //full height with border and spacing = 14px
 
 
+Pixmap Array Map Design
+^^^^^^^^^^^^^^^^^^^^^^^
+* 16 by 16 table of image thumbnails
+* enable selecting one of the pixmaps by clicking on it: highlight like in the palette
+* re-clicking the highlighted one: open editor
+
+
+Tile Layer Designer Design
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+* mouse gestures over the live screen are considered tile layer editing
+* buttons: Draw, Fill, Roll like in tile editor
+* paint with the tile selected on the pixmap array map
