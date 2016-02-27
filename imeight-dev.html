@@ -98,7 +98,6 @@
 			background: #302800 !important;
 			cursor: pointer !important;
 			font-size: 14px;
-			font-family: Consolas, monospace;
 		}
 		.sprite {
 			position: absolute;
@@ -118,10 +117,6 @@
 		var DRAW = 0
 		var FILL = 1
 		var ROLL = 2
-		
-		//axes to flip a pixmap around
-		var HORZ = [1, 0]
-		var VERT = [0, 1]
 		
 		//possible pixmap interpretations
 		var TILE = 0 //16-color tile (12 by 12 pixels)
@@ -371,7 +366,7 @@
 			}
 		}
 		
-		function editorFlip(axis, editor) {
+		function editorFlip(vert, editor) {
 			var cells = document.getElementById(editorIDs[editor]).getElementsByTagName("td")
 
 			origData = editorData.slice()
@@ -381,8 +376,8 @@
 				for(var j = 0; j < cc; ++j) {
 					var destIdx = cc*i + j
 
-					i0 = (axis[1]?(cc - 1 - i):i)
-					j0 = (axis[0]?(cc - 1 - j):j)
+					i0 = (vert?(cc - 1 - i):i)
+					j0 = (vert?j:(cc - 1 - j))
 
 					editorData[destIdx] = origData[cc*i0 + j0]
 
@@ -599,8 +594,8 @@
 			<td colspan="2" id="edit-mode-button-draw" onclick="editMode(DRAW)" class="button">Draw</td>
 			<td colspan="2" id="edit-mode-button-fill" onclick="editMode(FILL)" class="button">Fill</td>
 			<td colspan="2" id="edit-mode-button-roll" onclick="editMode(ROLL)" class="button">Roll</td>
-			<td colspan="3" onclick="editorFlip(HORZ, TILE)" class="button">Flip H</td>
-			<td colspan="3" onclick="editorFlip(VERT, TILE)" class="button">Flip V</td>
+			<td colspan="3" onclick="editorFlip(false, TILE)" class="button">Flip H</td>
+			<td colspan="3" onclick="editorFlip(true, TILE)" class="button">Flip V</td>
 		</tr>
 	</table>
 	<table id="color-chooser">
