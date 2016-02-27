@@ -12,7 +12,8 @@ var memory = []
 //$0400		1024		2319	1296	text layer				48*27
 //$0910		2320		2335	16		gap
 //$0920		2336		20479	18144	pixmap array			Addressable 2048+72*idx where idx>=4
-//$5000		20480		21503	1024	font bitmaps			1024*8 (codes 128 through 256 are inverts)
+//$5000		20480		21503	1024	font bitmaps			128*8 (codes 128 through 256 are inverts)
+//$5400		21504		21520	17		sound					2*8 + 1 (8 channels, 1 word for position + 1 play/stop bit each)
 
 var TILE_LAYER = 0
 var PALETTES = 576

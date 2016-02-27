@@ -40,7 +40,7 @@
 			margin: 0;
 			padding: 0;
 			table-layout: fixed;
-			width: 290px; //force width to match the palette's even on strange zoom levels
+			width: 290px; /* force width to match the palette's even on strange zoom levels */
 		}
 		table#tile-editor td {
 			width: 22px;
@@ -61,7 +61,7 @@
 			margin: 0;
 			padding: 0;
 			table-layout: fixed;
-			width: 290px; //force width to match the editor's even on strange zoom levels
+			width: 290px; /* force width to match the editor's even on strange zoom levels */
 		}
 		table#palette td {
 			width: 14px;
@@ -107,6 +107,7 @@
 	</style>
 	<script type="text/javascript">
 		var selColorIdx = 7
+		var editorPalIdx = 0
 		var editorPal = [0, 4, 9, 13, 18, 22, 27, 31, 135, 151, 167, 183, 199, 215, 231, 247]
 		var editorData = []
 		var editorIDs = ["tile-editor", "mult-editor", "mono-editor"]
@@ -143,21 +144,25 @@
 				cells[i].style.backgroundColor = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
 
 				cells[i].addEventListener("click", function(ev) {
-					colorChosen(ev.target.dataset.idx)
+					colorChosen(+ev.target.dataset.idx)
 				})
 			}
 
+			//set up default palette (copy editorPal initial values to memory)
 			cells = document.getElementById("palette").getElementsByTagName("td")
 			for(var i = 0; i < 16; ++i) {
 				var cdef = editorPal[i]
-				var c = possibleColors[cdef]
-				cells[i].style.backgroundColor = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
-				cells[i].style.color = "rgb(" + (255 - c[0]) + "," + (255 - c[1]) + "," + (255 - c[2]) + ")"
+				writeMemory(PALETTES + i, cdef)
+				writeMemory(PALETTES + i + 16, cdef)
+				writeMemory(PALETTES + i + 32, cdef)
+				writeMemory(PALETTES + i + 48, cdef)
 
+				//meanwhile set up click listeners
 				cells[i].addEventListener("click", function(ev) {
-					palClicked(ev.target.dataset.idx)
+					palClicked(+ev.target.dataset.idx)
 				})
 			}
+			selectPal(0)
 
 			var table = document.getElementById(editorIDs[TILE])
 			cells = table.getElementsByTagName("td")
@@ -165,18 +170,18 @@
 				editorData[i] = 0
 
 				cells[i].addEventListener("mousedown", function(ev) {
-					editCB(ev.target.dataset.idx, TILE, true)
+					editCB(+ev.target.dataset.idx, TILE, true)
 					ev.preventDefault()
 				})
 
 				cells[i].addEventListener("mouseup", function(ev) {
-					editCB(ev.target.dataset.idx, TILE, false)
+					editCB(+ev.target.dataset.idx, TILE, false)
 					ev.preventDefault()
 				})
 
 				cells[i].addEventListener("mouseover", function(ev) {
 					if(ev.buttons > 0) {
-						editCB(ev.target.dataset.idx, TILE, true)
+						editCB(+ev.target.dataset.idx, TILE, true)
 						ev.preventDefault()
 					}
 				})
@@ -191,6 +196,31 @@
 			})
 			
 			editMode(DRAW)
+		}
+
+		function selectPal(i) {
+			editorPalIdx = i
+			
+			var cells = document.getElementById("palette").getElementsByTagName("td")
+			for(var i = 0; i < 16; ++i) {
+				editorPal[i] = memory[PALETTES + (editorPalIdx<<4) + i]
+				var cdef = editorPal[i]
+				var c = possibleColors[cdef]
+				cells[i].style.backgroundColor = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
+				cells[i].style.color = "rgb(" + (255 - c[0]) + "," + (255 - c[1]) + "," + (255 - c[2]) + ")"
+			}
+			
+			for(var i = 0; i < 4; ++i) {
+				cells[16 + i].style.textDecoration = ((i == editorPalIdx) ? "underline" : "none")
+			}
+			
+			//refresh editor
+			cells = document.getElementById(editorIDs[TILE]).getElementsByTagName("td")
+			for(var pixIdx = 0; pixIdx < sizes[TILE]; ++pixIdx) {
+				var cdef = editorPal[editorData[pixIdx] || 0] //undefined is considered zero
+				var c = possibleColors[cdef]
+				cells[pixIdx].style.backgroundColor = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
+			}
 		}
 
 		function palClicked(i) {
@@ -214,6 +244,7 @@
 			var cells = document.getElementById("palette").getElementsByTagName("td")
 			var c = possibleColors[cdef]
 			editorPal[selColorIdx] = cdef
+			writeMemory(PALETTES + (editorPalIdx<<4) + selColorIdx, cdef)
 			cells[selColorIdx].style.backgroundColor = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
 			cells[selColorIdx].style.color = "rgb(" + (255 - c[0]) + "," + (255 - c[1]) + "," + (255 - c[2]) + ")"
 
@@ -288,20 +319,6 @@
 		var rollCB = function (pixIdx, editor, button) {
 			if(button) {
 				if((rollFrom !== null) && (rollFrom != pixIdx)) {
-					/*var cells = document.getElementById(editorIDs[editor]).getElementsByTagName("td")
-
-					origData = editorData.slice()
-					var offset = rollFrom - pixIdx
-
-					//do the roll on the data and refresh visuals
-					for(var i = 0; i < sizes[editor]; ++i) {
-						editorData[i] = origData[(i + offset + sizes[editor])%sizes[editor]]
-						var colorIdx = editorData[i]
-						var cdef = editorPal[colorIdx]
-						var c = possibleColors[cdef]
-
-						cells[i].style.backgroundColor = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
-					}*/
 					var cells = document.getElementById(editorIDs[editor]).getElementsByTagName("td")
 
 					origData = editorData.slice()
@@ -403,10 +420,10 @@
 			<td data-idx="15">&nbsp;</td>
 		</tr>
 		<tr>
-			<td class="button" colspan="4" style="text-decoration: underline">Pal 0</td>
-			<td class="button" colspan="4">Pal 1</td>
-			<td class="button" colspan="4">Pal 2</td>
-			<td class="button" colspan="4">Pal 3</td>
+			<td class="button" colspan="4" onclick="selectPal(0)" style="text-decoration: underline">Pal 0</td>
+			<td class="button" colspan="4" onclick="selectPal(1)">Pal 1</td>
+			<td class="button" colspan="4" onclick="selectPal(2)">Pal 2</td>
+			<td class="button" colspan="4" onclick="selectPal(3)">Pal 3</td>
 		</tr>
 	</table>
 	<table id="tile-editor">
