@@ -202,10 +202,14 @@
 				var cdef = editorPal[i]
 				var c = possibleColors[cdef]
 				cells[i].style.backgroundColor = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
-				cells[i].style.color = "rgb(" + (255 - c[0]) + "," + (255 - c[1]) + "," + (255 - c[2]) + ")"
+				if(isLumaHigh(c[0], c[1], c[2])) {
+					cells[i].style.color = "black"
+				} else {
+					cells[i].style.color = "white"
+				}
 			}
 			
-			for(var i = 0; i < 4; ++i) {
+			/*for(var i = 0; i < 4; ++i) {
 				cells[16 + i].style.textDecoration = ((i == editorPalIdx) ? "underline" : "none")
 			}
 			
@@ -215,7 +219,7 @@
 				var cdef = editorPal[editorData[pixIdx] || 0] //undefined is considered zero
 				var c = possibleColors[cdef]
 				cells[pixIdx].style.backgroundColor = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
-			}
+			}*/
 		}
 
 		function palClicked(i) {
@@ -235,13 +239,21 @@
 			}
 		}
 		
+		function isLumaHigh(R, G, B) {
+			return 299*R*R + 587*G*G + 114*B*B > 16384000
+		}
+		
 		function colorChosen(cdef) {
 			var cells = document.getElementById("palette").getElementsByTagName("td")
 			var c = possibleColors[cdef]
 			editorPal[selColorIdx] = cdef
 			writeMemory(PALETTES + (editorPalIdx<<4) + selColorIdx, cdef)
 			cells[selColorIdx].style.backgroundColor = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
-			cells[selColorIdx].style.color = "rgb(" + (255 - c[0]) + "," + (255 - c[1]) + "," + (255 - c[2]) + ")"
+			if(isLumaHigh(c[0], c[1], c[2])) {
+				cells[selColorIdx].style.color = "black"
+			} else {
+				cells[selColorIdx].style.color = "white"
+			}
 
 			document.getElementById("color-chooser").style.display = "none"
 			document.getElementById("palette").style.display = "block"
@@ -414,12 +426,12 @@
 			<td data-idx="14">&nbsp;</td>
 			<td data-idx="15">&nbsp;</td>
 		</tr>
-		<tr>
+		<!-- tr>
 			<td class="button" colspan="4" onclick="selectPal(0)" style="text-decoration: underline">Pal 0</td>
 			<td class="button" colspan="4" onclick="selectPal(1)">Pal 1</td>
 			<td class="button" colspan="4" onclick="selectPal(2)">Pal 2</td>
 			<td class="button" colspan="4" onclick="selectPal(3)">Pal 3</td>
-		</tr>
+		</tr -->
 	</table>
 	<table id="tile-editor">
 		<tr>

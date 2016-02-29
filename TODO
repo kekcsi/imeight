@@ -74,7 +74,7 @@ MULT editor mockup
 
 Pixmap Array Map Design
 ^^^^^^^^^^^^^^^^^^^^^^^
-* 16 by 16 table of images (tiles and sprites are 24 by 24 PC pixels)
+* 16 by 16 table of images (tiles and sprites are 24 by 24 PC pixels, colors dimmed)
 * enable selecting one of the pixmaps by clicking on it: highlight like in the palette
 * re-clicking the highlighted one: open editor
 * buttons below table: Tile, Mult, Mono
