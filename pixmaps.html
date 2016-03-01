@@ -26,15 +26,15 @@
 		}
 	</style>
 	<script>
-		var selection = []
-		var dragging = false
+		var pixmapsSelection = []
+		var pixmapsDragging = false
 		
 		var pixmapsCB = function(idx, editor, button) {
 			if(button) {
-				selection[1] = idx
-				if(!dragging) {
-					selection[0] = idx
-					dragging = true
+				pixmapsSelection[1] = idx
+				if(!pixmapsDragging) {
+					pixmapsSelection[0] = idx
+					pixmapsDragging = true
 				}
 
 				var cells = document.getElementById("pixmaps").getElementsByTagName("td")
@@ -42,12 +42,11 @@
 				var borderColor
 				var innerHTML = ""
 				var inSel = false
-				var selBeg = Math.min(selection[0], selection[1])
-				var selEnd = Math.max(selection[0], selection[1])
+				var selBeg = Math.min(pixmapsSelection[0], pixmapsSelection[1])
+				var selEnd = Math.max(pixmapsSelection[0], pixmapsSelection[1])
 				for(var i = 0; i < cells.length; ++i) {
 					if(selBeg == i) {
-						//borderColor = "orange"
-						if(selection[0] == selection[1]) {
+						if(pixmapsSelection[0] == pixmapsSelection[1]) {
 							innerHTML = "&check;"
 						} else {
 							innerHTML = "["
@@ -79,13 +78,12 @@
 						innerHTML = "&ndash;"
 					}
 					if(selEnd == i) {
-						//borderColor = "transparent"
 						innerHTML = ""
 					}
 				}
 			} else {
-				 selection[1] = idx
-				 dragging = false
+				 pixmapsSelection[1] = idx
+				 pixmapsDragging = false
 			}
 		}
 
