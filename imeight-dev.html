@@ -138,6 +138,7 @@
 		var pixmapsSelection = []
 		var pixmapsDragging = false
 		var blinkPhase = false
+		var vert = false
 		
 		//edit modez
 		var DRAW = 0
@@ -188,8 +189,6 @@
 			var table = document.getElementById(editorIDs[TILE])
 			cells = table.getElementsByTagName("td")
 			for(var i = 0; i < sizes[TILE]; ++i) {
-				editorData[i] = 0
-
 				cells[i].addEventListener("mousedown", function(ev) {
 					editCB(+ev.target.dataset.idx, TILE, true)
 					ev.preventDefault()
@@ -354,7 +353,7 @@
 					var right = Math.max(rectStart%cc, pixIdx%cc)
 					for(var row = top; row <= bottom; ++row) {
 						for(var col = left; col <= right; ++col) {
-							setPixel(cc*row + col, selColorIdx)
+							editorData[cc*row + col] = selColorIdx //update memory later
 						}
 					}
 					
@@ -364,6 +363,8 @@
 						var cdef = editorPal[colorIdx]
 						var c = possibleColors[cdef]
 						cells[i].style.backgroundColor = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
+
+						setPixel(i, colorIdx) //update memory
 					}
 				}
 			} else { //released
@@ -433,13 +434,37 @@
 				if(!pixmapsDragging) {
 					if(pixmapsSelection[0] == idx && pixmapsSelection[1] == idx) {
 						//reclicked: open editor
+						//TODO open sprite editor instead on demand
 						document.getElementById("pixmaps").style.display = "none"
 						//document.getElementById("copy-form").style.display = "none"
 						document.getElementById("palette").style.display = "block"
 						document.getElementById("tile-editor").style.display = "block"
+						
+						//init editor from memory
+						var addr = idx*72 + PIXMAP_ORIGO
+						var cells = document.getElementById("tile-editor").getElementsByTagName("td")
+						for(var i = 0; i < sizes[TILE]; i+=2) {
+							editorData[i] = (memory[addr]&0x0f)
+							editorData[i + 1] = (memory[addr]>>4)
+							++addr
+
+							var colorIdx = editorData[i]
+							var cdef = editorPal[colorIdx]
+							var c = possibleColors[cdef]
+							cells[i].style.backgroundColor = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
+							
+							colorIdx = editorData[i + 1]
+							cdef = editorPal[colorIdx]
+							c = possibleColors[cdef]
+							cells[i + 1].style.backgroundColor = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
+						}
+
+						pixmapsDragging = false
+						return
 					}
-					pixmapsSelection[0] = idx
+
 					pixmapsDragging = true
+					pixmapsSelection[0] = idx
 				}
 				pixmapsSelection[1] = idx
 
@@ -493,7 +518,14 @@
 			}
 		}
 		
-		function editorFlip(vert, editor) {
+		function showPixmaps() {
+			document.getElementById("pixmaps").style.display = "block"
+			//document.getElementById("copy-form").style.display = "block"
+			document.getElementById("palette").style.display = "none"
+			document.getElementById("tile-editor").style.display = "none"
+		}
+		
+		function editorFlip(editor) {
 			var cells = document.getElementById(editorIDs[editor]).getElementsByTagName("td")
 
 			origData = editorData.slice()
@@ -515,6 +547,11 @@
 					cells[destIdx].style.backgroundColor = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
 				}
 			}
+		}
+		
+		function toggleAxis(elem) {
+			vert = !vert
+			elem.innerHTML=(vert?'Vert':'Horz')
 		}
 	</script>
 </head>
@@ -721,8 +758,9 @@
 			<td colspan="2" id="edit-mode-button-draw" onclick="editMode(DRAW)" class="button">Draw</td>
 			<td colspan="2" id="edit-mode-button-fill" onclick="editMode(FILL)" class="button">Fill</td>
 			<td colspan="2" id="edit-mode-button-roll" onclick="editMode(ROLL)" class="button">Roll</td>
-			<td colspan="3" onclick="editorFlip(false, TILE)" class="button">Flip H</td>
-			<td colspan="3" onclick="editorFlip(true, TILE)" class="button">Flip V</td>
+			<td colspan="2" onclick="toggleAxis(this)" class="button">Horz</td>
+			<td colspan="2" onclick="editorFlip(TILE)" class="button">Flip</td>
+			<td colspan="2" onclick="showPixmaps()" class="button">Back</td>
 		</tr>
 	</table>
 	<table id="color-chooser">
