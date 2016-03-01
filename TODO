@@ -2,20 +2,21 @@ TO DO
 
 render text layer
 keyboard input
-onscreen text editing
 render sprites
 (music)
 
 [developer]
 
 pixmap array map
-tile layer editor
+undo palette selector above tile editor: palette depends on pixmap index
+tile layer designer (see design below)
 mono sprite editor (extract from spr-editor.html)
-color sprite editor
-memory organizer
+multicolor sprite editor (see design below + mult-mock.txt for css dims)
+onscreen text editing
+memory organizer (entry point for pixmaps, assembly and font; can copy current state of text layer also)
 assembly monitor
-text layer save/load
 font editor
+(sprite state, layering, text colors)
 (music editor)
 
 *****
@@ -63,7 +64,7 @@ MULT editor mockup
  	P0  ######################## /
     ^
     |
-    `------ cycle button P0 P1 P2 P3 to select palette for the region
+    `-------- cycle button P0 P1 P2 P3 to select palette for the region
 
 
 * palettes in a 4×1 table, border: 1px solid orange; cell-spacing: 2px
@@ -77,7 +78,7 @@ Pixmap Array Map Design
 * 16 by 16 table of images (tiles and sprites are 24 by 24 PC pixels, colors dimmed)
 * enable selecting one of the pixmaps by clicking on it: highlight like in the palette
 * re-clicking the highlighted one: open editor
-* buttons below table: Tile, Mult, Mono
+* buttons below table: Tile, Mult, Mono; Copy
 
 
 Tile Layer Designer Design
