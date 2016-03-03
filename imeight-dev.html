@@ -461,6 +461,7 @@
 						document.getElementById("tile-editor").style.display = "block"
 						
 						//init editor from memory
+						selectPal(idx>>6)
 						var addr = idx*72 + PIXMAP_ORIGO
 						var cells = document.getElementById("tile-editor").getElementsByTagName("td")
 						for(var i = 0; i < sizes[TILE]; i+=2) {

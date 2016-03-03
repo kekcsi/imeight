@@ -41,7 +41,7 @@ function updateDirtyMirrors() {
 		if((addr >= PIXMAP_ORIGO) && (addr < PIXMAP_ORIGO + 256*72)) {
 			dirtyPixmaps[Math.floor((addr - PIXMAP_ORIGO)/72)] = true
 		} else if((addr >= PALETTES) && (addr < PALETTES + 64)) {
-			dirtyPalettes[Math.floor((addr - PALETTES)>>4)] = true
+			dirtyPalettes[(addr - PALETTES)>>4] = true
 		}
 	}
 
@@ -52,7 +52,7 @@ function updateDirtyMirrors() {
 		updatePalettes()
 
 		//also invalidate affected pixmaps (tiles)
-		for(var i = 0; i < 255; ++i) {
+		for(var i = 0; i < 256; ++i) {
 			if(dirtyPalettes[i>>6]) {
 				tilePm[i] = true
 			}
