@@ -107,6 +107,18 @@
 			position: absolute;
 			z-index: 3;
 		}
+		canvas#pixmap-thumbs {
+			position: absolute;
+			left: 769px;
+			top: 1px;
+			width: 384px;
+			height: 384px;
+			border-spacing: 0;
+			border: none;
+			margin: 0;
+			padding: 0;
+			z-index: 0;
+		}
 		table#pixmaps {
 			position: absolute;
 			left: 768px;
@@ -116,6 +128,8 @@
 			margin: 0;
 			padding: 0;
 			color: white;
+			background: transparent;
+			z-index: 1;
 		}
 		#pixmaps td {
 			width: 22px;
@@ -123,8 +137,8 @@
 			border: 1px solid transparent;
 			margin: 0;
 			padding: 0;
+			background: transparent;
 			text-align: center;
-			background: blue;
 		}
 	</style>
 	<script type="text/javascript">
@@ -185,6 +199,11 @@
 				})
 			}
 			selectPal(0)
+			
+			//set up a test pattern on tile layer
+			for(var i = 0; i < 256; ++i) {
+				writeMemory(TILE_LAYER + i, i)
+			}
 
 			var table = document.getElementById(editorIDs[TILE])
 			cells = table.getElementsByTagName("td")
@@ -436,6 +455,7 @@
 						//reclicked: open editor
 						//TODO open sprite editor instead on demand
 						document.getElementById("pixmaps").style.display = "none"
+						document.getElementById("pixmap-thumbs").style.display = "none"
 						//document.getElementById("copy-form").style.display = "none"
 						document.getElementById("palette").style.display = "block"
 						document.getElementById("tile-editor").style.display = "block"
@@ -519,10 +539,19 @@
 		}
 		
 		function showPixmaps() {
+			document.getElementById("pixmap-thumbs").style.display = "block"
 			document.getElementById("pixmaps").style.display = "block"
 			//document.getElementById("copy-form").style.display = "block"
 			document.getElementById("palette").style.display = "none"
 			document.getElementById("tile-editor").style.display = "none"
+			
+			//get thumbnails
+			var ctx = document.getElementById("pixmap-thumbs").getContext("2d")
+			for(var i = 0; i < 256; ++i) {
+				if(tileMirror[i]) {
+					ctx.putImageData(tileMirror[i], (i&15)*24, (i>>4)*24)
+				}
+			}
 		}
 		
 		function editorFlip(editor) {
@@ -1061,6 +1090,7 @@
 			<td data-idx="255" colspan="4"></td>
 		</tr>
 	</table>
+    <canvas id="pixmap-thumbs" width="384" height="384"></canvas>
 	<table id="pixmaps">
 		<tr>
 			<td data-idx="0"></td>
