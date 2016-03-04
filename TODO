@@ -7,12 +7,11 @@ render sprites
 
 [developer]
 
-pixmap array map
-undo palette selector above tile editor: palette depends on pixmap index
+copy in pixmap array map
 tile layer designer (see design below)
 mono sprite editor (extract from spr-editor.html)
 multicolor sprite editor (see design below + mult-mock.txt for css dims)
-onscreen text editing
+onscreen text editing (only for developer but runs on the emu)
 memory organizer (entry point for pixmaps, assembly and font; can copy current state of text layer also)
 assembly monitor
 font editor
@@ -84,5 +83,5 @@ Pixmap Array Map Design
 Tile Layer Designer Design
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 * mouse gestures over the live screen are considered tile layer editing
-* buttons: Draw, Fill, Roll like in tile editor
+* buttons: Draw, Fill, Roll like in tile editor but Fill is default here
 * paint with the tile selected on the pixmap array map
