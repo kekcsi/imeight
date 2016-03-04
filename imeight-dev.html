@@ -118,6 +118,7 @@
 			margin: 0;
 			padding: 0;
 			z-index: 0;
+			opacity: 0.5;
 		}
 		table#pixmaps {
 			position: absolute;
@@ -546,9 +547,20 @@
 			document.getElementById("palette").style.display = "none"
 			document.getElementById("tile-editor").style.display = "none"
 			
+			//reset any unfinished gesture
+			rectStart = null
+			rollFrom = null
+			pixmapsDragging = false
+
 			//get thumbnails
 			var ctx = document.getElementById("pixmap-thumbs").getContext("2d")
 			for(var i = 0; i < 256; ++i) {
+				if(dirtyPixmaps[i]) {
+					//tile mirror has to be updated
+					tilePixmapChange(i)
+					dirtyPixmaps[i] = false
+				}
+
 				if(tileMirror[i]) {
 					ctx.putImageData(tileMirror[i], (i&15)*24, (i>>4)*24)
 				}
