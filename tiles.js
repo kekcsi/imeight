@@ -20,7 +20,9 @@ function tileInit() {
 //call when TILE_LAYER changes in memory - display tile accordingly
 function tileLayerChange(tilePos) {
 	var pixmapIdx = memory[TILE_LAYER + tilePos]
-	tileCtx.putImageData(tileMirror[pixmapIdx], (tilePos&31)<<6, (tilePos>>5)<<6)
+	if(tileMirror[pixmapIdx]) {
+		tileCtx.putImageData(tileMirror[pixmapIdx], (tilePos&31)*24, (tilePos>>5)*24)
+	}
 }
 
 //call when pixmap array in memory changed - updates imagedata

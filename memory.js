@@ -42,6 +42,8 @@ function updateDirtyMirrors() {
 			dirtyPixmaps[Math.floor((addr - PIXMAP_ORIGO)/72)] = true
 		} else if((addr >= PALETTES) && (addr < PALETTES + 64)) {
 			dirtyPalettes[(addr - PALETTES)>>4] = true
+		} else if((addr >= TILE_LAYER) && (addr < TILE_LAYER + 32*18)) {
+			tileLayerChange(addr - TILE_LAYER)
 		}
 	}
 

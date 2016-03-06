@@ -141,6 +141,14 @@
 			background: transparent;
 			text-align: center;
 		}
+		#designer-overlay {
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 768px;
+			height: 432px;
+			z-index: 15;
+		}
 	</style>
 	<script type="text/javascript">
 		var selColorIdx = 7
@@ -262,6 +270,40 @@
 				
 				blinkPhase = !blinkPhase
 			}, 750)
+			
+			var elem = document.getElementById("designer-overlay")
+			elem.addEventListener("mousedown", function(ev) {
+				overlayCB(ev.offsetX, ev.offsetY, true)
+				ev.preventDefault()
+			})
+
+			elem.addEventListener("mouseup", function(ev) {
+				overlayCB(ev.offsetX, ev.offsetY, false)
+				ev.preventDefault()
+			})
+
+			elem.addEventListener("mouseover", function(ev) {
+				if(ev.buttons > 0) {
+					overlayCB(ev.offsetX, ev.offsetY, true)
+					ev.preventDefault()
+				}
+			})
+		}
+
+		function overlayCB(x, y, button) {
+			if(button) {
+				var pixmapIdx = pixmapsSelection[0]
+				if(pixmapIdx === undefined) {
+					return
+				}
+				
+				var row = Math.floor(y/24)
+				var col = Math.floor(x/24)
+				
+				var tilePos = (row<<5) + col
+				
+				writeMemory(TILE_LAYER + tilePos, pixmapIdx)
+			}
 		}
 
 		function selectPal(i) {
@@ -1394,5 +1436,6 @@
 			<td data-idx="255"></td>
 		</tr>
 	</table>
+	<div id="designer-overlay"></div>
 </body>
 </html>
