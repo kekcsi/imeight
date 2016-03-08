@@ -158,7 +158,7 @@
 		var editorIDs = ["tile-editor", "mult-editor", "mono-editor"]
 		var sizes = [144, 576, 576]
 		var columnCounts = [12, 24, 24]
-		var pixmapsSelection = []
+		var pixmapsSelection = [4, 4]
 		var pixmapsDragging = false
 		var blinkPhase = false
 		var vert = false
@@ -288,6 +288,8 @@
 					ev.preventDefault()
 				}
 			})
+			
+			pixmapsCursor()
 		}
 
 		var olayStart = null
@@ -564,53 +566,57 @@
 				}
 				pixmapsSelection[1] = idx
 
-				var cells = document.getElementById("pixmaps").getElementsByTagName("td")
-				//top right bottom left
-				var borderColor = []
-				var innerHTML = ""
-				var inSel = false
-				var selBeg = Math.min(pixmapsSelection[0], pixmapsSelection[1])
-				var selEnd = Math.max(pixmapsSelection[0], pixmapsSelection[1])
-				for(var i = 0; i < cells.length; ++i) {
-					if(selBeg == i) {
-						if(pixmapsSelection[0] == pixmapsSelection[1]) {
-							innerHTML = "&check;"
-						} else {
-							innerHTML = "["
-							inSel = true
-						}
-					}
-					if(inSel && (selEnd == i)) {
-						innerHTML = "]"
-						inSel = false
-					}
-					if((i >= selBeg) && (i <= selEnd)) {
-						var j
-						j = i - 16 //top
-						borderColor[0] = (((j < selBeg) || (j > selEnd))?"orange":"transparent")
-						j = i + 1 //right
-						borderColor[1] = (((j < selBeg) || (j > selEnd))?"orange":"transparent")
-						j = i + 16 //bottom
-						borderColor[2] = (((j < selBeg) || (j > selEnd))?"orange":"transparent")
-						j = i - 1 //left
-						borderColor[3] = (((j < selBeg) || (j > selEnd))?"orange":"transparent")
-					} else {
-						borderColor = ["transparent", "transparent", "transparent", "transparent"]
-					}
-					
-					cells[i].style.borderColor = borderColor[0] + " " + borderColor[1] + " " + borderColor[2] + " " + borderColor[3]
-					cells[i].innerHTML = innerHTML
-					
-					if(inSel) {
-						innerHTML = "&ndash;"
-					}
-					if(selEnd == i) {
-						innerHTML = ""
-					}
-				}
+				pixmapsCursor()
 			} else {
 				 pixmapsSelection[1] = idx
 				 pixmapsDragging = false
+			}
+		}
+
+		function pixmapsCursor() {
+			var cells = document.getElementById("pixmaps").getElementsByTagName("td")
+			//top right bottom left
+			var borderColor = []
+			var innerHTML = ""
+			var inSel = false
+			var selBeg = Math.min(pixmapsSelection[0], pixmapsSelection[1])
+			var selEnd = Math.max(pixmapsSelection[0], pixmapsSelection[1])
+			for(var i = 0; i < cells.length; ++i) {
+				if(selBeg == i) {
+					if(pixmapsSelection[0] == pixmapsSelection[1]) {
+						innerHTML = "&check;"
+					} else {
+						innerHTML = "["
+						inSel = true
+					}
+				}
+				if(inSel && (selEnd == i)) {
+					innerHTML = "]"
+					inSel = false
+				}
+				if((i >= selBeg) && (i <= selEnd)) {
+					var j
+					j = i - 16 //top
+					borderColor[0] = (((j < selBeg) || (j > selEnd))?"orange":"transparent")
+					j = i + 1 //right
+					borderColor[1] = (((j < selBeg) || (j > selEnd))?"orange":"transparent")
+					j = i + 16 //bottom
+					borderColor[2] = (((j < selBeg) || (j > selEnd))?"orange":"transparent")
+					j = i - 1 //left
+					borderColor[3] = (((j < selBeg) || (j > selEnd))?"orange":"transparent")
+				} else {
+					borderColor = ["transparent", "transparent", "transparent", "transparent"]
+				}
+				
+				cells[i].style.borderColor = borderColor[0] + " " + borderColor[1] + " " + borderColor[2] + " " + borderColor[3]
+				cells[i].innerHTML = innerHTML
+				
+				if(inSel) {
+					innerHTML = "&ndash;"
+				}
+				if(selEnd == i) {
+					innerHTML = ""
+				}
 			}
 		}
 		
