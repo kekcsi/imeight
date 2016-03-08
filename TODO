@@ -7,6 +7,10 @@ render sprites
 
 [developer]
 
+how to save?
+fill bug: does not fill one pixel by just clicking (see overlayCB)
+refresh bug (pixmap that is not on tile layer not updated)
+overlay fill bug (on mouseleave)
 default pixmaps: $x0..$x7 tiles (tree etc.), $x8..$xB mono, $xC..$xF mult
 default font (below)
 copy in pixmap array map
@@ -17,6 +21,9 @@ onscreen text editing (only for developer but runs on the emu)
 memory organizer (entry point for pixmaps, assembly and font; can copy current state of text layer also)
 assembly monitor
 font editor
+tile layer offsets, borders
+(default routines: tile layer smoth scroll, sprite smooth move)
+(default data: sinetable)
 (sprite state, layering, text colors)
 (music editor)
 
@@ -954,3 +961,14 @@ Default Font
 ........
 ........
 ........
+
+Default Tiles
+^^^^^^^^^^^^^
+Pixmap indices 0, 1, 2, 3 are on the text layer memory area
+
+4 wall
+5 stars
+6 ladder
+7 door
+8 tree
+9 pine
