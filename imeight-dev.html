@@ -282,13 +282,17 @@
 				ev.preventDefault()
 			})
 
-			elem.addEventListener("mouseover", function(ev) {
+			elem.addEventListener("mousemove", function(ev) {
 				if(ev.buttons > 0) {
 					overlayCB(ev.offsetX, ev.offsetY, true)
 					ev.preventDefault()
 				}
 			})
 		}
+
+		var olayStart = null
+		var olayOrig = []
+		var olayEnd = null
 
 		function overlayCB(x, y, button) {
 			if(button) {
@@ -300,9 +304,37 @@
 				var row = Math.floor(y/24)
 				var col = Math.floor(x/24)
 				
-				var tilePos = (row<<5) + col
-				
+				var tilePos = ((row<<5) | col)
 				writeMemory(TILE_LAYER + tilePos, pixmapIdx)
+				
+				if(tilePos === olayEnd) {
+					return
+				} else {
+					olayEnd = tilePos
+				}
+
+				if(olayStart === null) {
+					olayStart = tilePos
+					olayOrig = memory.slice(TILE_LAYER, TILE_LAYER + 32*18) //backup
+				} else {
+					//restore
+					olayOrig.forEach(function(item, index) {
+						writeMemory(TILE_LAYER + index, item)
+					})
+					
+					var top = Math.min(olayStart>>5, tilePos>>5)
+					var bottom = Math.max(olayStart>>5, tilePos>>5)
+					var left = Math.min(olayStart&31, tilePos&31)
+					var right = Math.max(olayStart&31, tilePos&31)
+					for(var row = top; row <= bottom; ++row) {
+						for(var col = left; col <= right; ++col) {
+							memory[(row<<5) | col] = pixmapIdx //already dirty
+						}
+					}
+				}
+			} else { //released
+				olayStart = null
+				olayEnd = null
 			}
 		}
 
