@@ -237,15 +237,18 @@
 
 			table.addEventListener("mouseleave", function(ev) {
 				rollFrom = null
+				rectStart = null
 			})
 
 			table.rows[12].addEventListener("mouseenter", function(ev) {
 				rollFrom = null
+				rectStart = null
 			})
 			
 			editMode(DRAW)
 
-			var cells = document.getElementById("pixmaps").getElementsByTagName("td")
+			table = document.getElementById("pixmaps")
+			cells = table.getElementsByTagName("td")
 			for(var i = 0; i < 256; ++i) {
 				cells[i].addEventListener("mousedown", function(ev) {
 					pixmapsCB(+ev.target.dataset.idx, true)
@@ -264,6 +267,10 @@
 					}
 				})
 			}
+
+			table.addEventListener("mouseleave", function(ev) {
+				pixmapsDragging = false
+			})
 			
 			setInterval(function() {
 				document.getElementById("pixmaps").style.color = (blinkPhase?"white":"black")
@@ -287,6 +294,11 @@
 					overlayCB(ev.offsetX, ev.offsetY, true)
 					ev.preventDefault()
 				}
+			})
+
+			elem.addEventListener("mouseleave", function(ev) {
+				olayStart = null
+				olayEnd = null
 			})
 			
 			pixmapsCursor()
@@ -431,16 +443,18 @@
 		//rectangle fill
 		var fillCB = function (pixIdx, editor, button) {
 			if(button) {
+				var cells = document.getElementById(editorIDs[editor]).getElementsByTagName("td")
+				var cdef = editorPal[selColorIdx]
+				var c = possibleColors[cdef]
+				cells[pixIdx].style.backgroundColor = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
+				setPixel(pixIdx, selColorIdx)
+
 				if(rectStart === null) {
 					rectStart = pixIdx
 					origData = editorData.slice() //backup
 				} else {
 					editorData = origData.slice() //restore
 					
-					var cells = document.getElementById(editorIDs[editor]).getElementsByTagName("td")
-					var cdef = editorPal[selColorIdx]
-					var c = possibleColors[cdef]
-
 					//do the fill
 					var cc = columnCounts[editor]
 					var top = Math.min(Math.floor(rectStart/cc), Math.floor(pixIdx/cc))
@@ -632,15 +646,12 @@
 			rollFrom = null
 			pixmapsDragging = false
 
+			//returning from editor, tile mirror has to be updated
+			tilePixmapChange(pixmapsSelection[0])
+
 			//get thumbnails
 			var ctx = document.getElementById("pixmap-thumbs").getContext("2d")
 			for(var i = 0; i < 256; ++i) {
-				if(dirtyPixmaps[i]) {
-					//tile mirror has to be updated
-					tilePixmapChange(i)
-					dirtyPixmaps[i] = false
-				}
-
 				if(tileMirror[i]) {
 					ctx.putImageData(tileMirror[i], (i&15)*24, (i>>4)*24)
 				}

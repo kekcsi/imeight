@@ -8,9 +8,6 @@ render sprites
 [developer]
 
 how to save?
-fill bug: does not fill one pixel by just clicking (see overlayCB)
-refresh bug (pixmap that is not on tile layer not updated)
-overlay fill bug (on mouseleave)
 default pixmaps: $x0..$x7 tiles (tree etc.), $x8..$xB mono, $xC..$xF mult
 default font (below)
 copy in pixmap array map
