@@ -16,7 +16,7 @@
 
 //color sprites:
 //byte  |-------:-------:-------:-------|-------:-------:-------:-------|
-//3		|pixmap selector (4 pixmaps from byte3 & $fc)---:-------:fill bg|
+//3		|pixmap selector (4 pixmaps from byte3 & $fc)---:prio---:fill bg|
 //4		|palette A------:palette B------|palette C------:palette D------|
 
 //Sprite Positioning
@@ -49,18 +49,15 @@
 //fill bg bit set: color for color index 0 taken from the palette
 
 //Coloring layout
-//AABB
-//AABB
-//CCDD
-//CCDD
+//AAAA
+//BBBB
+//CCCC
+//DDDD
 
 //Sprite color mode bits: 0 for mono, 1 for 16-color
 //start address SPRITE_COLOR_MODE_BITS
 
-//Priority over text layer depends on LAYER_MODE high nibble
-// * there are four layers of sprites
-// * the layer number of an on-screen sprite is the lower two bits of its index
-// * priority of each sprite layer over the text layer can be set in one bit
+//Priority over text layer depends on prio bit
 
 var colorSpriteMirror = [] //color sprite interpretations
 var monoSpriteMirror = [] //mono sprite interpretations
