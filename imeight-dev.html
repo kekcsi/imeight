@@ -15,6 +15,7 @@
 	<script type="text/javascript" src="tiles.js"></script>
 	<script type="text/javascript" src="text.js"></script>
 	<script type="text/javascript" src="sprites.js"></script>
+	<script type="text/javascript" src="initial_memory_content.js"></script>
 	<style type="text/css">
 		#tile-layer {
 			position: absolute;
@@ -188,6 +189,7 @@
 			for(var i = 0; i < 21504; ++i) {
 				writeMemory(i, 0)
 			}
+      initMemory()
 			setInterval(updateDirtyMirrors, 1000/25)
 			
 			//developer only
