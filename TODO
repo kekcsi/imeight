@@ -1,5 +1,6 @@
 TO DO
 
+execute program
 render text layer
 keyboard input
 render sprites
@@ -7,13 +8,12 @@ render sprites
 
 [developer]
 
-initial_memory_content.js export
-default pixmaps: $x0..$x7 tiles (tree etc.), $x8..$xB mono, $xC..$xF mult
-default font (below)
 copy in pixmap array map
-tile layer designer (see design below)
+roll in tile layer designer
 mono sprite editor (extract from spr-editor.html)
 multicolor sprite editor (see design below + mult-mock.txt for css dims)
+default pixmaps: $x0..$x7 tiles (tree etc.), $x8..$xB mono, $xC..$xF mult
+initial_memory_content.js export
 onscreen text editing (only for developer but runs on the emu)
 memory organizer (entry point for pixmaps, assembly and font; can copy current state of text layer also)
 assembly monitor
@@ -85,12 +85,6 @@ Pixmap Array Map Design
 * re-clicking the highlighted one: open editor
 * buttons below table: Tile, Mult, Mono; Copy
 
-
-Tile Layer Designer Design
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-* mouse gestures over the live screen are considered tile layer editing
-* buttons: Draw, Fill, Roll like in tile editor but Fill is default here
-* paint with the tile selected on the pixmap array map
 
 Default Font
 ^^^^^^^^^^^^

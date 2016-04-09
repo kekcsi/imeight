@@ -19,22 +19,22 @@ var possibleColors
 var paletteMirror
 
 var HUES = [
-	0, //red
-	1/24,
-	2/24, //orange
-	3/24,
-	4/24, //yellow
-	6/24, //lime
-	8/24, //green
-	10/24,
-	11/24,
-	12/24, //cyan
-	14/24,
-	16/24, //blue
-	18/24,
-	20/24, //magenta
-	21/24,
-	22/24
+	0, //0 red*
+	1/24, //15
+	2/24, //30 orange*
+	3/24, //45 amber
+	4/24, //60 yellow*
+	6/24, //90 lime
+	8/24, //120 green*
+	10/24, //150 
+	11/24, //165 sea*
+	12/24, //180 cyan
+	14/24, //210 sky*
+	16/24, //240 blue
+	18/24, //270 violet*
+	20/24, //300 magenta
+	21/24, //315 pink*
+	22/24 //330
 ]
 
 function hue2rgb(p, q, t) {

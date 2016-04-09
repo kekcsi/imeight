@@ -16,7 +16,7 @@
 
 //color sprites:
 //byte  |-------:-------:-------:-------|-------:-------:-------:-------|
-//3		|pixmap selector (4 pixmaps from byte3 & $fc)---:prio---:fill bg|
+//3		|pixmap selector (4 pixmaps from byte3 & $fc)---:-------:fill bg|
 //4		|palette A------:palette B------|palette C------:palette D------|
 
 //Sprite Positioning
@@ -44,7 +44,7 @@
 // Rough coords are meant in four-pixel-long units. Offsets are in
 // one-pixel-long units.
 
-//Sprite Rendering
+//Sprite Rendering (only multicolor)
 //fill bg bit unset: pixels of color index 0 are transparent
 //fill bg bit set: color for color index 0 taken from the palette
 
@@ -57,7 +57,7 @@
 //Sprite color mode bits: 0 for mono, 1 for 16-color
 //start address SPRITE_COLOR_MODE_BITS
 
-//Priority over text layer depends on prio bit
+//Text layer has the priority over sprites
 
 var colorSpriteMirror = [] //color sprite interpretations
 var monoSpriteMirror = [] //mono sprite interpretations
