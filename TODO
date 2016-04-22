@@ -1,28 +1,25 @@
 TO DO
 
+render sprites
 execute program
 render text layer
+[developer] initial_memory_content.js export (zip with runtime)
+[developer] draw and export default pixmaps: $x0..$x7 tiles (tree etc.), $x8..$xB mono, $xC..$xF mult
+[developer] copy in pixmap array map
+[developer] roll in tile layer designer
+[developer] mono sprite editor (extract from spr-editor.html)
+[developer] multicolor sprite editor (see design below + mult-mock.txt for css dims)
+[developer] onscreen text editing (only for developer but runs on the emu)
+[developer] memory organizer (entry point for pixmaps, assembly and font; can copy current state of text layer also)
+[developer] assembly monitor
+[developer] font editor
 keyboard input
-render sprites
 tile layer offsets, borders
 (music)
-
-[developer]
-
-initial_memory_content.js export (zip with runtime)
-draw and export default pixmaps: $x0..$x7 tiles (tree etc.), $x8..$xB mono, $xC..$xF mult
-copy in pixmap array map
-roll in tile layer designer
-mono sprite editor (extract from spr-editor.html)
-multicolor sprite editor (see design below + mult-mock.txt for css dims)
-onscreen text editing (only for developer but runs on the emu)
-memory organizer (entry point for pixmaps, assembly and font; can copy current state of text layer also)
-assembly monitor
-font editor
-(default routines: tile layer smooth scroll, sprite smooth move)
-(default data: sinetable)
-(sprite state, layering, text colors)
-(music editor)
+[developer] (music editor)
+[developer] (default routines: tile layer smooth scroll, sprite smooth move)
+[developer] (default data: sinetable)
+[developer] (sprite state, layering, text colors)
 
 *****
 
