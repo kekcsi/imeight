@@ -1,0 +1,33 @@
+<html>
+<head>
+	<script type="text/javascript" src="imeight_pl.js"></script>
+</head>
+<body>
+	<div>&nbsp;</div>
+	<div>&nbsp;</div>
+	<div>&nbsp;</div>
+	<textarea rows="20" cols="40" id="taText">
+INPUT B(-(2+1))
+DATA B,-3^2/1,$7F:REM HEXADECIMAL FOR: 127
+FOR I=0 TO 3:READ X:PRINT X
+IF I = 2 THEN GOSUB SUB1
+NEXT
+RESTORE C1
+X=6
+READ Y$:PRINT Y$
+@C1:DATA B1$ + F + X
+CLR
+DIMX(2):X(0) = 5:LETX(1) = 1000
+POKE X(0)*X(1),5+F
+IF PEEK(5000) = 5 THEN END
+@SUB1: INPUT "HELLO", F
+RETURN
+
+DIMB(9)
+INPUT B(-(2+1))
+INPUT "NA",B(-(2+1))
+	</textarea><br/>
+	<button onclick="parseText()">TOKENIZE+RELINK</button>
+	<button id="btnRun" onclick="runProgram()" disabled>RUN</button>
+</body>
+</html>
