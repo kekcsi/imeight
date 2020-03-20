@@ -5,26 +5,17 @@ var parseSuccess
 var line = 0
  
 function parseError(message) {
-    window.alert("?" + message + "  ERROR IN " + (line + 1))
+    window.alert("?" + message + "  ERROR IN " + line)
 	text = ""
 	parseSuccess = false
 }
 
 var NAME_RE = /^[A-Z][A-Z0-9]*[%!$]?/
-
-function checkName(fragment) {
-    var m = fragment.match(NAME_RE)
-	
-	if (!m) return false
-	
-	return m[0]
-}
-
 var INDEXED_RE = /^[A-Z][A-Z0-9]*[%!$]?[(]/
 
-function checkIndexed(fragment) {
-	var m = fragment.match(INDEXED_RE)
-
+function getRegexPrefix(regex, fragment) {
+    var m = fragment.match(regex)
+	
 	if (!m) return false
 	
 	return m[0]
@@ -32,7 +23,7 @@ function checkIndexed(fragment) {
 
 function nameArg() {
     text = text.trim()
-    var name = checkName(text)
+    var name = getRegexPrefix(NAME_RE, text)
  
     if (name === false) {
         parseError("REFERENCE EXPECTED")
@@ -42,10 +33,11 @@ function nameArg() {
     program.push(name)
     text = text.substring(name.length)
 }
- 
+
+//parse an argument that refers to either a variable by name or an array member by index
 function assignableArg() {
 	text = text.trim()
-	var prefix = checkIndexed(text)
+	var prefix = getRegexPrefix(INDEXED_RE, text)
  
 	if (prefix === false) {
 		nameArg()
@@ -54,16 +46,26 @@ function assignableArg() {
 		expressionArg()
 		expect(")")
 		  
-		program.push(prefix.substring(0, prefix.length - 1))
+		program.push(prefix)
 	}
 }
  
-function expectEnd() {
+function expectEnd(deStart) {
     text = text.trim()
- 
-    if (text.length > 0 && text[0] == ":") {
-        text = text.substring(1)
+
+    if (text.length > 0) {
+		if (text[0] == ":") {
+			text = text.substring(1)
+		} else {
+			parseError("EXTRA ARGUMENT")
+			return
+		}
     }
+
+	// ending deferred evaluation
+	if (deStart === undefined) return
+
+	elseBranches[deStart] = program.length + 1
 }
 
 function instructionEnds() {
@@ -80,24 +82,48 @@ function instructionEnds() {
 	
 	return false
 }
- 
-function expect(s, fragment) {
+
+function tryPrefix(pfx, fragment) {
     if (fragment === undefined) {
-        text = expect(s, text)
+        var rest = tryPrefix(pfx, text)
+		if (rest !== false) text = rest
+		return rest
     } else {
-        fragment = fragment.trim()
- 
-        if (fragment.toUpperCase().startsWith(s)) {
-            fragment = fragment.substring(s.length)
-        } else {
-            parseError("SYNTAX")
-			return
-        }
-                  
-        return fragment
-    }
+		fragment = fragment.trim()
+
+		if (fragment.toUpperCase().startsWith(pfx)) {
+			fragment = fragment.substring(pfx.length)
+			return fragment
+		}
+		
+		return false
+	}
 }
- 
+
+function expect(pfx, fragment) {
+	var rest = tryPrefix(pfx, fragment)
+	
+	if (rest === false) {
+		parseError("SYNTAX")
+		return
+	}
+	
+	return rest
+}
+
+function expectOne(arr) {
+	for (idx in arr) {
+		pfx = arr[idx]
+		
+		var rest = tryPrefix(pfx)
+		if (rest !== false) {
+			return pfx
+		}
+	}
+
+	parseError("SYNTAX")
+}
+
 function isName(ch) {
     return "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".includes(ch)
 }
@@ -156,7 +182,7 @@ function extractExpression(fragment) {
 		fragment = expressionArgUpTo(operators["*"].precedenceLevel, fragment)
 		if (fragment === undefined) return //parse error happened and reported, stop
 
-		program.push("_NEG")
+		program.push("_NEG(")
 		
 		return fragment
 	}
@@ -173,26 +199,26 @@ function extractExpression(fragment) {
             fragment = expressionArg(fragment)
             fragment = expect(")", fragment)
                      
-            program.push(token)
+            program.push(token + "(")
                       
             return fragment
         }
     }
  
     //user-defined functions, arrays
-	prefix = checkIndexed(fragment)
+	prefix = getRegexPrefix(INDEXED_RE, fragment)
     if (prefix !== false) {
         fragment = fragment.substring(prefix.length)
         fragment = expressionArg(fragment)
         fragment = expect(")", fragment)
                   
-        program.push(prefix.substring(0, prefix.length - 1))
+        program.push(prefix)
                   
         return fragment
     }
  
     //variable name
-    prefix = checkName(fragment)
+    prefix = getRegexPrefix(NAME_RE, fragment)
     if (prefix !== false) {
         program.push(prefix)
         return fragment.substring(prefix.length)
@@ -213,10 +239,16 @@ function extractExpression(fragment) {
             parseError("PARSE")
 			return
         }
-                  
+
         program.push(fragment.substring(0, end + 1))
         return fragment.substring(end + 1)
     }
+}
+
+function deferredEvaluation(token) {
+	var deStart = program.length
+	program.push(token)
+	return deStart
 }
 
 function tokenEscape(fragment) {
@@ -224,7 +256,7 @@ function tokenEscape(fragment) {
 	return fragment + "\n"
 }
 
-function parseToEndOfLine() {
+function parseToEndOfLine(deStart) {
     text = text.trim()
 
     while (text.length > 0) {
@@ -241,7 +273,7 @@ function parseToEndOfLine() {
 				}
             }
         }
-
+		
 		if (!instructionPushed) {
 			//no instruction keyword - check if it is an assignment
 			instructions.LET.parse()
@@ -250,6 +282,11 @@ function parseToEndOfLine() {
 
         text = text.trim()
     }
+
+	// ending deferred evaluation
+	if (deStart === undefined) return
+
+	elseBranches[deStart] = program.length + 1
 }
 
 function parseLine() {
@@ -285,16 +322,74 @@ function parseText() {
 }
  
 //runner
-var argumentStack = []
+var argumentStack = [] //for evaluating arguments and storing return addresses
   
-var functions = builtInFunctions
+var functions = {}
 
 var readDataBuffer = []
 var readDataPointer
  
 var variables = {}
 
-function varToMem(name, index, value) {
+var stopped
+ 
+var arrays = {}
+ 
+var loops = []
+ 
+var memory = []
+ 
+var lastLabel
+var labelOffset
+ 
+//runner constant
+var builtInVariables = {
+    PI: Math.PI,
+ 
+    /* Built-in variables bound to video chip registers */
+    COLORTEXT: 1, //mask is 6 bits ASCII, 2 bits color if COLORTEXT=1; 8 bits ASCII if COLORTEXT=0
+    CHARFILL: 0, //zero pixels of the font are transparent (0) or filled (1) in the 8 by 8 block
+    VECTORS: 3, //enable/disable triangle sets 0-15 (bit 1) and 16-31 (bit 2)
+    TILEX: 0, //tile offset horizontal (0-32)
+    TILEY: 0, //tile offset vertical (0-32)
+    TEXTX: 0, //text offset horizontal (0-32)
+    TEXTY: 0, //text offset vertical (0-32)
+    BORDERS: 255, //4 tile borders + 4 text borders
+ 
+    BACKGROUND: 0, //8-bit IRGB
+    CHARFILL: 0, //8-bit IRGB
+    BORDER: 0 //8-bit IRGB
+}
+ 
+var builtInArrays = {
+    SPRITEX: new Array(16), //values 0-511
+    SPRITEY: new Array(16), //values 0-255
+    SPRITEPTR: new Array(16), //values 0-16, 0 being off
+    SPRITEPRIO: new Array(16), //values 0-2 (behind tiles, over tiles, over vectors, over text)
+              
+    PALSELECT: new Array(16), //0 is for vectors, 1-15 is for designs; values 0-3
+ 
+    PALDEFINE: new Array(5*3),
+        //each member of the PALDEFINE dim is mapped to 1 byte, which represents 8-bit IRGB
+        //1 palette is 3 color definitions:
+        //color index 0 is transparent, 1-3 are defined in such palettes
+        //4 palettes (0-2, 3-5, 6-9, 10-12) are selectable for sprite/tile designs 1-15
+        //palette 13-15 is for the text layer
+              
+    TILES: new Array(9*16), //values 0-15, 0 is fully transparent
+ 
+    //overlapped memory area @V+3088-3312
+    VECTORX: new Array(3*32), //values 0-511
+    VECTORY: new Array(3*32), //values 0-256
+    VECTORCOLOR: new Array(32), //values 0-3
+    VECTORFILL: new Array(32), //values 0-3
+ 
+    CHARMASK: new Array(24*48), //@V+0; 24 rows, 48 columns of ASCII + color data bytes
+    FONT: new Array(8*256), //@V+1296; index=8*(ASCII>32?ASCII-32:ASCII+224)
+    DESIGN: new Array(15*144) //@V+1872
+}
+
+function arrayToMemory(name, index, value) {
     var base
  
     switch (name) {
@@ -349,7 +444,7 @@ function varToMem(name, index, value) {
     }
 }
 
-function memToVar(name, index) {
+function memoryToArray(name, index) {
 	switch (name) {
 		case "CHARMASK":
 			variables.CHARMASK[index] = memory[index]
@@ -388,100 +483,66 @@ function memToVar(name, index) {
 	}
 }
  
-var arrays = {}
- 
-var loops = []
- 
-var memory = []
- 
-var lastLabel = "START"
- 
-//runner constant
-var builtInVariables = {
-    PI: Math.PI,
- 
-    /* Built-in variables bound to video chip registers */
-    COLORTEXT: 1, //mask is 6 bits ASCII, 2 bits color if COLORTEXT=1; 8 bits ASCII if COLORTEXT=0
-    CHARFILL: 0, //zero pixels of the font are transparent (0) or filled (1) in the 8 by 8 block
-    VECTORS: 3, //enable/disable triangle sets 0-15 (bit 1) and 16-31 (bit 2)
-    TILEX: 0, //tile offset horizontal (0-32)
-    TILEY: 0, //tile offset vertical (0-32)
-    TEXTX: 0, //text offset horizontal (0-32)
-    TEXTY: 0, //text offset vertical (0-32)
-    BORDERS: 255, //4 tile borders + 4 text borders
- 
-    BACKGROUND: 0, //8-bit IRGB
-    CHARFILL: 0, //8-bit IRGB
-    BORDER: 0 //8-bit IRGB
-}
- 
-var builtInArrays = {
-    SPRITEX: new Array(16), //values 0-511
-    SPRITEY: new Array(16), //values 0-255
-    SPRITEPTR: new Array(16), //values 0-16, 0 being off
-    SPRITEPRIO: new Array(16), //values 0-2 (behind tiles, over tiles, over vectors, over text)
-              
-    PALSELECT: new Array(16), //0 is for vectors, 1-15 is for designs; values 0-3
- 
-    PALDEFINE: new Array(5*3),
-        //each member of the PALDEFINE dim is mapped to 1 byte, which represents 8-bit IRGB
-        //1 palette is 3 color definitions:
-        //color index 0 is transparent, 1-3 are defined in such palettes
-        //4 palettes (0-2, 3-5, 6-9, 10-12) are selectable for sprite/tile designs 1-15
-        //palette 13-15 is for the text layer
-              
-    TILES: new Array(9*16), //values 0-15, 0 is fully transparent
- 
-    //overlapped memory area @V+3088-3312
-    VECTORX: new Array(3*32), //values 0-511
-    VECTORY: new Array(3*32), //values 0-256
-    VECTORCOLOR: new Array(32), //values 0-3
-    VECTORFILL: new Array(32), //values 0-3
-              
-    BASSPITCH: new Array(32), //values 0-63
-    BASSEFFECT: new Array(32), //values 0-3: drum bit, glide (pitch > 0)/release (pitch = 0) bit
-    TENORPITCH: new Array(32), //values 0-63
-    TENOREFFECT: new Array(32), //values 0-3: snare bit, glide (pitch > 0)/release (pitch = 0) bit
- 
-    CHARMASK: new Array(24*48), //@V+0; 24 rows, 48 columns of ASCII + color data bytes
-    FONT: new Array(8*256), //@V+1296; index=8*(ASCII>32?ASCII-32:ASCII+224)
-    DESIGN: new Array(15*144) //@V+1872
-}
- 
 function runError(message) {
-    window.alert("?" + message + "  ERROR AT " + lastLabel)
-    program.splice(rollback, program.length - rollback)
+    window.alert("?" + message + "  ERROR AT " + lastLabel + "+" + labelOffset)
+	stopped = true
+}
+
+//try to interpret the token as a function call or array member reference
+function indexedReference(token, expectedSet) {
+	if (typeof token === "string" && token.endsWith("(")) {
+		var name = token.substring(0, token.length - 1)
+		
+		if (name in expectedSet) {
+			return name
+		}
+	}
+	
+	return false
+}
+
+function preparePush(result) {
+	if (typeof result === "string") {
+		result = '"' + result + '"'
+	}
+	
+	return result
 }
 
 function runProgram() {
     var programCounter = 0
+	stopped = false
 	instructions.CLR.run(0)
     lastLabel = "START"
+	labelOffset = 0
               
-    while (programCounter < program.length) {
+    while (programCounter < program.length && !stopped) {
         var token = program[programCounter]
- 
+
         if (token in instructions) {
             var instruction = instructions[token]
             programCounter = instruction.run(programCounter)
-        } else if (token in functions) {
-            var fn = functions[token]
-            var arg = popValue()
-            argumentStack.push(fn.apply(arg))
-            programCounter++
-        } else if (token in operators) {
-			var o = operators[token]
-			var b = popValue()
-			var a = popValue()
-			argumentStack.push(o.evaluate(a, b))
-			programCounter++
+			labelOffset++
         } else {
-			// token here may be a variable name or a literal value
-			// the instruction may want to use variable names or variable values
-			// the run function of each instruction will evaluate variables if necessary
-            argumentStack.push(token)
-			programCounter++
-        }
+			var funcName = indexedReference(token, functions)
+			if (funcName !== false) {
+				var arg = popAndEvaluate()
+				argumentStack.push(preparePush(functions[funcName].apply(arg)))
+				programCounter++
+			} else if (token in operators) {
+				var o = operators[token]
+				var b = popAndEvaluate()
+				var a = popAndEvaluate()
+				argumentStack.push(preparePush(o.evaluate(a, b)))
+				programCounter++
+			} else {
+				// token here may be a variable name or a literal value
+				// the instruction may want to use variable names or variable values
+				// the run function of each instruction will evaluate variables if necessary
+				argumentStack.push(token)
+				programCounter++
+			}
+		}
     }
 }
 
@@ -490,23 +551,9 @@ function evaluateDataInstruction() {
     var token = program[programCounter]
 
     while (token != "DATA") {
-        if (token in functions) {
-            var fn = functions[token]
-            var arg = popValue()
-            argumentStack.push(fn.apply(arg))
-        } else if (token in operators) {
-			var o = operators[token]
-			var b = popValue()
-			var a = popValue()
-			argumentStack.push(o.evaluate(a, b))
-        } else if (token in variables) {
-			argumentStack.push(variables[token])
-		} else {
-			//should be a literal
-            argumentStack.push(token)
-        }
+		evaluateToken(token)
 		
-        programCounter++
+		programCounter++
 		token = program[programCounter]
     }
 	
@@ -517,35 +564,64 @@ function evaluateDataInstruction() {
 	}
 }
 
-function popValue(defaultValue) {
-	var arg = argumentStack.pop()
-	if (arg === "") arg = defaultValue
+function evaluateToken(token) {
+	var funcName = indexedReference(token, functions)
 	
-	if (Array.isArray(arg)) {
-		var results = []
-		
-		for (i in arg) {
-			results.push(getValue(arg[i]))
-		}
-		
-		return results
+	if (funcName !== false) {
+		var arg = popAndEvaluate()
+		argumentStack.push(preparePush(functions[funcName].apply(arg)))
+	} else if (token in operators) {
+		var o = operators[token]
+		var b = popAndEvaluate()
+		var a = popAndEvaluate()
+		argumentStack.push(preparePush(o.evaluate(a, b)))
+	} else if (token in variables) {
+		argumentStack.push(preparePush(variables[token]))
 	} else {
-		return getValue(arg)
+		//should be a literal
+		argumentStack.push(token)
 	}
 }
 
-var NUMBER_LITERAL_RE = /^(([0-9]*[.])?[0-9]+|%[01]*|![0123]|[$][A-F0-9]*)/
+function popAndEvaluate(defaultValue) {
+	var arg = argumentStack.pop()
+	if (arg === "") arg = defaultValue
+	return getValue(arg)
+}
+
+var NUMBER_LITERAL_RE = /^(([0-9]*[.])?[0-9]+(E[+-]?[0-9]+)?|%[01]+|![0123]+|[$][A-F0-9]+)/
 
 // dereference names and parse literals
 function getValue(arg) {
-	if (arg in variables) {
-		arg = variables[arg]
+	if (typeof arg !== "string") {
+		return arg
+	}
+	
+	var dereferenced = arg
+	var arrayName = indexedReference(arg, arrays)
+	if (arrayName !== false) {
+		var i = popAndEvaluate()
+		var a = arrays[arrayName]
+		dereferenced = a[i]
+	} else if (getRegexPrefix(NAME_RE, arg) === arg) {
+		dereferenced = variables[arg]
+	}
+	
+	if (dereferenced === undefined) {
+		if (arg in labels) {
+			return arg
+		} else {
+			runError("NO VALUE")
+			return
+		}		
+	} else {
+		arg = dereferenced
 	}
 
-	if (arg === undefined) runError("NO VALUE")
-		
- 	if (typeof arg != 'string') return arg //already a parsed calculation result?
-		
+	if (typeof arg !== "string") {
+		return arg
+	}
+	
 	if (arg.startsWith('"')) {
 		return arg.substring(1, arg.length - 1)
 	}
@@ -572,6 +648,31 @@ function getValue(arg) {
 	return arg
 }
 
+function popAndAssign(valueSupplier, defaultName) {
+	var name = argumentStack.pop()
+
+	if (name === "") {
+		name = defaultName
+	}
+	
+	if (typeof name !== "string") {
+		runError("INVALID REFERENCE")
+		return
+	}
+	
+	var arrayName = indexedReference(name, arrays)
+	if (arrayName !== false) {
+		var i = popAndEvaluate()
+		var a = arrays[arrayName]
+		a[i] = valueSupplier(name + i + ")", a[i])
+	} else if (getRegexPrefix(NAME_RE, name) === name) {
+		variables[name] = valueSupplier(name, variables[name])
+	} else {
+		runError("INVALID REFERENCE")
+		return
+	}
+}
+
 //common constant
 var instructions = {
     "@": {
@@ -584,6 +685,7 @@ var instructions = {
                   
         run: function(pc) {
             lastLabel = argumentStack.pop()
+			labelOffset = 0
             return pc + 1
         }
     },
@@ -598,7 +700,7 @@ var instructions = {
               
     FOR: {
         parse: function() {
-            nameArg()
+            assignableArg()
             expect("=")
             expressionArg()
             expect("TO")
@@ -608,23 +710,22 @@ var instructions = {
             } else {
                 expect("STEP")
                 expressionArg()
+				expectEnd()
             }
-            expectEnd()
         },
  
         run: function(pc) {
             var loop = {
                 bodyStart: pc + 1,
-                step: popValue(1),
-                end: popValue(),
-                start: popValue(),
-                name: argumentStack.pop()
+                step: popAndEvaluate(1),
+                end: popAndEvaluate(),
+                start: popAndEvaluate()
             }
+			
+            popAndAssign(function(name) { loop.name = name; return loop.start })
                       
             loops.push(loop)
-                      
-            variables[loop.name] = loop.start
-                      
+			
             return pc + 1
         }
     },
@@ -634,44 +735,51 @@ var instructions = {
             if (instructionEnds()) {
                 program.push("")
             } else {
-                nameArg()
+                assignableArg()
 				expectEnd()
             }
         },
  
         run: function(pc) {
-            loop = loops[loops.length - 1]
-                      
-            var expectedName = argumentStack.pop()
-                      
-            if (expectedName != "" && expectedName != loop.name) {
-                runError("NEXT WITHOUT FOR")
+			if (loops.length == 0) {
+				runError("NEXT WITHOUT FOR")
 				return 
-            }
-                      
-            variables[loop.name] += loop.step
-            if (loop.end*Math.sign(loop.step) >= variables[loop.name]*Math.sign(loop.step)) {
-				return loop.bodyStart
-            }
+			}
+			
+			var loop = loops[loops.length - 1]
             
+			popAndAssign(function(expectedName, oldValue) {
+				if (expectedName != "" && expectedName != loop.name) {
+					runError("LOOP MISMATCH")
+					return 
+				}
+
+				loop.counter = oldValue + loop.step
+				
+				return loop.counter
+			}, loop.name)
+
+			if (stopped) return
+
+			var dir = Math.sign(loop.step)
+			if (loop.end*dir >= loop.counter*dir) {
+				return loop.bodyStart
+			}            
+
 			loops.pop()
 			return pc + 1
         }
     },
-              
+	
     DATA: {
         parse: function() {
+			var deStart = deferredEvaluation("_DEFER")
 			dataLookup.push(program.length)
             expressionArg()
-			expectEnd()
-        },
-		
-		run: function(pc) {
-			argumentStack.pop()
-			return pc + 1
+			expectEnd(deStart)
 		}
     },
-              
+
     INPUT: {
 		parse: function() {
 			var firstArg = program.length
@@ -679,7 +787,8 @@ var instructions = {
 
 			if (instructionEnds()) {
 				var name = program[program.length - 1]
-				if (checkName(name) !== name) {
+				if (getRegexPrefix(INDEXED_RE, name) === false && getRegexPrefix(NAME_RE, name) === false) { 
+					//the only argument was neither array nor variable name
 					parseError("REFERENCE EXPECTED")
 					return
 				}
@@ -693,12 +802,16 @@ var instructions = {
 		},
  
         run: function(pc) {
-			var name = argumentStack.pop()
-			if (name in arrays) {
-				arrays[name][popValue()] = window.prompt(popValue("ENTER VALUE FOR " + name))
-			} else {
-				variables[name] = window.prompt(popValue("ENTER VALUE FOR " + name))
-			}
+			popAndAssign(function(name) {
+				var response = window.prompt(popAndEvaluate("ENTER VALUE FOR " + name))
+				
+				if (response === null) {
+					runError("BREAK")
+					return
+				}
+				
+				return response
+			})
 			
 			return pc + 1
 		}
@@ -714,8 +827,15 @@ var instructions = {
 		},
 		
 		run: function(pc) {
-			var size = popValue()
-			arrays[argumentStack.pop()] = new Array(size)
+			var size = popAndEvaluate()
+			var name = argumentStack.pop()
+
+			if (name in functions) {
+				runError("OVERDEFINITION")
+				return
+			}
+
+			arrays[name] = new Array(size)
 			
 			return pc + 1
 		}
@@ -726,7 +846,7 @@ var instructions = {
 		// in DATA lines are evaluated like any other expression when READ reaches the
 		// DATA instruction in question. They evaluate to an array along the commas.
 		parse: function() {
-			nameArg()
+			assignableArg()
 			expectEnd()
 		},
 		
@@ -742,7 +862,7 @@ var instructions = {
 				readDataPointer++
 			}
 
-			variables[argumentStack.pop()] = readDataBuffer.shift()
+			popAndAssign(function() { return readDataBuffer.shift() })
 			
 			return pc + 1
 		}
@@ -757,15 +877,9 @@ var instructions = {
 		},
 		
 		run: function(pc) {
-			var value = popValue()
-			var name = argumentStack.pop()
-			
-			if (name in arrays) {
-				arrays[name][popValue()] = value
-			} else {
-				variables[name] = value
-			}
-			
+			var value = popAndEvaluate()
+			popAndAssign(function() { return value })
+
 			return pc + 1
 		}
 	},
@@ -777,20 +891,25 @@ var instructions = {
 		},
 
         run: function(pc) {
-            lastLabel = argumentStack.pop()
-            return labels[lastLabel]
+            var target = argumentStack.pop()
+			
+			if (target in labels) {
+				lastLabel = target
+				labelOffset = 0
+				return labels[target]
+			}
+			
+			runError("LABEL DOES NOT EXIST")
         }
     },
 
 	// IF/THEN construct in tokenized postfix: [ conditionExpression, THEN token, thenBranchInstructions, IF token ]
     IF: {
 		parse: function() {
-			expressionArg()
-			expect("THEN")
-			var thenBranch = program.length
-			program.push("THEN")
-			parseToEndOfLine()
-			elseBranches[thenBranch] = program.length + 1
+			expressionArg()		
+			var thenWord = expectOne(["THEN", "T."])
+			var deStart = deferredEvaluation(thenWord)
+			parseToEndOfLine(deStart)
 		},
 		
 		run: pc => pc + 1
@@ -799,12 +918,17 @@ var instructions = {
 	// evaluate the condition expression here
 	THEN: {
 		run: function(pc) {
-			if (popValue()) {
+			if (popAndEvaluate()) {
 				return pc + 1
 			}
 			
 			return elseBranches[pc]
 		}
+	},
+	
+	// DATA and DEF skips evaluation of arguments like THEN with a false condition
+	_DEFER: {
+		run: pc => elseBranches[pc]
 	},
 	
     RESTORE: {
@@ -824,13 +948,14 @@ var instructions = {
 			if (label == "") {
 				readDataPointer = 0
 			} else if (label in labels) {
-				readDataPointer = dataLookup.indexOf(labels[label])
+				readDataPointer = dataLookup.indexOf(labels[label] + 1 /* skip the _DEFER instruction */)
 
 				if (readDataPointer < 0) {
 					runError("NO DATA AT LABEL")
+					return
 				}
 			} else {
-				runError("LABEL EXPECTED")
+				runError("LABEL DOES NOT EXIST")
 				return
 			}
 
@@ -845,9 +970,17 @@ var instructions = {
 		},
 		
 		run: function(pc) {
-            lastLabel = argumentStack.pop()
-			argumentStack.push(pc + 1)
-            return labels[lastLabel]
+            var target = argumentStack.pop()
+			
+			if (target in labels) {
+				lastLabel = target
+				labelOffset = 0
+
+				argumentStack.push(pc + 1)
+				return labels[target]
+			}
+			
+			runError("LABEL DOES NOT EXIST")
 		}
 	},
 	
@@ -861,6 +994,12 @@ var instructions = {
 	
     REM: {
 		parse: function() {
+			for (label in labels) {
+				if (labels[label] === program.length) {
+					labels[label] += 2
+				}
+			}
+			
 			program.push(tokenEscape(text))
 			text = ""
 		},
@@ -871,11 +1010,112 @@ var instructions = {
 		}
 	},
 	
-    //STOP:
-    //ON:
+    STOP: {
+		parse: expectEnd,
+
+		run: function(pc) {
+			stopped = true
+			return pc + 1
+		}
+	},
+
+    ON: {
+		parse: function() {
+			expressionArg()
+			
+			var goWord = expectOne(goWords)
+			program.push(goWords.indexOf(goWord))
+			
+			expressionArg()
+
+			if (program[program.length - 1] !== ",") {
+				runError("ON SYNTAX")
+				return
+			}
+
+			expectEnd()
+		},
+		
+		run: function(pc) {
+			var labelArray = argumentStack.pop()
+			var goWord = goWords[argumentStack.pop()]
+			var which = popAndEvaluate()
+
+			if (typeof which === "number") 
+			{ 
+				which = Math.floor(which) - 1
+
+				if (which in labelArray) {
+					argumentStack.push(labelArray[which])
+					return instructions[goWord].run(pc)
+				}
+			}
+			
+			runError("BRANCH")
+		}
+	},
+
     //WAIT:
-    //DEF: "FN"
 	
+    DEF: {
+		parse: function() {
+			text = text.trim()
+			var prefix = getRegexPrefix(INDEXED_RE, text)
+		 
+			if (prefix === false) {
+				parseError("FN SYNTAX")
+				return
+			} else {
+				text = text.substring(prefix.length)
+				nameArg() //TODO zero/more arguments?
+				var fnParam = program[program.length - 1]
+				expect(")")
+				  
+				program.push(prefix.substring(0, prefix.length - 1))
+			}
+			
+			expect("=")
+			
+			var deStart = deferredEvaluation("_FN")
+			expressionArg()
+			expectEnd(deStart)
+		}
+	},
+
+	// add a user function definition
+	_FN: {
+		run: function(pc) {
+			var name = argumentStack.pop()
+			var fnParam = argumentStack.pop()
+
+			if (name in arrays) {
+				runError("OVERDEFINITION")
+				return
+			}
+
+			functions[name] = { apply: function(arg) {
+				var saveX = variables[fnParam]
+				variables[fnParam] = arg
+				
+				var evalPC = pc + 1
+				var token = program[evalPC]
+
+				while (token != "DEF") {
+					evaluateToken(token)
+					
+					evalPC++
+					token = program[evalPC]
+				}
+				
+				variables[fnParam] = saveX
+				
+				return argumentStack.pop()
+			}}
+			
+		    return elseBranches[pc] //defer evaluation
+		}
+	},
+		
     POKE: {
 		parse: function() {
 			expressionArgUpTo(operators[","].precedenceLevel)
@@ -885,8 +1125,8 @@ var instructions = {
 		},
 		
 		run: function(pc) {
-			var value = popValue()
-			memory[popValue()] = value
+			var value = popAndEvaluate()
+			memory[popAndEvaluate()] = value
 			
 			return pc + 1
 		}
@@ -899,7 +1139,7 @@ var instructions = {
 		},
 		
 		run: function(pc) {
-			console.log(popValue())
+			console.log(popAndEvaluate())
 			return pc + 1
 		}
 	},
@@ -908,10 +1148,10 @@ var instructions = {
 		parse: expectEnd,
 		
 		run: function(pc) {
-			variables = builtInVariables
-			arrays = builtInArrays
+			variables = Object.assign({}, builtInVariables)
+			arrays = Object.assign({}, builtInArrays)
 			loops = []
-			functions = builtInFunctions
+			functions = Object.assign({}, builtInFunctions)
 			argumentStack = []
 			readDataBuffer = []
 			readDataPointer = 0
@@ -929,23 +1169,35 @@ instructions._LET = { //implicit assignment (omit keyword in listing, appears as
 	run: instructions.LET.run
 }
 
-instructions._GOTO = { //implicit GOTO after THEN (omit keyword in listing, appears as token)
-	run: instructions.GOTO.run
-}
+// abbreviations
+instructions["T."] = instructions.THEN
+instructions["G."] = instructions.GOTO
+instructions["N."] = instructions.NEXT
+instructions["R."] = instructions.RETURN
+instructions["'"] = instructions.REM
 
-instructions["\n"] = { //line break - enables relinking and listing from tokenized program
-	run: pc => pc + 1
-}
+var goWords = ["GOTO", "GOSUB", "G."]
 
 var operators = {
     "+": { precedenceLevel: 3, evaluate: (a, b) => a + b },
     "-": { precedenceLevel: 3, evaluate: (a, b) => a - b },
-    "/": { precedenceLevel: 2, evaluate: (a, b) => a / b },
     "*": { precedenceLevel: 2, evaluate: (a, b) => a * b },
+    "/": { 
+		precedenceLevel: 2, 
+		evaluate: function(a, b) {
+			if (b == 0) {
+				runError("DIVIDE BY ZERO")
+			}
+			
+			return a / b 
+		}
+	},
     "^": { precedenceLevel: 1, evaluate: Math.pow },
     AND: { precedenceLevel: 6, evaluate: (a, b) => a & b },
     OR: { precedenceLevel: 7, evaluate: (a, b) => a | b },
+    ">=": { precedenceLevel: 4, evaluate: (a, b) => a >= b },
     "<>": { precedenceLevel: 4, evaluate: (a, b) => a != b },
+    "<=": { precedenceLevel: 4, evaluate: (a, b) => a <= b },
     ">": { precedenceLevel: 4, evaluate: (a, b) => a > b },
     "=": { precedenceLevel: 5, evaluate: (a, b) => a == b },
     "<": { precedenceLevel: 4, evaluate: (a, b) => a < b },
@@ -966,7 +1218,7 @@ var builtInFunctions = {
     SIN: { apply: Math.sin },
     TAN: { apply: Math.tan },
     ATN: { apply: Math.atan },
-    PEEK: { apply: arg => memory[arg] },
+    PEEK: { apply: arg => (arg in memory ? memory[arg] : 255) },
     LEN: { apply: arg => arg.length },
     "STR$": { apply: arg => "" + arg },
     VAL: { apply: parseFloat },
