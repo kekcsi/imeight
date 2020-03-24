@@ -1,16 +1,139 @@
+//interactive
+
+function programTab() {
+	btnProgram.style.border="inset"
+	tabProgram.style.display="block"
+	btnScreen.style.border="outset"
+	tabScreen.style.display="none"
+	taList.focus()
+}
+
+function screenTab() {
+	btnScreen.style.border="inset"
+	tabScreen.style.display="block"
+	btnProgram.style.border="outset"
+	tabProgram.style.display="none"
+	inUserInput.focus()
+}
+
+function pageLoad() {
+	inUserInput.addEventListener("keyup", function(event) {
+		if (event.keyCode === 13) { //Enter
+			event.preventDefault()
+			btnGo.click()
+		}
+		
+		if (event.keyCode === 27) { //Esc
+			event.preventDefault()
+			btnStop.click()
+		}
+	})
+	
+	taList.addEventListener("keyup", function(event) {
+		if (event.keyCode === 120) { //F9
+			event.preventDefault()
+			parseText()
+		}
+		
+		if (event.keyCode === 112) { //F1
+			event.preventDefault()
+			divTutor.style.display = "block"
+		}
+	})
+}
+
+function videoPrint(message) {
+	while (divOutput.childElementCount >= 20) {
+		divOutput.removeChild(divOutput.firstChild)
+	}
+	divOutput.innerHTML = divOutput.innerHTML + "<div>" + message + "&nbsp;</div>"
+	screenTab()
+	
+	return divOutput.lastChild
+}
+
+var interact = function(input) {
+	if (input === null) return
+	
+	var div = videoPrint(input)
+
+	var command = input.toUpperCase()
+
+	if (command in commands) {
+		commands[command]()
+	} else {
+		//try adding it as a line to the end of the program text
+		parseSuccess = true
+
+		text = input
+		parseLine()
+		
+		if (parseSuccess) {
+			if (!taList.value.endsWith("\n")) taList.value += "\n"
+			taList.value += input
+			div.style.color = "yellow"
+		}
+	}
+}
+
+var inputAction = interact
+
+function userBreak() {
+	inUserInput.value = ""
+	inputAction(null)
+}
+
+function userInput() {
+	var input = inUserInput.value
+	inUserInput.value = ""
+	inputAction(input)
+}
+
+var oldText = ""
+
+var commands = {
+	RUN: runProgram,
+	CONT: contProgram,
+	LIST: programTab,
+	NEW: function() {
+		newProgram()
+		oldText = taList.value
+		taList.value = ""
+		programTab()
+	},
+	OLD: function() {
+		newProgram()
+		var swap = taList.value
+		taList.value = oldText
+		oldText = swap
+		programTab()
+	}
+}
+
 //parser
 var text
 var rollback
 var parseSuccess
 var line = 0
  
+function newProgram() {
+	line = 1
+	program = []
+	labels = { START:0 }
+	dataLookup = []
+	elseBranches = {}
+}
+ 
 function parseError(message) {
-    window.alert("?" + message + "  ERROR IN " + line)
+	if (!parseSuccess) return
+    videoPrint("?" + message + "  ERROR IN " + line)
 	text = ""
 	parseSuccess = false
+	videoPrint("READY.")
 }
 
 var NAME_RE = /^[A-Z][A-Z0-9]*[%!$]?/
+var ASSIGN_RE = /^[A-Z][A-Z0-9]*[%!$]?([(][^)]*[)])?[ \t]*=/
 var INDEXED_RE = /^[A-Z][A-Z0-9]*[%!$]?[(]/
 
 function getRegexPrefix(regex, fragment) {
@@ -32,6 +155,33 @@ function nameArg() {
 
     program.push(name)
     text = text.substring(name.length)
+}
+
+function namesArg() {
+	var shunt = []
+	
+	while (true) {
+		text = text.trim()
+		var name = getRegexPrefix(NAME_RE, text)
+	 
+		if (name === false) {
+			break
+		}
+
+		program.push(name)
+		text = text.substring(name.length)
+
+		var rest = tryPrefix(",")
+		
+		if (rest === false) {
+			break
+		} else {
+			while(shunt.length > 0) program.push(shunt.pop())
+		    shunt.push(",")
+		}
+	}
+	
+	while (shunt.length > 0) program.push(shunt.pop())
 }
 
 //parse an argument that refers to either a variable by name or an array member by index
@@ -56,7 +206,7 @@ function expectEnd(deStart) {
     if (text.length > 0) {
 		if (text[0] == ":") {
 			text = text.substring(1)
-		} else {
+		} else if (text[0] != "'") {
 			parseError("EXTRA ARGUMENT")
 			return
 		}
@@ -80,7 +230,7 @@ function instructionEnds() {
 		return true
 	}
 	
-	return false
+	return "'" == text[0]
 }
 
 function tryPrefix(pfx, fragment) {
@@ -243,6 +393,10 @@ function extractExpression(fragment) {
         program.push(fragment.substring(0, end + 1))
         return fragment.substring(end + 1)
     }
+
+	//nullary function call?
+	program.push("")
+	return fragment
 }
 
 function deferredEvaluation(token) {
@@ -276,8 +430,13 @@ function parseToEndOfLine(deStart) {
 		
 		if (!instructionPushed) {
 			//no instruction keyword - check if it is an assignment
-			instructions.LET.parse()
-			program.push("_LET")
+			if (getRegexPrefix(ASSIGN_RE, text) !== false) {
+				instructions.LET.parse()
+				program.push("_LET")
+			} else {
+				parseError("INSTRUCTION EXPECTED")
+				break
+			}
 		}
 
         text = text.trim()
@@ -302,22 +461,19 @@ function parseLine() {
 }
 
 function parseText() {
-	line = 1
-	lines = taText.value.split("\n")
-	program = []
-	labels = { START:0 }
-    dataLookup = []
-	elseBranches = {}
+	lines = taList.value.split("\n")
+	newProgram()
 
 	parseSuccess = true
-	
+
 	for (var i = 0; parseSuccess && (i < lines.length); i++) {
 		text = lines[i]
 		parseLine()
 	}
 	
-	if (program.length > 0) {
-		btnRun.disabled = false
+	if (parseSuccess) {
+		videoPrint("PROGRAM UPDATED").style.color = "yellow"
+		inUserInput.value="RUN"
 	}
 }
  
@@ -347,7 +503,7 @@ var builtInVariables = {
     PI: Math.PI,
  
     /* Built-in variables bound to video chip registers */
-    COLORTEXT: 1, //mask is 6 bits ASCII, 2 bits color if COLORTEXT=1; 8 bits ASCII if COLORTEXT=0
+    /*COLORTEXT: 1, //mask is 6 bits ASCII, 2 bits color if COLORTEXT=1; 8 bits ASCII if COLORTEXT=0
     CHARFILL: 0, //zero pixels of the font are transparent (0) or filled (1) in the 8 by 8 block
     VECTORS: 3, //enable/disable triangle sets 0-15 (bit 1) and 16-31 (bit 2)
     TILEX: 0, //tile offset horizontal (0-32)
@@ -358,11 +514,11 @@ var builtInVariables = {
  
     BACKGROUND: 0, //8-bit IRGB
     CHARFILL: 0, //8-bit IRGB
-    BORDER: 0 //8-bit IRGB
+    BORDER: 0 //8-bit IRGB*/
 }
  
 var builtInArrays = {
-    SPRITEX: new Array(16), //values 0-511
+    /*SPRITEX: new Array(16), //values 0-511
     SPRITEY: new Array(16), //values 0-255
     SPRITEPTR: new Array(16), //values 0-16, 0 being off
     SPRITEPRIO: new Array(16), //values 0-2 (behind tiles, over tiles, over vectors, over text)
@@ -386,10 +542,10 @@ var builtInArrays = {
  
     CHARMASK: new Array(24*48), //@V+0; 24 rows, 48 columns of ASCII + color data bytes
     FONT: new Array(8*256), //@V+1296; index=8*(ASCII>32?ASCII-32:ASCII+224)
-    DESIGN: new Array(15*144) //@V+1872
+    DESIGN: new Array(15*144) //@V+1872*/
 }
 
-function arrayToMemory(name, index, value) {
+/*function arrayToMemory(name, index, value) {
     var base
  
     switch (name) {
@@ -481,10 +637,10 @@ function memoryToArray(name, index) {
 			variables.VECTORFILL[index] = (highbit << 1) & lowbit
 			break
 	}
-}
+}*/
  
 function runError(message) {
-    window.alert("?" + message + "  ERROR AT " + lastLabel + "+" + labelOffset)
+    videoPrint("?" + message + "  ERROR AT " + lastLabel + "+" + labelOffset)
 	stopped = true
 }
 
@@ -510,12 +666,21 @@ function preparePush(result) {
 }
 
 function runProgram() {
-    var programCounter = 0
-	stopped = false
+	stopped = 0
 	instructions.CLR.run(0)
-    lastLabel = "START"
-	labelOffset = 0
-              
+	
+	contProgram()
+}
+
+function contProgram() {
+    var programCounter = stopped
+	stopped = 0
+
+	if (programCounter == 0) {
+		lastLabel = "START"
+		labelOffset = 0
+	}
+
     while (programCounter < program.length && !stopped) {
         var token = program[programCounter]
 
@@ -526,14 +691,11 @@ function runProgram() {
         } else {
 			var funcName = indexedReference(token, functions)
 			if (funcName !== false) {
-				var arg = popAndEvaluate()
+				var arg = popAndDeeplyEvaluate([])
 				argumentStack.push(preparePush(functions[funcName].apply(arg)))
 				programCounter++
 			} else if (token in operators) {
-				var o = operators[token]
-				var b = popAndEvaluate()
-				var a = popAndEvaluate()
-				argumentStack.push(preparePush(o.evaluate(a, b)))
+				evaluateOperator(token)
 				programCounter++
 			} else {
 				// token here may be a variable name or a literal value
@@ -544,6 +706,8 @@ function runProgram() {
 			}
 		}
     }
+
+	if (interact == inputAction) videoPrint("READY.")
 }
 
 function evaluateDataInstruction() {
@@ -564,29 +728,55 @@ function evaluateDataInstruction() {
 	}
 }
 
-function evaluateToken(token) {
-	var funcName = indexedReference(token, functions)
+function evaluateOperator(token) {
+	var o = operators[token]
 	
-	if (funcName !== false) {
-		var arg = popAndEvaluate()
-		argumentStack.push(preparePush(functions[funcName].apply(arg)))
-	} else if (token in operators) {
-		var o = operators[token]
-		var b = popAndEvaluate()
-		var a = popAndEvaluate()
-		argumentStack.push(preparePush(o.evaluate(a, b)))
-	} else if (token in variables) {
-		argumentStack.push(preparePush(variables[token]))
+	if ("lateEvaluated" in o) {
+		var b = argumentStack.pop()
+		var a = argumentStack.pop()
 	} else {
-		//should be a literal
-		argumentStack.push(token)
+		var b = getValue(argumentStack.pop())
+		var a = getValue(argumentStack.pop())
 	}
+	
+	argumentStack.push(preparePush(o.evaluate(a, b)))
 }
 
 function popAndEvaluate(defaultValue) {
 	var arg = argumentStack.pop()
 	if (arg === "") arg = defaultValue
 	return getValue(arg)
+}
+
+function popAndDeeplyEvaluate(defaultValue) {
+	var arg = argumentStack.pop()
+	if (arg === "") arg = defaultValue
+	
+	if (Array.isArray(arg)) {
+		for (var i = 0; i < arg.length; i++) {
+			arg[i] = getValue(arg[i])
+		}
+		
+		return arg
+	}
+	
+	return getValue(arg)
+}
+
+function evaluateToken(token) {
+	var funcName = indexedReference(token, functions)
+	
+	if (funcName !== false) {
+		var arg = popAndDeeplyEvaluate([])
+		argumentStack.push(preparePush(functions[funcName].apply(arg)))
+	} else if (token in operators) {
+		evaluateOperator(token)
+	} else if (token in variables) {
+		argumentStack.push(preparePush(variables[token]))
+	} else {
+		//should be a literal
+		argumentStack.push(token)
+	}
 }
 
 var NUMBER_LITERAL_RE = /^(([0-9]*[.])?[0-9]+(E[+-]?[0-9]+)?|%[01]+|![0123]+|[$][A-F0-9]+)/
@@ -608,12 +798,8 @@ function getValue(arg) {
 	}
 	
 	if (dereferenced === undefined) {
-		if (arg in labels) {
-			return arg
-		} else {
-			runError("NO VALUE")
-			return
-		}		
+		runError("NO VALUE")
+		return
 	} else {
 		arg = dereferenced
 	}
@@ -665,8 +851,10 @@ function popAndAssign(valueSupplier, defaultName) {
 		var i = popAndEvaluate()
 		var a = arrays[arrayName]
 		a[i] = valueSupplier(name + i + ")", a[i])
+		return { array: a, index: i }
 	} else if (getRegexPrefix(NAME_RE, name) === name) {
 		variables[name] = valueSupplier(name, variables[name])
+		return { array: variables, index: name }
 	} else {
 		runError("INVALID REFERENCE")
 		return
@@ -802,16 +990,30 @@ var instructions = {
 		},
  
         run: function(pc) {
-			popAndAssign(function(name) {
-				var response = window.prompt(popAndEvaluate("ENTER VALUE FOR " + name))
-				
+			saveStk = argumentStack.slice() //in case user breaks
+
+			var target = popAndAssign(function(name, oldValue) {
+				var message = popAndEvaluate("ENTER VALUE FOR " + name)
+				videoPrint(message)
+				stopped = pc + 1
+								
+				return oldValue //for now
+			})
+			
+			inputAction = function(response) {
+				inputAction = interact
+
 				if (response === null) {
 					runError("BREAK")
+					argumentStack = saveStk
+					stopped = pc
 					return
 				}
 				
-				return response
-			})
+				videoPrint(response)
+				target.array[target.index] = response
+				contProgram()
+			}
 			
 			return pc + 1
 		}
@@ -827,7 +1029,7 @@ var instructions = {
 		},
 		
 		run: function(pc) {
-			var size = popAndEvaluate()
+			var size = popAndDeeplyEvaluate()
 			var name = argumentStack.pop()
 
 			if (name in functions) {
@@ -835,7 +1037,7 @@ var instructions = {
 				return
 			}
 
-			arrays[name] = new Array(size)
+			arrays[name] = []
 			
 			return pc + 1
 		}
@@ -988,7 +1190,9 @@ var instructions = {
 		parse: expectEnd,
 		
 		run: function(pc) {
-            return argumentStack.pop()
+			var target = argumentStack.pop()
+			if (typeof target == "number") return target
+			runError("RETURN WITHOUT GOSUB")
 		}
 	},
 	
@@ -1014,7 +1218,7 @@ var instructions = {
 		parse: expectEnd,
 
 		run: function(pc) {
-			stopped = true
+			stopped = pc + 1
 			return pc + 1
 		}
 	},
@@ -1026,12 +1230,7 @@ var instructions = {
 			var goWord = expectOne(goWords)
 			program.push(goWords.indexOf(goWord))
 			
-			expressionArg()
-
-			if (program[program.length - 1] !== ",") {
-				runError("ON SYNTAX")
-				return
-			}
+			namesArg()
 
 			expectEnd()
 		},
@@ -1067,10 +1266,10 @@ var instructions = {
 				return
 			} else {
 				text = text.substring(prefix.length)
-				nameArg() //TODO zero/more arguments?
+				namesArg()
 				var fnParam = program[program.length - 1]
 				expect(")")
-				  
+				
 				program.push(prefix.substring(0, prefix.length - 1))
 			}
 			
@@ -1086,31 +1285,52 @@ var instructions = {
 	_FN: {
 		run: function(pc) {
 			var name = argumentStack.pop()
-			var fnParam = argumentStack.pop()
+			var fnParams = argumentStack.pop()
+			if (!Array.isArray(fnParams)) {
+				// unary case
+				fnParams = [fnParams]
+			}
 
 			if (name in arrays) {
 				runError("OVERDEFINITION")
 				return
 			}
 
-			functions[name] = { apply: function(arg) {
-				var saveX = variables[fnParam]
-				variables[fnParam] = arg
-				
-				var evalPC = pc + 1
-				var token = program[evalPC]
+			functions[name] = { 
+				apply: function(arg) {
+					if (!Array.isArray(arg)) {
+						//unary case
+						arg = [arg]
+					}
 
-				while (token != "DEF") {
-					evaluateToken(token)
+					var saveX = []
 					
-					evalPC++
-					token = program[evalPC]
+					for (i in fnParams) {
+						var fnParam = fnParams[i]
+						
+						saveX[i] = variables[fnParam]
+						variables[fnParam] = arg[i]
+					}
+					
+					var evalPC = pc + 1
+					var token = program[evalPC]
+
+					while (token != "DEF") {
+						evaluateToken(token)
+						
+						evalPC++
+						token = program[evalPC]
+					}
+
+					for (i in fnParams) {
+						var fnParam = fnParams[i]
+						
+						variables[fnParam] = saveX[i]
+					}
+					
+					return argumentStack.pop()
 				}
-				
-				variables[fnParam] = saveX
-				
-				return argumentStack.pop()
-			}}
+			}
 			
 		    return elseBranches[pc] //defer evaluation
 		}
@@ -1139,7 +1359,9 @@ var instructions = {
 		},
 		
 		run: function(pc) {
-			console.log(popAndEvaluate())
+			var msg = popAndDeeplyEvaluate()
+			if (msg === undefined) return
+			videoPrint(msg)
 			return pc + 1
 		}
 	},
@@ -1201,7 +1423,7 @@ var operators = {
     ">": { precedenceLevel: 4, evaluate: (a, b) => a > b },
     "=": { precedenceLevel: 5, evaluate: (a, b) => a == b },
     "<": { precedenceLevel: 4, evaluate: (a, b) => a < b },
-    ",": { precedenceLevel: 8, evaluate: (a, b) => (Array.isArray(a) ? a.concat([b]) : [a, b]) }
+    ",": { precedenceLevel: 8, evaluate: (a, b) => (Array.isArray(a) ? a.concat([b]) : [a, b]), lateEvaluated: true }
 }
  
 var builtInFunctions = {
