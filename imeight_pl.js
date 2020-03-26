@@ -31,15 +31,22 @@ function graphicTab() {
 }
 
 function pageLoad() {
+	inUserInput.addEventListener("keydown", function(event) {
+		if (interact != inputAction) {
+			eventQueue.push(event.keyCode + 0.5*event.shiftKey + 0.25*event.ctrlKey)
+			eventHandler()
+		}
+	})
+
 	inUserInput.addEventListener("keyup", function(event) {
 		if (event.keyCode === 13) { //Enter
 			event.preventDefault()
-			btnGo.click()
+			userInput()
 		}
 		
 		if (event.keyCode === 27) { //Esc
 			event.preventDefault()
-			btnStop.click()
+			userBreak()
 		}
 	})
 	
@@ -50,13 +57,14 @@ function pageLoad() {
 		}
 	})
 	
-	tabGraphic.addEventListener("keyup", function(event) {
+	tabGraphic.addEventListener("keydown", function(event) {
 		event.preventDefault()
-		keyBuffer.push(event.keyCode)
+		eventQueue.push(event.keyCode)
+		eventHandler()
 	})
-}
 
-var keyBuffer = []
+	setInterval(function() { eventHandler() }, 20)
+}
 
 function videoPrint(message) {
 	while (divOutput.childElementCount >= 20) {
@@ -67,6 +75,7 @@ function videoPrint(message) {
 	return divOutput.lastChild
 }
 
+//the default inputAction routine
 var interact = function(input) {
 	if (input === null) return
 	
@@ -94,11 +103,13 @@ var interact = function(input) {
 var inputAction = interact
 
 function userBreak() {
+	inUserInput.focus()
 	inUserInput.value = ""
 	inputAction(null)
 }
 
 function userInput() {
+	inUserInput.focus()
 	var input = inUserInput.value
 	inUserInput.value = ""
 	inputAction(input)
@@ -514,6 +525,9 @@ var memory = []
 var lastLabel
 var labelOffset
  
+var eventQueue = []
+var eventHandler = function() {}
+
 //runner constant
 var builtInVariables = {
     PI: Math.PI,
@@ -880,6 +894,20 @@ function popAndAssign(valueSupplier, defaultName) {
 	}
 }
 
+//inputAction alternative for WAIT
+var onlyStop = function(input) {
+	//don't display READY prompt when program is stopped like this
+	if (input === null) {
+		//unless there was user break 
+		videoPrint("READY.")
+		outputTab()
+
+		//restore normal handlers
+		inputAction = interact
+		eventHandler = function() {}
+	}
+}
+
 //common constant
 var instructions = {
     "@": {
@@ -1031,7 +1059,7 @@ var instructions = {
 					return
 				}
 				
-				videoPrint(response)
+				videoPrint(response).style.opacity = 0.75
 				target.array[target.index] = response
 				contProgram()
 			}
@@ -1276,20 +1304,23 @@ var instructions = {
 	},
 
     WAIT: {
-		parse: function() {
-			expressionArg()
-			expectEnd()
-		},
+		parse: expectEnd,
 		
 		run: function(pc) {
-			var time = popAndEvaluate()
-			
 			stopped = pc + 1
-			inputAction = function() {}
-			setTimeout(function() { 
-				inputAction = interact 
+
+			inputAction = onlyStop
+
+			// wake up with a CONT when the next event comes
+			eventHandler = function() { 
+				// restore normal stopping conditions for a future STOP/INPUT
+				inputAction = interact
+				eventHandler = function() {}
+
 				contProgram()
-			}, time)
+			}
+			
+			return pc + 1
 		}
 	},
 	
@@ -1414,6 +1445,7 @@ var instructions = {
 			argumentStack = []
 			readDataBuffer = []
 			readDataPointer = 0
+			eventQueue = []
 			
 			return pc + 1
 		}
@@ -1428,7 +1460,7 @@ var instructions = {
 		},
 		
 		run: function(pc) {
-			var value = keyBuffer.shift()
+			var value = eventQueue.shift()
 			
 			popAndAssign(function() {
 				return value?value:0 
