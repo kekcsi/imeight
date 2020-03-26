@@ -1,19 +1,33 @@
 //interactive
 
 function programTab() {
-	btnProgram.style.border="inset"
+	btnProgram.style.borderStyle="inset"
 	tabProgram.style.display="block"
-	btnScreen.style.border="outset"
-	tabScreen.style.display="none"
+	btnOutput.style.borderStyle="outset"
+	tabOutput.style.display="none"
+	btnGraphic.style.borderStyle="outset"
+	tabGraphic.style.display="none"
 	taList.focus()
 }
 
-function screenTab() {
-	btnScreen.style.border="inset"
-	tabScreen.style.display="block"
-	btnProgram.style.border="outset"
+function outputTab() {
+	btnProgram.style.borderStyle="outset"
 	tabProgram.style.display="none"
+	btnOutput.style.borderStyle="inset"
+	tabOutput.style.display="block"
+	btnGraphic.style.borderStyle="outset"
+	tabGraphic.style.display="none"
 	inUserInput.focus()
+}
+
+function graphicTab() {
+	btnProgram.style.borderStyle="outset"
+	tabProgram.style.display="none"
+	btnOutput.style.borderStyle="outset"
+	tabOutput.style.display="none"
+	btnGraphic.style.borderStyle="inset"
+	tabGraphic.style.display="block"
+	tabGraphic.focus()
 }
 
 function pageLoad() {
@@ -34,20 +48,21 @@ function pageLoad() {
 			event.preventDefault()
 			parseText()
 		}
-		
-		if (event.keyCode === 112) { //F1
-			event.preventDefault()
-			divTutor.style.display = "block"
-		}
+	})
+	
+	tabGraphic.addEventListener("keyup", function(event) {
+		event.preventDefault()
+		keyBuffer.push(event.keyCode)
 	})
 }
+
+var keyBuffer = []
 
 function videoPrint(message) {
 	while (divOutput.childElementCount >= 20) {
 		divOutput.removeChild(divOutput.firstChild)
 	}
 	divOutput.innerHTML = divOutput.innerHTML + "<div>" + message + "&nbsp;</div>"
-	screenTab()
 	
 	return divOutput.lastChild
 }
@@ -57,7 +72,7 @@ var interact = function(input) {
 	
 	var div = videoPrint(input)
 
-	var command = input.toUpperCase()
+	var command = input.toUpperCase().trim()
 
 	if (command in commands) {
 		commands[command]()
@@ -464,6 +479,7 @@ function parseText() {
 	lines = taList.value.split("\n")
 	newProgram()
 
+	outputTab() //allow showing parse errors
 	parseSuccess = true
 
 	for (var i = 0; parseSuccess && (i < lines.length); i++) {
@@ -512,16 +528,16 @@ var builtInVariables = {
     TEXTY: 0, //text offset vertical (0-32)
     BORDERS: 255, //4 tile borders + 4 text borders
  
-    BACKGROUND: 0, //8-bit IRGB
+    */BACKGROUND: 0/*, //8-bit IRGB
     CHARFILL: 0, //8-bit IRGB
     BORDER: 0 //8-bit IRGB*/
 }
  
 var builtInArrays = {
-    /*SPRITEX: new Array(16), //values 0-511
+    SPRITEX: new Array(16), //values 0-511
     SPRITEY: new Array(16), //values 0-255
     SPRITEPTR: new Array(16), //values 0-16, 0 being off
-    SPRITEPRIO: new Array(16), //values 0-2 (behind tiles, over tiles, over vectors, over text)
+    /*SPRITEPRIO: new Array(16), //values 0-2 (behind tiles, over tiles, over vectors, over text)
               
     PALSELECT: new Array(16), //0 is for vectors, 1-15 is for designs; values 0-3
  
@@ -541,8 +557,8 @@ var builtInArrays = {
     VECTORFILL: new Array(32), //values 0-3
  
     CHARMASK: new Array(24*48), //@V+0; 24 rows, 48 columns of ASCII + color data bytes
-    FONT: new Array(8*256), //@V+1296; index=8*(ASCII>32?ASCII-32:ASCII+224)
-    DESIGN: new Array(15*144) //@V+1872*/
+    FONT: new Array(8*256), //@V+1296; index=8*(ASCII>32?ASCII-32:ASCII+224)*/
+    DESIGN: new Array(15*144) //@V+1872
 }
 
 /*function arrayToMemory(name, index, value) {
@@ -707,7 +723,10 @@ function contProgram() {
 		}
     }
 
-	if (interact == inputAction) videoPrint("READY.")
+	if (interact == inputAction) {
+		videoPrint("READY.")
+		outputTab()
+	}
 }
 
 function evaluateDataInstruction() {
@@ -995,6 +1014,7 @@ var instructions = {
 			var target = popAndAssign(function(name, oldValue) {
 				var message = popAndEvaluate("ENTER VALUE FOR " + name)
 				videoPrint(message)
+				outputTab()
 				stopped = pc + 1
 								
 				return oldValue //for now
@@ -1004,7 +1024,8 @@ var instructions = {
 				inputAction = interact
 
 				if (response === null) {
-					runError("BREAK")
+					videoPrint("READY.")
+					outputTab()
 					argumentStack = saveStk
 					stopped = pc
 					return
@@ -1114,7 +1135,7 @@ var instructions = {
 			parseToEndOfLine(deStart)
 		},
 		
-		run: pc => pc + 1
+		run: function(pc) { return pc + 1 }
 	},
 	
 	// evaluate the condition expression here
@@ -1130,7 +1151,7 @@ var instructions = {
 	
 	// DATA and DEF skips evaluation of arguments like THEN with a false condition
 	_DEFER: {
-		run: pc => elseBranches[pc]
+		run: function(pc) { return elseBranches[pc] }
 	},
 	
     RESTORE: {
@@ -1254,7 +1275,23 @@ var instructions = {
 		}
 	},
 
-    //WAIT:
+    WAIT: {
+		parse: function() {
+			expressionArg()
+			expectEnd()
+		},
+		
+		run: function(pc) {
+			var time = popAndEvaluate()
+			
+			stopped = pc + 1
+			inputAction = function() {}
+			setTimeout(function() { 
+				inputAction = interact 
+				contProgram()
+			}, time)
+		}
+	},
 	
     DEF: {
 		parse: function() {
@@ -1380,11 +1417,26 @@ var instructions = {
 			
 			return pc + 1
 		}
-	}
+	},
 	
     //OPEN:
     //CLOSE:
-    //GET:
+    GET: {
+		parse: function() {
+			assignableArg()
+			expectEnd()
+		},
+		
+		run: function(pc) {
+			var value = keyBuffer.shift()
+			
+			popAndAssign(function() {
+				return value?value:0 
+			})
+
+			return pc + 1
+		}
+	}
 }
 
 instructions._LET = { //implicit assignment (omit keyword in listing, appears as token)
