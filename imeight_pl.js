@@ -140,11 +140,13 @@ var commands = {
 var text
 var rollback
 var parseSuccess
-var line = 0
+var lineNumber = 0
  
 function newProgram() {
-	line = 1
+	lineNumber = 1
+	colonCount = 1
 	program = []
+	lineNumbers = []
 	labels = { START:0 }
 	dataLookup = []
 	elseBranches = {}
@@ -152,7 +154,7 @@ function newProgram() {
  
 function parseError(message) {
 	if (!parseSuccess) return
-    videoPrint("?" + message + "  ERROR IN " + line)
+    videoPrint("?" + message + "  ERROR IN " + lineNumber)
 	text = ""
 	parseSuccess = false
 	videoPrint("READY.")
@@ -232,6 +234,7 @@ function expectEnd(deStart) {
     if (text.length > 0) {
 		if (text[0] == ":") {
 			text = text.substring(1)
+			colonCount++
 		} else if (text[0] != "'") {
 			parseError("EXTRA ARGUMENT")
 			return
@@ -251,7 +254,8 @@ function instructionEnds() {
 		return true
 	}
 	
-	if (':' == text[0]) {
+	if (text[0] == ":") {
+		colonCount++
 		text = text.substring(1)
 		return true
 	}
@@ -446,7 +450,10 @@ function parseToEndOfLine(deStart) {
 			if ("parse" in instructions[instruction]) {
 				if (text.toUpperCase().startsWith(instruction)) {
 					text = text.substring(instruction.length)
+					var bugLocator = colonCount + ", " + instruction
 					instructions[instruction].parse()
+					lineNumbers.push(lineNumber + ":" + bugLocator)
+					lineNumbers[program.length] = lineNumber + ":" + bugLocator
 					program.push(instruction)
 					instructionPushed = true
 					break
@@ -457,7 +464,10 @@ function parseToEndOfLine(deStart) {
 		if (!instructionPushed) {
 			//no instruction keyword - check if it is an assignment
 			if (getRegexPrefix(ASSIGN_RE, text) !== false) {
+				var bugLocator = colonCount + ", ASSIGNMENT"
 				instructions.LET.parse()
+				lineNumbers.push(lineNumber + ":" + bugLocator)
+				lineNumbers[program.length] = lineNumber + ":" + bugLocator
 				program.push("_LET")
 			} else {
 				parseError("INSTRUCTION EXPECTED")
@@ -480,7 +490,8 @@ function parseLine() {
 	parseToEndOfLine()
 	
 	if (parseSuccess) {
-		line++
+		lineNumber++
+		colonCount=1
 	} else {
 		program.splice(rollback, program.length - rollback)
 	}
@@ -522,155 +533,19 @@ var loops = []
  
 var memory = []
  
-var lastLabel
-var labelOffset
- 
 var eventQueue = []
 var eventHandler = function() {}
 
 //runner constant
 var builtInVariables = {
-    PI: Math.PI,
- 
-    /* Built-in variables bound to video chip registers */
-    /*COLORTEXT: 1, //mask is 6 bits ASCII, 2 bits color if COLORTEXT=1; 8 bits ASCII if COLORTEXT=0
-    CHARFILL: 0, //zero pixels of the font are transparent (0) or filled (1) in the 8 by 8 block
-    VECTORS: 3, //enable/disable triangle sets 0-15 (bit 1) and 16-31 (bit 2)
-    TILEX: 0, //tile offset horizontal (0-32)
-    TILEY: 0, //tile offset vertical (0-32)
-    TEXTX: 0, //text offset horizontal (0-32)
-    TEXTY: 0, //text offset vertical (0-32)
-    BORDERS: 255, //4 tile borders + 4 text borders
- 
-    */BACKGROUND: 0/*, //8-bit IRGB
-    CHARFILL: 0, //8-bit IRGB
-    BORDER: 0 //8-bit IRGB*/
+    PI: Math.PI
 }
  
-var builtInArrays = {
-    SPRITEX: new Array(16), //values 0-511
-    SPRITEY: new Array(16), //values 0-255
-    SPRITEPTR: new Array(16), //values 0-16, 0 being off
-    /*SPRITEPRIO: new Array(16), //values 0-2 (behind tiles, over tiles, over vectors, over text)
-              
-    PALSELECT: new Array(16), //0 is for vectors, 1-15 is for designs; values 0-3
- 
-    PALDEFINE: new Array(5*3),
-        //each member of the PALDEFINE dim is mapped to 1 byte, which represents 8-bit IRGB
-        //1 palette is 3 color definitions:
-        //color index 0 is transparent, 1-3 are defined in such palettes
-        //4 palettes (0-2, 3-5, 6-9, 10-12) are selectable for sprite/tile designs 1-15
-        //palette 13-15 is for the text layer
-              
-    TILES: new Array(9*16), //values 0-15, 0 is fully transparent
- 
-    //overlapped memory area @V+3088-3312
-    VECTORX: new Array(3*32), //values 0-511
-    VECTORY: new Array(3*32), //values 0-256
-    VECTORCOLOR: new Array(32), //values 0-3
-    VECTORFILL: new Array(32), //values 0-3
- 
-    CHARMASK: new Array(24*48), //@V+0; 24 rows, 48 columns of ASCII + color data bytes
-    FONT: new Array(8*256), //@V+1296; index=8*(ASCII>32?ASCII-32:ASCII+224)*/
-    DESIGN: new Array(15*144) //@V+1872
-}
+var builtInArrays = {}
 
-/*function arrayToMemory(name, index, value) {
-    var base
- 
-    switch (name) {
-        case "VECTORX":
-			value &= 511
-            base = (index < 48)?3088:3200
-            index %= 48
-            memory[base + index] = value & 255
-            base += 48
-            highbit = (value >> 8) << (index%8)
-            memory[base + index/8] &= ~highbit
-            memory[base + index/8] |= highbit
-            break
-        case "VECTORY":
-			value &= 255
-            base = (index < 48)?3142:3254
-            memory[base + index%48] = value
-            break
-        case "VECTORCOLOR":
-			value &= 3
-            base = (index < 16)?3190:3302
-            index &= 15
-            highbit = (value >> 1) << (index%8)
-			lowbit = (value & 1) << (index%8)
-            memory[base + index/8] &= ~highbit
-            memory[base + index/8] |= highbit
-			base += 2
-            memory[base + index/8] &= ~lowbit
-            memory[base + index/8] |= lowbit
-            break
-        case "VECTORFILL":
-			value &= 3
-            base = (index < 16)?3194:3306
-            index &= 15
-            highbit = (value >> 1) << (index%8)
-			lowbit = (value & 1) << (index%8)
-            memory[base + index/8] &= ~highbit
-            memory[base + index/8] |= highbit
-			base += 2
-            memory[base + index/8] &= ~lowbit
-            memory[base + index/8] |= lowbit
-            break
-        case "CHARMASK":
-            memory[0 + index] = value
-            break
-        case "FONT":
-            memory[1296 + index] = value
-            break
-        case "DESIGN":
-            memory[1872 + index] = value
-            break
-    }
-}
-
-function memoryToArray(name, index) {
-	switch (name) {
-		case "CHARMASK":
-			variables.CHARMASK[index] = memory[index]
-			break
-		case "FONT":
-			variables.FONT[index] = memory[index + 1296]
-			break
-		case "DESIGN":
-			variables.DESIGN[index] = memory[index + 1872]
-			break
-		case "VECTORX":
-			var base = (index < 48)?3088:3200
-			var i = index%48
-			variables.VECTORX[index] = memory[base + i] | (((memory[base + 48 + i/8] >> (i%8)) & 1) << 8)
-			break
-		case "VECTORY":
-			var base = (index < 48)?3142:3254
-			var i = index%48
-			variables.VECTORY[index] = memory[base + i]
-			break
-        case "VECTORCOLOR":
-            base = (index < 16)?3190:3302
-			var i = index%16
-			highbit = (memory[base + i/8] >> (i%8)) & 1
-			base += 2
-			lowbit = (memory[base + i/8] >> (i%8)) & 1
-			variables.VECTORCOLOR[index] = (highbit << 1) & lowbit
-			break
-        case "VECTORFILL":
-            base = (index < 16)?3194:3306
-			highbit = (memory[base + index/8] >> (index%8)) & 1
-			base += 2
-			lowbit = (memory[base + index/8] >> (index%8)) & 1
-			variables.VECTORFILL[index] = (highbit << 1) & lowbit
-			break
-	}
-}*/
- 
 function runError(message) {
-    videoPrint("?" + message + "  ERROR AT " + lastLabel + "+" + labelOffset)
+	if (stopped === true) return
+    videoPrint("?" + message + "  ERROR IN " + lineNumber)
 	stopped = true
 }
 
@@ -706,18 +581,13 @@ function contProgram() {
     var programCounter = stopped
 	stopped = 0
 
-	if (programCounter == 0) {
-		lastLabel = "START"
-		labelOffset = 0
-	}
-
     while (programCounter < program.length && !stopped) {
         var token = program[programCounter]
+		if (programCounter in lineNumbers) lineNumber = lineNumbers[programCounter]
 
         if (token in instructions) {
             var instruction = instructions[token]
             programCounter = instruction.run(programCounter)
-			labelOffset++
         } else {
 			var funcName = indexedReference(token, functions)
 			if (funcName !== false) {
@@ -919,8 +789,7 @@ var instructions = {
         },
                   
         run: function(pc) {
-            lastLabel = argumentStack.pop()
-			labelOffset = 0
+            argumentStack.pop()
             return pc + 1
         }
     },
@@ -1061,6 +930,7 @@ var instructions = {
 				
 				videoPrint(response).style.opacity = 0.75
 				target.array[target.index] = response
+				eventQueue = [] //don't let GET capture what is already processed
 				contProgram()
 			}
 			
@@ -1145,8 +1015,6 @@ var instructions = {
             var target = argumentStack.pop()
 			
 			if (target in labels) {
-				lastLabel = target
-				labelOffset = 0
 				return labels[target]
 			}
 			
@@ -1157,8 +1025,11 @@ var instructions = {
 	// IF/THEN construct in tokenized postfix: [ conditionExpression, THEN token, thenBranchInstructions, IF token ]
     IF: {
 		parse: function() {
-			expressionArg()		
+			expressionArg()
 			var thenWord = expectOne(["THEN", "T."])
+			var bugLocator = colonCount + ", " + "IF"
+			lineNumbers.push(lineNumber + ":" + bugLocator)
+			lineNumbers[program.length] = lineNumber + ":" + bugLocator
 			var deStart = deferredEvaluation(thenWord)
 			parseToEndOfLine(deStart)
 		},
@@ -1224,9 +1095,6 @@ var instructions = {
             var target = argumentStack.pop()
 			
 			if (target in labels) {
-				lastLabel = target
-				labelOffset = 0
-
 				argumentStack.push(pc + 1)
 				return labels[target]
 			}
@@ -1533,6 +1401,8 @@ var builtInFunctions = {
     "LEFT$": { apply: arg => arg[0].substr(0, arg[1]) },
     "RIGHT$": { apply: arg => arg[0].substring(arg[0].length - arg[1]) },
     "MID$": { apply: arg => arg[0].substr(arg[1] - 1, arg[2]) },
+    "TIME$": { apply: arg => new Date(Array.isArray(arg)?Date.now():arg).toUTCString().replace(/ GMT$/, '') },
+	TIME: { apply: function() { return Date.now() } },
     _PAREN: {
         listAs: "(", //explicitly marked parentheses - omit keyword in listing 
         apply: arg => arg
@@ -1545,5 +1415,5 @@ var builtInFunctions = {
 var labels = { START: 0 } //pointers to instructions after each @ instruction in the tokenized program
 var dataLookup = [] //pointers to DATA instruction arguments in the tokenized program
 var elseBranches = {} //where to jump if condition evaluates to false (pointer to IF mapped to end of its line)
-
+var lineNumbers = [] //mapping program indices of instructions to line numbers
 var program = [] //the tokenized program (postfix Polish notation)

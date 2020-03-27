@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <script type="text/javascript" src="imeight_pl.js"></script>
     <style>
@@ -11,11 +12,8 @@
     		font-size: 13px;
     	}
 
-    	#inUserInput:focus, #taList:focus {
+    	#inUserInput:focus, #taList:focus, div:focus {
     		outline: none;
-    		background:transparent;
-    		padding: 0;
-    		margin: 0;
     	}
     	
     	div.dark, #taList, div.dark input {
@@ -80,6 +78,10 @@
     		position: relative;
     		height: 320px;
     	}
+		
+		#divOutput div {
+		    white-space: pre;
+		}
     	
     	#divTutor {
     		position: fixed;
@@ -113,13 +115,13 @@
     		<button class="glow" onclick="commands.OLD()" title="Restore Program Text After NEW or OLD Command">OLD</button>
     		<button class="glow" onclick="divTutor.style.display='block'" title="Show Tutorial (F1)">TUTOR</button>
     	</div>
-    	<div class="dark" id="tabOutput" style="display:none">
-    		<div class="dark" id="divOutput" style="font-family:Monospace">
+    	<div class="dark" id="tabOutput" style="display:none" tabindex="1" onkeydown="document.getElementById('inUserInput').focus()">
+    		<div class="dark" id="divOutput" style="font-family:Monospace" tabindex="2" onkeydown="document.getElementById('inUserInput').focus()">
     		</div>
     		<input size="64" id="inUserInput"/>
     		<span id="inputButtons">
-    			<button class="glow" onclick="userInput()" id="btnGo">&#x2713;</button>
-    			<button class="glow" onclick="userBreak()" id="btnStop">&#x2715;</button>
+    			<button class="glow" onclick="userInput()" id="btnGo" title="Enter">&#x2713;</button>
+    			<button class="glow" onclick="userBreak()" id="btnStop" title="Esc">&#x2715;</button>
     		</span>
     	</div>
     	<div tabindex="0" class="dark" id="tabGraphic" style="display:none;width:384px;height:216px;margin:52px auto">
