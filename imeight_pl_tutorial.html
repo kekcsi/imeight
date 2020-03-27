@@ -116,6 +116,7 @@ Interactive Screen, press Enter.</p>
 &bull;	<a href="#738">Contrasting C64</a></div>
 <h3>Game Programming Tutorial</h3><div class="contents">
 	<a href="#2001">WAIT and GET</a>
+&bull;	<a href="#2002">TIME and TIME$</a>
 </div>
 <h1>Programming Instruction by Instruction</h1>
 <h2><a name="72">PRINT</a></h2>
@@ -770,6 +771,9 @@ Use spaces to separate names from operators
 
 
 <h1>Game Programming Tutorial</h1>
+<p>OK, that was boring. Fortunately this imaginary little machine has all the
+necessary stuff for action game programming, too. You'll need controls,
+timing and graphics. Let's go.</p>
 <h2><a name="2001">WAIT and GET</a></h2>
 <p>WAIT instruction halts execution of your program until one of the 
 events occur:</p><ul>
@@ -783,7 +787,7 @@ it started to run. E.g. just after another WAIT, it's exactly 20 ms.</li>
 variable in argument. Consecutive GETs will process the key hits in 
 chronological order.</p>
 <p>Key codes:</p><ul>
-<li>If no button has been hit (since all of the events are processed by GET 
+<li>If no button has been hit (since all of the events had been processed by GET 
 instructions) then GET assigns the value 0.</li>
 <li>Buttons for alphanumeric characters and space have key codes 32 through 
 127, according to ASCII.</li>
@@ -792,41 +796,55 @@ instructions) then GET assigns the value 0.</li>
 <li>When Shift or Ctrl is still pressed while another key is hit, .5 or .25 is 
 added to its key code, respectively.</li>
 </ul>
-<div class="code">	T$="":TIME=0
-	@LOOP:GET ASCII
-	IF ASCII=27 THEN PRINT T$:END
-	IF ASCII=0 THEN WAIT:TIME=TIME+1
-	IF ASCII>31 AND 128>ASCII THEN T$=T$+CHR$(ASCII)
-	IF ASCII=13 THEN PRINT T$:T$=""
-	IF TIME>50 THEN PRINT "TICK...":TIME=0
-	GOTO LOOP</div>
+<div class="code">    SECS=10:AN=10
+    PRINT "ENTER "+AN+" ANIMALS IN "+SECS+" SECONDS"
+    T$="":TICKS=0
+    @LOOP:GET KEY
+    IF KEY=27 THEN PRINT "GIVEN UP?":END
+    IF KEY=0 THEN WAIT:TICKS=TICKS+1
+    IF KEY>31 AND 128>KEY THEN T$=T$+CHR$(KEY)
+    IF KEY=13 THEN AN=AN-1:PRINT T$+" ACCEPTED, "+AN+" STILL TO GO!":T$=""
+    IF AN=0 THEN PRINT "YOU WIN.":END
+    IF TICKS>50 THEN SECS=SECS-1:PRINT SECS+" SECONDS LEFT...":TICKS=0
+    IF SECS=0 THEN PRINT "YOU LOSE.":END
+    GOTO LOOP</div>
 <h3>Motivation</h3>
 <p>Busy loops without any WAIT in them will render your browser totally
 irresponsive.</p>
 <div class="code">    REM<i> * BROWSER KILLING CODE *</i>
     @BUSYLOOP:GOTO BUSYLOOP<hr/>    @FRIENDLYLOOP:WAIT:GOTO FRIENDLYLOOP
     '<i>CPU IS COLDER AND PROGRAM STOPPABLE: HIT ESC ON THE INTERACTIVE SCREEN</i></div>
-<h3>First In - First Out</h3>
-<p>If keystrokes are not processed for a long time, GET may process on 
-surprisingly old events:</p>
-<div class="code">    FOR I=0 TO 500:WAIT:N. '<i>WAIT 10 SECS: USER MAY HIT KEYS MEANWHILE</i>
+<h3>Clearing Past Events</h3>
+<div class="code">    FOR I=1 TO 500:WAIT:N. '<i>WAIT 10 SECS: USER MAY HIT KEYS MEANWHILE</i>
     PRINT "HIT A BUTTON NOW:"
-    @LOOP:WAIT:GET A
+    @GETLOOP:WAIT:GET A '<i>PROGRAMMER MAY THINK THIS WAIT AND GET BELONG TOGETHER</i>
     IF A=0 T.G.LOOP
     PRINT A
-    REM<i> * WHEN USER HITS A BUTTON, ONE KEY CODE GETS PRINTED *</i>
-    REM<i> *        BUT NOT NECESSARILY THE ONE JUST HIT        *</i>
-<hr/>    FOR I=0 TO 500:WAIT:N.
-    @ZAP:GET A:IF A&lt>0 THEN GOTO ZAP 'CLEAR ALL PAST EVENTS
+    REM<i> * KEY CODE OF FIRST HIT SINCE PROGRAM START GETS PRINTED *</i>
+    REM<i> *    NOT NECESSARILY ONE HIT WHILE WAITING AT GETLOOP    *</i>
+<hr/>    FOR I=1 TO 500:WAIT:N.
+    @ZAP:GET A:IF A&lt>0 THEN GOTO ZAP '<i>CLEAR ALL PAST EVENTS</i>
     PRINT "HIT A BUTTON NOW:"
     @LOOP:WAIT:GET A '<i>NOW THIS WILL GET A YOUNG EVENT</i>
     IF A=0 T.G.LOOP
     PRINT A
-<hr/>    FOR I=0 TO 500:WAIT:N.
-    CLR 'CLEAR ALL PAST EVENTS (AND VARIABLES ETC.)
+<hr/>    FOR I=1 TO 500:WAIT:N.
+    CLR '<i>CLEAR ALL PAST EVENTS (AND ALL VARIABLES ETC.)</i>
     PRINT "HIT A BUTTON NOW:"
     @LOOP:WAIT:GET A
     IF A=0 T.G.LOOP
     PRINT A</div>
+<h3>Abbreviation</h3>
+<div class="code">    FOR I=1 TO 50:W.:N. '<i>WAIT >980 BUT &lt=1000 MILLISECONDS</i></div>
+<h2><a name="2002">TIME and TIME$</a></h2>
+<div class="code">    PRINT TIME() '<i>MILLISECONDS SINCE EPOCH, 1 JAN 1970</i>
+    PRINT TIME$(0) '<i>THE EPOCH IN A HUMAN READABLE FORMAT</i>
+    PRINT TIME$(TIME()) '<i>CURRENT DATE AND TIME</i>
+    FOR I=0 TO 50:W.:N. '<i>WAIT (MORE THAN) A SECOND...</i>
+    PRINT TIME$() '<i>CURRENT DATE AND TIME, SHORTER WAY</i>
+    REM<i> * LAST TWO LINES SHOULD DIFFER IN 1 SECOND *</i></div>
+<p>Timing for less than 20 milliseconds:</p>
+<div class="code">    UNTIL=TIME()+10 '<i>10 MILLISECONDS FROM NOW</i>
+    @BUSY:IF TIME()&lt;UNTIL T.G.BUSY</div>
 </body>
 </html>

@@ -55,7 +55,11 @@ function pageLoad() {
 			event.preventDefault()
 			parseText()
 		}
+
+		updateLineNumber()
 	})
+	
+	taList.addEventListener("mouseup", updateLineNumber)
 	
 	tabGraphic.addEventListener("keydown", function(event) {
 		event.preventDefault()
@@ -64,6 +68,35 @@ function pageLoad() {
 	})
 
 	setInterval(function() { eventHandler() }, 20)
+}
+
+function updateLineNumber() {
+	inLine.value = taList.value.substring(0, taList.selectionStart).split("\n").length
+}
+
+function goLine(target) {
+	var currPos = 0
+	var lines = taList.value.split("\n")
+	var target0based = +target - 1
+
+	inLine.value = target
+
+	for (var currLine in lines) {
+		var part = lines[currLine]
+		
+		if (currLine == target0based) {
+			taList.selectionStart = currPos
+		}
+		
+		currPos += part.length + 1
+		
+		if (currLine == target0based) {
+			taList.selectionEnd = currPos
+			break
+		}
+	}
+	
+	taList.focus()
 }
 
 function videoPrint(message) {
@@ -158,6 +191,7 @@ function parseError(message) {
 	text = ""
 	parseSuccess = false
 	videoPrint("READY.")
+	goLine(lineNumber)
 }
 
 var NAME_RE = /^[A-Z][A-Z0-9]*[%!$]?/
@@ -546,6 +580,7 @@ var builtInArrays = {}
 function runError(message) {
 	if (stopped === true) return
     videoPrint("?" + message + "  ERROR IN " + lineNumber)
+	goLine(parseInt(lineNumber))
 	stopped = true
 }
 
@@ -1348,6 +1383,7 @@ instructions["T."] = instructions.THEN
 instructions["G."] = instructions.GOTO
 instructions["N."] = instructions.NEXT
 instructions["R."] = instructions.RETURN
+instructions["W."] = instructions.WAIT
 instructions["'"] = instructions.REM
 
 var goWords = ["GOTO", "GOSUB", "G."]
@@ -1401,7 +1437,7 @@ var builtInFunctions = {
     "LEFT$": { apply: arg => arg[0].substr(0, arg[1]) },
     "RIGHT$": { apply: arg => arg[0].substring(arg[0].length - arg[1]) },
     "MID$": { apply: arg => arg[0].substr(arg[1] - 1, arg[2]) },
-    "TIME$": { apply: arg => new Date(Array.isArray(arg)?Date.now():arg).toUTCString().replace(/ GMT$/, '') },
+    "TIME$": { apply: arg => new Date(Array.isArray(arg)?Date.now():arg).toUTCString().replace(/ GMT$/, '').toUpperCase() },
 	TIME: { apply: function() { return Date.now() } },
     _PAREN: {
         listAs: "(", //explicitly marked parentheses - omit keyword in listing 
