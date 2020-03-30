@@ -1,3 +1,7 @@
+//TODO
+//buglocator coloncount in parseerror
+//coloncount in goline
+
 //interactive
 
 function programTab() {
@@ -77,9 +81,7 @@ function updateLineNumber() {
 function goLine(target) {
 	var currPos = 0
 	var lines = taList.value.split("\n")
-	var target0based = +target - 1
-
-	inLine.value = target
+	var target0based = parseInt(target) - 1
 
 	for (var currLine in lines) {
 		var part = lines[currLine]
@@ -127,7 +129,7 @@ var interact = function(input) {
 		
 		if (parseSuccess) {
 			if (!taList.value.endsWith("\n")) taList.value += "\n"
-			taList.value += input
+			taList.value += input //FIXME 'PROGRAM FORKED when dirty
 			div.style.color = "yellow"
 		}
 	}
@@ -174,10 +176,12 @@ var text
 var rollback
 var parseSuccess
 var lineNumber = 0
+var colonCount
+var charsParsed
  
 function newProgram() {
 	lineNumber = 1
-	colonCount = 1
+	charsParsed = 0
 	program = []
 	lineNumbers = []
 	labels = { START:0 }
@@ -187,11 +191,17 @@ function newProgram() {
  
 function parseError(message) {
 	if (!parseSuccess) return
-    videoPrint("?" + message + "  ERROR IN " + lineNumber)
+    videoPrint("?" + message + "  ERROR IN " + lineNumber + ":" + colonCount)
+	chStart = charsParsed - colonAt
+	charsParsed -= text.length
 	text = ""
 	parseSuccess = false
 	videoPrint("READY.")
-	goLine(lineNumber)
+	inUserInput.value="LIST"
+	taList.selectionStart = chStart
+	taList.selectionEnd = charsParsed
+	inLine.value = lineNumber
+	taList.focus()
 }
 
 var NAME_RE = /^[A-Z][A-Z0-9]*[%!$]?/
@@ -268,6 +278,7 @@ function expectEnd(deStart) {
     if (text.length > 0) {
 		if (text[0] == ":") {
 			text = text.substring(1)
+			colonAt = text.length
 			colonCount++
 		} else if (text[0] != "'") {
 			parseError("EXTRA ARGUMENT")
@@ -289,6 +300,7 @@ function instructionEnds() {
 	}
 	
 	if (text[0] == ":") {
+		colonAt = text.length - 1
 		colonCount++
 		text = text.substring(1)
 		return true
@@ -305,7 +317,7 @@ function tryPrefix(pfx, fragment) {
     } else {
 		fragment = fragment.trim()
 
-		if (fragment.toUpperCase().startsWith(pfx)) {
+		if (fragment.startsWith(pfx)) {
 			fragment = fragment.substring(pfx.length)
 			return fragment
 		}
@@ -367,7 +379,7 @@ function expressionArgUpTo(endPrecedence, fragment) {
 					continue
 				}
 				
-                if (fragment.toUpperCase().startsWith(operator)) {
+                if (fragment.startsWith(operator)) {
                     while (shunt.length > 0 && operators[shunt[shunt.length - 1]].precedenceLevel <= operators[operator].precedenceLevel) {
                         program.push(shunt.pop())
                     }
@@ -408,7 +420,7 @@ function extractExpression(fragment) {
             prefix = token + "(" //spaces in between are _not_ allowed
         }
  
-        if (fragment.toUpperCase().startsWith(prefix)) {
+        if (fragment.startsWith(prefix)) {
             fragment = fragment.substring(prefix.length)
             fragment = expressionArg(fragment)
             fragment = expect(")", fragment)
@@ -474,21 +486,31 @@ function tokenEscape(fragment) {
 	return fragment + "\n"
 }
 
+function parseInstruction(pushed, parsed, displayed, sinceChars) {
+	var bugLocator = {colon: colonCount, instruction: displayed, 
+		chStart: charsParsed - text.length - sinceChars}
+
+	if (parsed) instructions[parsed].parse()
+	if (displayed) {
+		bugLocator.line = lineNumber
+		bugLocator.chEnd = charsParsed - text.length
+		lineNumbers.push(bugLocator)
+		lineNumbers[program.length] = bugLocator
+	}
+	if (pushed) program.push(pushed)
+}
+
 function parseToEndOfLine(deStart) {
-    text = text.trim()
+    text = text.trim().toUpperCase()
 
     while (text.length > 0) {
 		instructionPushed = false
                   
         for (var instruction in instructions) {
 			if ("parse" in instructions[instruction]) {
-				if (text.toUpperCase().startsWith(instruction)) {
+				if (text.startsWith(instruction)) {
 					text = text.substring(instruction.length)
-					var bugLocator = colonCount + ", " + instruction
-					instructions[instruction].parse()
-					lineNumbers.push(lineNumber + ":" + bugLocator)
-					lineNumbers[program.length] = lineNumber + ":" + bugLocator
-					program.push(instruction)
+					parseInstruction(instruction, instruction, instruction, instruction.length)
 					instructionPushed = true
 					break
 				}
@@ -498,11 +520,7 @@ function parseToEndOfLine(deStart) {
 		if (!instructionPushed) {
 			//no instruction keyword - check if it is an assignment
 			if (getRegexPrefix(ASSIGN_RE, text) !== false) {
-				var bugLocator = colonCount + ", ASSIGNMENT"
-				instructions.LET.parse()
-				lineNumbers.push(lineNumber + ":" + bugLocator)
-				lineNumbers[program.length] = lineNumber + ":" + bugLocator
-				program.push("_LET")
+				parseInstruction("_LET", "LET", "ASSIGNMENT", 0)
 			} else {
 				parseError("INSTRUCTION EXPECTED")
 				break
@@ -520,12 +538,15 @@ function parseToEndOfLine(deStart) {
 
 function parseLine() {
     rollback = program.length
+	charsParsed += text.length
+	colonAt = text.length
 	
 	parseToEndOfLine()
 	
 	if (parseSuccess) {
 		lineNumber++
-		colonCount=1
+		colonCount = 1
+		charsParsed++
 	} else {
 		program.splice(rollback, program.length - rollback)
 	}
@@ -570,6 +591,8 @@ var memory = []
 var eventQueue = []
 var eventHandler = function() {}
 
+var bugLocator
+
 //runner constant
 var builtInVariables = {
     PI: Math.PI
@@ -579,8 +602,13 @@ var builtInArrays = {}
 
 function runError(message) {
 	if (stopped === true) return
-    videoPrint("?" + message + "  ERROR IN " + lineNumber)
-	goLine(parseInt(lineNumber))
+    videoPrint("?" + message + "  ERROR IN " + bugLocator.line + ":" 
+		+ bugLocator.colon + ", " + bugLocator.instruction)
+
+	taList.selectionStart = bugLocator.chStart
+	taList.selectionEnd = bugLocator.chEnd
+	inLine.value = bugLocator.line
+	taList.focus()
 	stopped = true
 }
 
@@ -618,7 +646,7 @@ function contProgram() {
 
     while (programCounter < program.length && !stopped) {
         var token = program[programCounter]
-		if (programCounter in lineNumbers) lineNumber = lineNumbers[programCounter]
+		if (programCounter in lineNumbers) bugLocator = lineNumbers[programCounter]
 
         if (token in instructions) {
             var instruction = instructions[token]
@@ -952,6 +980,8 @@ var instructions = {
 				return oldValue //for now
 			})
 			
+			if (target === undefined) return
+			
 			inputAction = function(response) {
 				inputAction = interact
 
@@ -1060,11 +1090,10 @@ var instructions = {
 	// IF/THEN construct in tokenized postfix: [ conditionExpression, THEN token, thenBranchInstructions, IF token ]
     IF: {
 		parse: function() {
+			var startTail = text.length
 			expressionArg()
+			parseInstruction(false, false, "IF", startTail - text.length - 1)
 			var thenWord = expectOne(["THEN", "T."])
-			var bugLocator = colonCount + ", " + "IF"
-			lineNumbers.push(lineNumber + ":" + bugLocator)
-			lineNumbers[program.length] = lineNumber + ":" + bugLocator
 			var deStart = deferredEvaluation(thenWord)
 			parseToEndOfLine(deStart)
 		},
@@ -1330,7 +1359,7 @@ var instructions = {
 		},
 		
 		run: function(pc) {
-			var msg = popAndDeeplyEvaluate()
+			var msg = popAndDeeplyEvaluate("")
 			if (msg === undefined) return
 			videoPrint(msg)
 			return pc + 1
