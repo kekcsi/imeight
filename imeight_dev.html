@@ -6,11 +6,20 @@
     	#inUserInput, #taList {
     		border: none;
     		background: transparent;
-    		padding: 0;
+    		padding: 1px;
     		margin: 0;
     		font-family: monospace;
     		font-size: 13px;
+			line-height: 15px;
     	}
+		
+		#taList {
+			white-space: pre;
+			overflow-wrap: normal;
+			overflow-x: scroll;
+			width:592px;
+			height:298px;
+		}
 
     	#inUserInput:focus, #taList:focus, div:focus {
     		outline: none;
@@ -21,22 +30,54 @@
     		color: orange;
     		resize: none;
     	}
+		
+		div.dark i {
+			font-style: normal;
+			font-weight: normal;
+			opacity: 0.75;
+		}
+		
+		div.dark b {
+			font-style: normal;
+			font-weight: normal;
+			color: yellow;
+		}
     	
+		#tabProgram {
+			position: relative
+		}
+    	
+    	#divStatus {
+    		position: absolute;
+    		right: 0px;
+			bottom: 0px;
+    		font-size: 13px;
+			opacity: 0.75;
+			height: 16px;
+			width: 200px;
+			font-family: sans-serif;
+    	}
+		
 		#inLine, #inLine:focus {
     		border: 0;
     		background: black;
     		padding: 0;
     		margin: 0;
     		outline: none;
-			height: 14px;
-			font-size: 12px;
+			height: 16px;
+			font-size: 13px;
 			font-family: monospace;
 		}
 
     	.dark ::-webkit-scrollbar {
-    		width: 12px;
+    		width: 8px;
+			height: 8px;
     	}
     	 
+		.dark ::-webkit-scrollbar-corner {
+			background: black;
+		}
+		 
     	.dark ::-webkit-scrollbar-track {
     		background: black; 
     	}
@@ -98,7 +139,7 @@
     		position: fixed;
     		top: 8px;
     		left: 624px;
-    		width: 624px;
+    		width: 600px;
     		height: 346px;
     	}
 		
@@ -109,7 +150,7 @@
 		}
 		
 		#taTutor {
-			width: 620px;
+			width: 592px;
 			height: 322px;
 			border: 0;
 		}
@@ -121,11 +162,13 @@
     	<button id="btnOutput" onclick="outputTab()" class="tab" style="border-style:outset">Interactive Screen</button>
     	<button id="btnGraphic" onclick="graphicTab()" class="tab" style="border-style:outset">Graphic Screen</button>
     	<div class="dark" id="tabProgram">
-    		<textarea rows="20" cols="80" id="taList"></textarea><br/>
+    		<textarea id="taList"></textarea><div>
     		<input id="inLine" size="5" type="text" onchange="goLine(this.value)"/>
     		<button class="glow" onclick="parseText()" title="Test Run Program on the Interactive Screen (F9)">TOKENIZE+RELINK</button>
     		<button class="glow" onclick="commands.OLD()" title="Restore Program Text After NEW or OLD Command">OLD</button>
-    		<button class="glow" onclick="divTutor.style.display='block'" title="Show Tutorial (F1)">TUTOR</button>
+    		<button class="glow" id="btnTutorRight" onclick="tutorRight()" title="Show Tutorial (F1)">TUTOR &gt;</button>
+    		<button class="glow" id="btnTutorBelow" style="display:none" onclick="tutorBelow()" title="Show Tutorial (F1)">TUTOR <small>\/</small></button>
+			<div id="divStatus">&nbsp;</div></div>
     	</div>
     	<div class="dark" id="tabOutput" style="display:none" tabindex="1" onkeydown="document.getElementById('inUserInput').focus()">
     		<div class="dark" id="divOutput" style="font-family:Monospace" tabindex="2" onkeydown="document.getElementById('inUserInput').focus()">

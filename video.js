@@ -1,17 +1,17 @@
-builtInArrays.SPRX = [] //horizontal coordinate of each sprite (-23 to 384)
-builtInArrays.SPRY = [] //vertical coordinate of each sprite (-23 to 216)
+builtInArrays.SPRX = [] //horizontal coordinate of each sprite (-24 to 384)
+builtInArrays.SPRY = [] //vertical coordinate of each sprite (-24 to 216)
 builtInArrays.SPRLIGHT = [] //intensity mask pointers (0*144 to 255*144)
 builtInArrays.SPRRED = [] //red mask pointers (0*144 to 255*144)
 builtInArrays.SPRGREEN = [] //green mask pointers (0*144 to 255*144)
 builtInArrays.SPRBLUE = [] //blue mask pointers (0*144 to 255*144)
 builtInArrays.SPRPRIO = [] //priorities
 
-builtInArrays.TEXT = [] //64+2 by 48+2 bytes
+builtInArrays.TEXT = [] //64+1 by 48+1 bytes
 
-builtInArrays.TILEI = [] //16+2 by 9+2 pointers (0*144 to 255*144)
-builtInArrays.TILER = [] //16+2 by 9+2 pointers (0*144 to 255*144)
-builtInArrays.TILEG = [] //16+2 by 9+2 pointers (0*144 to 255*144)
-builtInArrays.TILEB = [] //16+2 by 9+2 pointers (0*144 to 255*144)
+builtInArrays.TILELIGHT = [] //16+1 by 9+1 pointers (0*144 to 255*144)
+builtInArrays.TILERED = []
+builtInArrays.TILEGREEN = []
+builtInArrays.TILEBLUE = []
 
 builtInVariables.BACKGROUND = %1000 //IRGB nibble
 builtInVariables.DESIGNS = 0 //mask pointer offset

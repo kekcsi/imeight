@@ -1,8 +1,6 @@
-//TODO
-//buglocator coloncount in parseerror
-//coloncount in goline
-
 //interactive
+
+var listClean = true //does the tokenized program match the text in the lising?
 
 function programTab() {
 	btnProgram.style.borderStyle="inset"
@@ -34,7 +32,28 @@ function graphicTab() {
 	tabGraphic.focus()
 }
 
+function tutorRight() {
+	divTutor.style.display = "block"
+    divTutor.style.top = "8px"
+    divTutor.style.left = "624px";
+	btnTutorRight.style.display = "none"
+	btnTutorBelow.style.display = "inline"
+}
+
+function tutorBelow() {
+	divTutor.style.display = "block"
+    divTutor.style.top = "372px"
+    divTutor.style.left = "8px";
+	btnTutorRight.style.display = "inline"
+	btnTutorBelow.style.display = "none"
+}
+
 function pageLoad() {
+	btnTutorBelow.addEventListener("mouseout", function(event) {
+		btnTutorRight.style.display = "inline"
+		btnTutorBelow.style.display = "none"
+	})
+	
 	inUserInput.addEventListener("keydown", function(event) {
 		if (interact != inputAction) {
 			eventQueue.push(event.keyCode + 0.5*event.shiftKey + 0.25*event.ctrlKey)
@@ -60,10 +79,12 @@ function pageLoad() {
 			parseText()
 		}
 
-		updateLineNumber()
+		updateLineNumber() //in case it's up/down arrow etc.
 	})
 	
 	taList.addEventListener("mouseup", updateLineNumber)
+	
+	taList.addEventListener("change", function() { listClean = false })
 	
 	tabGraphic.addEventListener("keydown", function(event) {
 		event.preventDefault()
@@ -72,16 +93,22 @@ function pageLoad() {
 	})
 
 	setInterval(function() { eventHandler() }, 20)
+	
+	instructions.CLR.run(0)
 }
 
 function updateLineNumber() {
 	inLine.value = taList.value.substring(0, taList.selectionStart).split("\n").length
+	divStatus.innerHTML = ""
 }
 
 function goLine(target) {
 	var currPos = 0
 	var lines = taList.value.split("\n")
 	var target0based = parseInt(target) - 1
+	
+	taList.scrollTop = Math.max(taList.scrollTop, (target0based - 16)*15)
+	taList.scrollTop = Math.min(taList.scrollTop, (target0based - 4)*15)
 
 	for (var currLine in lines) {
 		var part = lines[currLine]
@@ -115,11 +142,38 @@ var interact = function(input) {
 	if (input === null) return
 	
 	var div = videoPrint(input)
+	
+	if (input === "") return
 
+	fullTextParse = false
 	var command = input.toUpperCase().trim()
 
 	if (command in commands) {
 		commands[command]()
+	} else if (command.startsWith("?")) {
+		//direct expression
+		var saveProgram = program.slice()
+		
+		var evalPC = program.length
+
+		var rest = expressionArg(command.substring(1))
+		if (rest !== "") {
+			parseError("EXTRA ARGUMENT")
+		} else {
+			bugLocator = false
+			
+			while (evalPC in program) {
+				var token = program[evalPC]
+				evaluateToken(token)
+				evalPC++
+			}
+
+			var result = popAndDeeplyEvaluate("")
+			if (result === undefined) result = "READY."
+			videoPrint(result)
+		}
+		
+		program = saveProgram
 	} else {
 		//try adding it as a line to the end of the program text
 		parseSuccess = true
@@ -128,9 +182,18 @@ var interact = function(input) {
 		parseLine()
 		
 		if (parseSuccess) {
-			if (!taList.value.endsWith("\n")) taList.value += "\n"
-			taList.value += input //FIXME 'PROGRAM FORKED when dirty
-			div.style.color = "yellow"
+			if (listClean) {
+				if (!taList.value.endsWith("\n") && taList.value.length > 0) {
+					taList.value += "\n"
+				}
+				taList.value += input + "\n"
+				updateLineNumber()
+			} else {
+				divStatus.innerHTML = "[PROGRAM FORKED]"
+			}
+			div.innerHTML = div.innerHTML.bold()
+		} else {
+			inUserInput.value = input
 		}
 	}
 }
@@ -174,10 +237,10 @@ var commands = {
 //parser
 var text
 var rollback
-var parseSuccess
-var lineNumber = 0
-var colonCount
-var charsParsed
+var parseSuccess = true
+var lineNumber = 1
+var colonCount = 1
+var charsParsed = 0
  
 function newProgram() {
 	lineNumber = 1
@@ -191,17 +254,26 @@ function newProgram() {
  
 function parseError(message) {
 	if (!parseSuccess) return
-    videoPrint("?" + message + "  ERROR IN " + lineNumber + ":" + colonCount)
-	chStart = charsParsed - colonAt
-	charsParsed -= text.length
+
+	if (fullTextParse) {
+		videoPrint("?" + message + "  ERROR IN " + lineNumber + ":" + colonCount)
+		divStatus.innerHTML = message
+		charsParsed -= text.length
+	} else {
+		videoPrint("?" + message + "  ERROR")
+	}
+
 	text = ""
 	parseSuccess = false
 	videoPrint("READY.")
-	inUserInput.value="LIST"
-	taList.selectionStart = chStart
-	taList.selectionEnd = charsParsed
-	inLine.value = lineNumber
-	taList.focus()
+
+	if (fullTextParse) {
+		inUserInput.value = "LIST"
+		taList.selectionStart = charsParsed
+		taList.selectionEnd = (taList.value + "\n").indexOf("\n", charsParsed)
+		inLine.value = lineNumber
+		taList.focus()
+	}
 }
 
 var NAME_RE = /^[A-Z][A-Z0-9]*[%!$]?/
@@ -540,12 +612,12 @@ function parseLine() {
     rollback = program.length
 	charsParsed += text.length
 	colonAt = text.length
+	colonCount = 1
 	
 	parseToEndOfLine()
 	
 	if (parseSuccess) {
 		lineNumber++
-		colonCount = 1
 		charsParsed++
 	} else {
 		program.splice(rollback, program.length - rollback)
@@ -553,11 +625,14 @@ function parseLine() {
 }
 
 function parseText() {
-	lines = taList.value.split("\n")
+	var lines = taList.value.split("\n")
+	fullTextParse = true
 	newProgram()
 
 	outputTab() //allow showing parse errors
 	parseSuccess = true
+
+	if (lines[lines.length - 1] == "") lines.pop()
 
 	for (var i = 0; parseSuccess && (i < lines.length); i++) {
 		text = lines[i]
@@ -565,9 +640,13 @@ function parseText() {
 	}
 	
 	if (parseSuccess) {
-		videoPrint("PROGRAM UPDATED").style.color = "yellow"
+		listClean = true
+		videoPrint("PROGRAM UPDATED".bold())
+		divStatus.innerHTML = "&nbsp;"
 		inUserInput.value="RUN"
 	}
+	
+	fullTextParse = false
 }
  
 //runner
@@ -602,13 +681,20 @@ var builtInArrays = {}
 
 function runError(message) {
 	if (stopped === true) return
-    videoPrint("?" + message + "  ERROR IN " + bugLocator.line + ":" 
-		+ bugLocator.colon + ", " + bugLocator.instruction)
+	
+	if (bugLocator) {
+		videoPrint("?" + message + "  ERROR IN " + bugLocator.line + ":" 
+			+ bugLocator.colon + ", " + bugLocator.instruction)
+		
+		divStatus.innerHTML = message
+		taList.selectionStart = bugLocator.chStart
+		taList.selectionEnd = bugLocator.chEnd
+		inLine.value = bugLocator.line
+		taList.focus()
+	} else {
+		videoPrint("?" + message + "  ERROR")
+	}
 
-	taList.selectionStart = bugLocator.chStart
-	taList.selectionEnd = bugLocator.chEnd
-	inLine.value = bugLocator.line
-	taList.focus()
 	stopped = true
 }
 
@@ -740,7 +826,6 @@ function evaluateToken(token) {
 	} else if (token in variables) {
 		argumentStack.push(preparePush(variables[token]))
 	} else {
-		//should be a literal
 		argumentStack.push(token)
 	}
 }
@@ -993,7 +1078,7 @@ var instructions = {
 					return
 				}
 				
-				videoPrint(response).style.opacity = 0.75
+				videoPrint(response.italics())
 				target.array[target.index] = response
 				eventQueue = [] //don't let GET capture what is already processed
 				contProgram()
@@ -1172,7 +1257,11 @@ var instructions = {
 		
 		run: function(pc) {
 			var target = argumentStack.pop()
-			if (typeof target == "number") return target
+
+			if (typeof target == "number" && target in program) {
+				return target
+			}
+
 			runError("RETURN WITHOUT GOSUB")
 		}
 	},
