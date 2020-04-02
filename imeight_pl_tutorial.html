@@ -82,13 +82,13 @@
 languages when programming was still fun to learn. Do you want to experience, too?</p>
 <p>This emulated imaginary machine has three screen modes:</p><ul>
 <li>Program Listing: for writing and editing your program text.</li>
-<li>Interactive Screen: for issuing interactive commands and reading output of your program as it runs.</li>
+<li>Command Line: for issuing interactive commands and reading output of your program as it runs.</li>
 <li>Graphic Screen: to be covered in the Game Programming Tutorial.</li>
 </ul>
 <p>You can use the usual Copy and Paste function in your browser to transfer
 example codes from the tutorial to the Program Listing panel.</p>
 <p>For a test run, press TOKENIZE+RELINK (F9) then see RUN command appear in the 
-Interactive Screen, press Enter.</p>
+Command Line, press Enter.</p>
 <p>Return to the Program Listing by entering the LIST command.</p>
 <p>NEW command will also erase the program text.</p>
 <h2><a name="contents">Contents</a></h2>
@@ -128,7 +128,7 @@ REM<i>ARK: The PRINT instruction is for learning and debugging purposes only.</i
 REM<i>ARK: See "HELLO WORLD" printed as a result.</i></div>
 <h3>An Infix Operator: + Between Numbers</h3>
 <div class="code">PRINT 6+4
-REM<i>ARK: See 10 printed on the Interactive Screen.</i>
+REM<i>ARK: See 10 printed on the Command Line.</i>
 REM<i>ARK: + is an infix operator and works like in maths.</i>
 REM<i>ARK: There are more operators to be covered later.</i></div>
 <h3>A Function: SIN</h3>
@@ -171,18 +171,19 @@ PRINT A</div>
 <h2><a name="126">Names</a></h2>
 <p>
 In the INPUT examples we could see that there are variables named A and B, which help us store numbers.
-But you can name them relatively freely. Let's see the exact rules for naming variables and more:
+But you can name them relatively freely. Let's see the exact rules for naming variables:
 </p><ol>
 <li> A variable name must start with a letter A through Z. It may have a longer name.
-</li>
+<div class="code">INPUT NUM</div></li>
 <li> From the second position on, the name may contain digits 0 to 9 or more letters, or both, in any order.
-</li>
+<div class="code">INPUT NUMBER2STORE
+INPUT INCOME2020</div></li>
 <li> There is no length limit for the name.
-</li>
+<div class="code">INPUT THEREISNODEFINEDLENGTHLIMITFORTHEVARIABLENAMES</div></li>
 <li> The name optionally ends in one $ or one % sign.
 Convention is that the name ends in $ if it is supposed to have a text value rather than number.
 The % sign suggests integer number value.
-</li>
+<div class="code">INPUT N%:INPUT TEXT$</div></li>
 </ol>
 <p>These rules not only apply to variable names, but also function names and array names, which are covered later.</p>
 <h2><a name="143">LET</a></h2>
@@ -195,7 +196,8 @@ PRINT SUM</div>
 <div class="code">SUM = 6+4
 PRINT SUM</div>
 <p>You can omit the instruction LET and it will still be interpreted as an assignment.</p>
-<p><em>Note:</em> Line 1 is not an equation. The left side must specify the thing to assign to (variable A this time.)</p>
+<p><em>Note:</em> Line 1 is not an equation. The left side must specify the thing to assign to (variable A this time.)
+It is an error to swap the two sides of the assignment, putting numbers or operators to the left side.</p>
 <h3>Motivation</h3>
 <div class="code">SUM = 1+1+1+1+1+1+1+1+1+1
 LITTLEBIGGER = SUM+1
@@ -315,7 +317,7 @@ Y = ATN(X):REM<i> ARC TANGENT	</i>
 
 REM<i> * COMPUTING *</i>
 Y = NOT(X):REM<i> BITWISE LOGICAL NEGATION</i>
-Y = INT%(X):REM<i> INTEGER VALUE OF X, STORED IN A 16-BIT FIXED WORD</i>
+Y = FRAC(X):REM<i> FRACTIONAL PART OF X</i>
 Y = RND(X):REM<i> NON-NEGATIVE RANDOM NUMBER THAT IS LESS THAN X</i>
 Y = PEEK(X):REM<i> THE BYTE STORED AT ADDRESS X; SPOILER: USE POKE INSTRUCTION</i>
 Y$ = STR$(X):REM<i> A DECIMAL REPRESENTATION OF THE NUMBER X</i></div>
@@ -405,7 +407,7 @@ several instructions separated with colon.                                      
 <div class="code">REM<i> ^            	    LEVEL 1</i>
 PRINT 2 * 3^2:REM<i> 18</i>
 PRINT (2*3)^2:REM<i> 36</i>
-REM<i> / *          	    LEVEL 2</i>
+REM<i> / * MOD     	    LEVEL 2</i>
 PRINT 1 + 2*3:REM<i> 7</i>
 PRINT (1+2)*3:REM<i> 9</i>
 REM<i> + -          	    LEVEL 3</i>
@@ -420,7 +422,7 @@ PRINT (1 AND 3)=1:REM<i> 1</i>
 REM<i> AND          	    LEVEL 6</i>
 PRINT 1 OR 3 AND 2:REM<i> 3</i>
 PRINT (1 OR 3)AND 2:REM<i> 2</i>
-REM<i> OR           	    LEVEL 7</i>
+REM<i> OR XOR      	    LEVEL 7</i>
 PRINT 1, 2 OR 4:REM<i> [1, 6]</i>
 REM<i> ,            	    LEVEL 8</i>
 <hr/>REM<i> * OTHER OPERATORS ON THE SAME PRECEDENCE LEVELS *</i>
@@ -476,7 +478,8 @@ PRINT "STEP 2"
 STOP
 PRINT "STEP 3"
 REM<i> * ENTER INTERACTIVE COMMAND CONT TO CONTINUE *</i>
-REM<i> * ENTER INTERACTIVE COMMAND RUN TO START OVER *</i></div>
+REM<i> * ENTER INTERACTIVE COMMAND RUN TO START OVER *</i>
+REM<i> * ?STATUS TO TELL STOP (1) FROM END (0) OR ERROR (-1) *</i></div>
 <h2><a name="465">FOR and NEXT</a></h2>
 <p>Wanna do something 10 times?</p>
 <div class="code">FOR I=1 TO 10:PRINT "THIS OLD MAN, HE PLAYED " + I:NEXT</div>
@@ -743,13 +746,24 @@ Use spaces to separate names from operators
 SC = 1:E = 2
 PRINT SCORE:REM<i> 30</i>
 PRINT SC OR E:REM<i> 3</i></div>
+Dimensions in DIM is documentation of intended indexing. It does not limit the
+usage of the array as it is _not_ memory allocation. Programmer may use 
+zero-based or one-based indexing, interpret DIM numbers as maximal index or 
+number of elements... to taste.
+<div class="code">DIM A(2)
+A(-1)=0
+A(8)=0
+A(2,1)=0
+REM<i> * ALL OF THE ABOVE IS LEGAL ALTHOUGH THE CODE IS MISLEADING *</i></div>
+More differences that are already mentioned:<div class="contents">
 <a href="#d1">DATA evaluation</a>
 &bull; <a href="#642">Abbreviations</a>
 &bull; Concept of labels
 &bull; <a href="#rtl">RESTORE to a label</a>
 &bull; <a href="#novalue">Unassigned variables</a>
 &bull; Built-in variables
-&bull; Distinguishing interactive commands from programming instructions
+&bull; FRAC function, MOD and XOR operators added
+&bull; Distinguishing interactive commands from programming instructions</div>
 
 
 
@@ -816,7 +830,7 @@ GOTO LOOP</div>
 irresponsive.</p>
 <div class="code">REM<i> * BROWSER KILLING CODE *</i>
 @BUSYLOOP:GOTO BUSYLOOP<hr/>@FRIENDLYLOOP:WAIT:GOTO FRIENDLYLOOP
-'<i>CPU IS COLDER AND PROGRAM STOPPABLE: HIT ESC ON THE INTERACTIVE SCREEN</i></div>
+'<i>CPU IS COLDER AND PROGRAM STOPPABLE: HIT ESC ON THE COMMAND LINE</i></div>
 <h3>Clearing Past Events</h3>
 <div class="code">FOR I=1 TO 500:WAIT:N. '<i>WAIT 10 SECS: USER MAY HIT KEYS MEANWHILE</i>
 PRINT "HIT A BUTTON NOW:"
