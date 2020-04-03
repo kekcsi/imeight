@@ -1,8 +1,3 @@
-//FIXME PRINT PEG$(1),PEG$(2),PEG$(3) goes NO VALUE
-//...but LEFT$(PEG$(SOURCE), LEN(PEG$(SOURCE))-1) is fine!?
-//(by chance, because LEFT$(A(1),A(2)) still goes NO VALUE)
-//Late evaluated operator comma is a misconcept. Deep evaluation too.
-
 //transfer variables from parser to runner
   
 var program = [] //the tokenized program (postfix Polish notation)
