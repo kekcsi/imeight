@@ -57,7 +57,7 @@ function namesArg() {
 		var name = getRegexPrefix(NAME_RE, text)
 	 
 		if (name === false) {
-			break
+			name = "" //add a placeholder
 		}
 
 		program.push(name)
@@ -69,7 +69,7 @@ function namesArg() {
 			break
 		} else {
 			while(shunt.length > 0) program.push(shunt.pop())
-		    shunt.push(",")
+		    shunt.push("_NAMELIST")
 		}
 	}
 	

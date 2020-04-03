@@ -163,6 +163,7 @@ var interact = function(input) {
 			parseError("EXTRA ARGUMENT")
 		} else {
 			bugLocator = false
+			stopped = evalPC //enable reporting errors (even after errors)
 			
 			while (evalPC in program) {
 				var token = program[evalPC]
@@ -170,7 +171,7 @@ var interact = function(input) {
 				evalPC++
 			}
 
-			var result = popAndDeeplyEvaluate("")
+			var result = popAndEvaluate("")
 			if (result === undefined) result = "READY."
 			videoPrint(result)
 		}

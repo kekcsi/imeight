@@ -9,6 +9,8 @@
 }
 
 #taList {
+	scrollbar-color: orange black;
+    scrollbar-width: thin;
 	white-space: pre;
 	overflow-wrap: normal;
 	overflow-x: scroll;

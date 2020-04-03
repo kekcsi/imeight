@@ -1,3 +1,17 @@
+//FIXME PRINT PEG$(1),PEG$(2),PEG$(3) goes NO VALUE
+//...but LEFT$(PEG$(SOURCE), LEN(PEG$(SOURCE))-1) is fine!?
+//(by chance, because LEFT$(A(1),A(2)) still goes NO VALUE)
+//Late evaluated operator comma is a misconcept. Deep evaluation too.
+
+//transfer variables from parser to runner
+  
+var program = [] //the tokenized program (postfix Polish notation)
+
+var labels = { START: 0 } //pointers to instructions after each @ instruction in the tokenized program
+var dataLookup = [] //pointers to DATA instruction arguments in the tokenized program (after _DEFER)
+var elseBranches = {} //where to jump if condition evaluates to false (pointer to THEN mapped to after IF)
+var lineNumbers = [] //mapping program indices of instructions to line numbers (debug info)
+
 //runner
 var argumentStack = [] //for evaluating arguments and storing return addresses
 var functions = {}
@@ -19,8 +33,11 @@ var videoPrint = function(message) {
 } // print to Command Line in dev env - browser logs instead in prod
 
 //runner constant
+var safetyWait = 10000
+
 var builtInVariables = {
-    PI: Math.PI
+    PI: Math.PI,
+	TZO: -60000*new Date().getTimezoneOffset()
 }
  
 var builtInArrays = {}
@@ -57,13 +74,8 @@ function preparePush(result) {
 function evaluateOperator(token) {
 	var o = operators[token]
 	
-	if ("lateEvaluated" in o) {
-		var b = argumentStack.pop()
-		var a = argumentStack.pop()
-	} else {
-		var b = getValue(argumentStack.pop())
-		var a = getValue(argumentStack.pop())
-	}
+	var b = getValue(argumentStack.pop())
+	var a = getValue(argumentStack.pop())
 
 	var result = o.evaluate(a, b)
 
@@ -84,6 +96,7 @@ function runProgram() {
 function contProgram() {
     var programCounter = stopped
 	stopped = 0
+	var heat = 10*safetyWait + safetyWait*Math.random()
 
     while (programCounter < program.length && !stopped) {
         var token = program[programCounter]
@@ -92,10 +105,16 @@ function contProgram() {
         if (token in instructions) {
             var instruction = instructions[token]
             programCounter = instruction.run(programCounter)
+			
+			// keep the browser responsive in case of a busy loop
+			if(heat-- <= 0) {
+				instructions.WAIT.run(programCounter - 1)
+				break //in case program stops at 0
+			}
         } else {
 			var funcName = indexedReference(token, functions)
 			if (funcName !== false) {
-				var arg = popAndDeeplyEvaluate([])
+				var arg = popAndEvaluate([])
 				argumentStack.push(preparePush(functions[funcName].apply(arg)))
 				programCounter++
 			} else if (token in operators) {
@@ -116,7 +135,7 @@ function contProgram() {
 		outputTab()
 	}
 
-	variables.STATUS = (programCounter == program.length) ? 0 : ((stopped === true) ? -1 : 1)
+	variables.STATUS = (stopped === true) ? -1 : ((stopped == 0) ? 0 : 1)
 }
 
 function evaluateDataInstruction() {
@@ -143,26 +162,11 @@ function popAndEvaluate(defaultValue) {
 	return getValue(arg)
 }
 
-function popAndDeeplyEvaluate(defaultValue) {
-	var arg = argumentStack.pop()
-	if (arg === "") arg = defaultValue
-	
-	if (Array.isArray(arg)) {
-		for (var i = 0; i < arg.length; i++) {
-			arg[i] = getValue(arg[i])
-		}
-		
-		return arg
-	}
-	
-	return getValue(arg)
-}
-
 function evaluateToken(token) {
 	var funcName = indexedReference(token, functions)
 	
 	if (funcName !== false) {
-		var arg = popAndDeeplyEvaluate([])
+		var arg = popAndEvaluate([])
 		argumentStack.push(preparePush(functions[funcName].apply(arg)))
 	} else if (token in operators) {
 		evaluateOperator(token)
@@ -181,30 +185,26 @@ function getValue(arg) {
 		return arg
 	}
 	
-	var dereferenced = arg
 	var arrayName = indexedReference(arg)
 	if (arrayName !== false) {
-		dereferenced = undefined
-		
 		var i = popAndEvaluate()
 		
 		if (arrayName in arrays) {
-			dereferenced = arrays[arrayName][i]
+			if (i in arrays[arrayName]) {
+				return arrays[arrayName][i]
+			}
 		}
-	} else if (getRegexPrefix(NAME_RE, arg) === arg) {
-		dereferenced = variables[arg]
-	} 
 
-	if (dereferenced === undefined) {
 		runError("NO VALUE")
 		return
-	} else {
-		arg = dereferenced
-	}
+	} else if (getRegexPrefix(NAME_RE, arg) === arg) {
+		if (arg in variables) {
+			return variables[arg]
+		}
 
-	if (typeof arg !== "string") {
-		return arg
-	}
+		runError("NO VALUE")
+		return
+	} 
 	
 	if (arg.startsWith('"') && arg.endsWith('"')) {
 		return arg.substring(1, arg.length - 1)

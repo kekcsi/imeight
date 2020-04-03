@@ -171,11 +171,11 @@ var instructions = {
 		},
 		
 		run: function(pc) {
-			var size = popAndDeeplyEvaluate()
+			var size = popAndEvaluate()
 			var name = argumentStack.pop()
 
 			if (name in functions) {
-				runError("OVERDEFINITION")
+				runError("DIM OVERDEFINES DEF")
 				return
 			}
 
@@ -228,6 +228,31 @@ var instructions = {
 		}
 	},
 	
+	PUSH: {
+		parse: function() {
+			expressionArg()
+			expectEnd()
+		},
+
+		run: function(pc) {
+			var value = popAndEvaluate()
+			argumentStack.push(preparePush(value))
+			return pc + 1
+		}
+	},
+	
+	PULL: {
+		parse: function() {
+			assignableArg()
+			expectEnd()
+		},
+		
+		run: function(pc) {
+			popAndAssign(function() { return popAndEvaluate() })	
+			return pc + 1
+		}
+	},
+
     GOTO: {  
 		parse: function() {
 			nameArg()
@@ -381,19 +406,16 @@ var instructions = {
 		run: function(pc) {
 			var labelArray = argumentStack.pop()
 			var goWord = goWords[argumentStack.pop()]
-			var which = popAndEvaluate()
-
-			if (typeof which === "number") 
-			{ 
-				which = Math.floor(which) - 1
-
-				if (which in labelArray) {
-					argumentStack.push(labelArray[which])
-					return instructions[goWord].run(pc)
-				}
-			}
+			var which = parseFloat("" + popAndEvaluate())
+			which = Math.floor(which) - 1
 			
-			runError("BRANCH")
+			if (which in labelArray) {
+				argumentStack.push(labelArray[which])
+			} else {
+				argumentStack.push(labelArray[labelArray.length - 1])
+			}
+
+			return instructions[goWord].run(pc)
 		}
 	},
 
@@ -424,12 +446,11 @@ var instructions = {
 			var prefix = getRegexPrefix(INDEXED_RE, text)
 		 
 			if (prefix === false) {
-				parseError("FN SYNTAX")
+				parseError("DEF SYNTAX")
 				return
 			} else {
 				text = text.substring(prefix.length)
 				namesArg()
-				var fnParam = program[program.length - 1]
 				expect(")")
 				
 				program.push(prefix.substring(0, prefix.length - 1))
@@ -442,6 +463,18 @@ var instructions = {
 			expectEnd(deStart)
 		}
 	},
+	
+	// comma between names that are not to be evaluated (label or definition)
+	_NAMELIST: {
+		run: function(pc) {
+			var b = argumentStack.pop()
+			var a = argumentStack.pop()
+			
+			argumentStack.push(Array.isArray(a) ? a.concat([b]) : [a, b])
+			
+			return pc + 1
+		}
+	},
 
 	// add a user function definition
 	_FN: {
@@ -449,12 +482,17 @@ var instructions = {
 			var name = argumentStack.pop()
 			var fnParams = argumentStack.pop()
 			if (!Array.isArray(fnParams)) {
-				// unary case
-				fnParams = [fnParams]
+				if (fnParams === "") {
+					//nullary case
+					fnParams = []
+				} else {
+					// unary case
+					fnParams = [fnParams]
+				}
 			}
 
 			if (name in arrays) {
-				runError("OVERDEFINITION")
+				runError("DEF OVERDEFINES DIM")
 				return
 			}
 
@@ -490,7 +528,7 @@ var instructions = {
 						variables[fnParam] = saveX[i]
 					}
 					
-					return argumentStack.pop()
+					return popAndEvaluate()
 				}
 			}
 			
@@ -521,7 +559,7 @@ var instructions = {
 		},
 		
 		run: function(pc) {
-			var msg = popAndDeeplyEvaluate("")
+			var msg = popAndEvaluate("")
 			if (msg === undefined) return
 			videoPrint(msg)
 			return pc + 1
@@ -607,15 +645,15 @@ var operators = {
 	},
     "^": { precedenceLevel: 1, evaluate: Math.pow },
     AND: { precedenceLevel: 6, evaluate: (a, b) => a & b },
-    OR: { precedenceLevel: 7, evaluate: (a, b) => a | b },
 	XOR: { precedenceLevel: 7, evaluate: (a, b) => a ^ b },
+    OR: { precedenceLevel: 8, evaluate: (a, b) => a | b },
     ">=": { precedenceLevel: 4, evaluate: (a, b) => a >= b },
     "<>": { precedenceLevel: 4, evaluate: (a, b) => a != b },
     "<=": { precedenceLevel: 4, evaluate: (a, b) => a <= b },
     ">": { precedenceLevel: 4, evaluate: (a, b) => a > b },
     "=": { precedenceLevel: 5, evaluate: (a, b) => a == b },
     "<": { precedenceLevel: 4, evaluate: (a, b) => a < b },
-    ",": { precedenceLevel: 8, evaluate: (a, b) => (Array.isArray(a) ? a.concat([b]) : [a, b]), lateEvaluated: true }
+    ",": { precedenceLevel: 9, evaluate: (a, b) => (Array.isArray(a) ? a.concat([b]) : [a, b]) }
 }
  
 var builtInFunctions = {
@@ -633,15 +671,15 @@ var builtInFunctions = {
     TAN: { apply: Math.tan },
     ATN: { apply: Math.atan },
     PEEK: { apply: arg => (arg in memory ? memory[arg] : 255) },
-    LEN: { apply: arg => arg.length },
+    LEN: { apply: arg => ("" + arg).length },
     "STR$": { apply: arg => "" + arg },
     VAL: { apply: parseFloat },
-    ASC: { apply: arg => arg.charCodeAt(0) },
+    ASC: { apply: arg => ("" + arg).charCodeAt(0) },
     "CHR$": { apply: String.fromCharCode },
-    "LEFT$": { apply: arg => arg[0].substr(0, arg[1]) },
-    "RIGHT$": { apply: arg => arg[0].substring(arg[0].length - arg[1]) },
-    "MID$": { apply: arg => arg[0].substr(arg[1] - 1, arg[2]) },
-    "TIME$": { apply: arg => new Date(Array.isArray(arg)?Date.now():arg).toUTCString().replace(/ GMT$/, '').toUpperCase() },
+    "LEFT$": { apply: arg => ("" + arg[0]).substr(0, arg[1]) },
+    "RIGHT$": { apply: arg => ("" + arg[0]).substring(arg[0].length - arg[1]) },
+    "MID$": { apply: arg => ("" + arg[0]).substr(arg[1] - 1, arg[2]) },
+    "TIME$": { apply: arg => new Date(arg == []?Date.now():arg).toUTCString().replace(/ GMT$/, '').toUpperCase() },
 	TIME: { apply: function() { return Date.now() } },
     _PAREN: {
         listAs: "(", //explicitly marked parentheses - omit keyword in listing 
@@ -650,10 +688,3 @@ var builtInFunctions = {
 	_NEG: { apply: arg => -arg }
 }
 
-//transfer variables from parser to runner
-  
-var labels = { START: 0 } //pointers to instructions after each @ instruction in the tokenized program
-var dataLookup = [] //pointers to DATA instruction arguments in the tokenized program
-var elseBranches = {} //where to jump if condition evaluates to false (pointer to IF mapped to end of its line)
-var lineNumbers = [] //mapping program indices of instructions to line numbers
-var program = [] //the tokenized program (postfix Polish notation)
