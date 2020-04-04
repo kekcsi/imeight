@@ -12,7 +12,7 @@ function newProgram() {
 	lineNumber = 1
 	charsParsed = 0
 	program = []
-	lineNumbers = []
+	bugLocators = []
 	labels = { START:0 }
 	dataLookup = []
 	elseBranches = {}
@@ -25,7 +25,7 @@ function parseError(message) {
 }
 
 var NAME_RE = /^[A-Z][A-Z0-9]*[%!$]?/
-var ASSIGN_RE = /^[A-Z][A-Z0-9]*[%!$]?([(][^)]*[)])?[ \t]*=/
+var ASSIGN_RE = /^[A-Z][A-Z0-9]*[%!$]?([(][^:]*[)])?[ \t]*=/
 var INDEXED_RE = /^[A-Z][A-Z0-9]*[%!$]?[(]/
 
 function getRegexPrefix(regex, fragment) {
@@ -314,8 +314,8 @@ function parseInstruction(pushed, parsed, displayed, sinceChars) {
 	if (displayed) {
 		bugLocator.line = lineNumber
 		bugLocator.chEnd = charsParsed - text.length
-		lineNumbers.push(bugLocator)
-		lineNumbers[program.length] = bugLocator
+		bugLocators.push(bugLocator)
+		bugLocators[program.length] = bugLocator
 	}
 	if (pushed) program.push(pushed)
 }

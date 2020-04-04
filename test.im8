@@ -48,7 +48,7 @@ FOR I=1 TO 10
     ROW$ = ""
 	FOR J=1 TO 10
 		A(I,J)=D12()
-        LET D(A(I,J)) = D(A(I,J)) + 1
+        D(A(I,J)) = D(A(I,J)) + 1
 		ROW$=ROW$+RIGHT$("  " + A(I,J), 3)
 	NEXT J
 	PRINT ROW$

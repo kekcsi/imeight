@@ -5,7 +5,7 @@ var program = [] //the tokenized program (postfix Polish notation)
 var labels = { START: 0 } //pointers to instructions after each @ instruction in the tokenized program
 var dataLookup = [] //pointers to DATA instruction arguments in the tokenized program (after _DEFER)
 var elseBranches = {} //where to jump if condition evaluates to false (pointer to THEN mapped to after IF)
-var lineNumbers = [] //mapping program indices of instructions to line numbers (debug info)
+var bugLocators = [] //mapping program indices of instructions to bugLocators (debug info)
 
 //runner
 var argumentStack = [] //for evaluating arguments and storing return addresses
@@ -95,7 +95,7 @@ function contProgram() {
 
     while (programCounter < program.length && !stopped) {
         var token = program[programCounter]
-		if (programCounter in lineNumbers) bugLocator = lineNumbers[programCounter]
+		if (programCounter in bugLocators) bugLocator = bugLocators[programCounter]
 
         if (token in instructions) {
             var instruction = instructions[token]

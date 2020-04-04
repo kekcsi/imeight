@@ -4,7 +4,12 @@ var instructions = {
         //text label for GOTO/GOSUB/RESTORE (put them on the list while relinking)
         parse: function() {
             nameArg()
-            labels[program[program.length - 1]] = program.length + 1
+			var name = program[program.length - 1]
+			if (name in labels) {
+				parseError("DUPLICATE LABEL")
+				return
+			}
+            labels[name] = program.length + 1
             expectEnd()
         },
                   

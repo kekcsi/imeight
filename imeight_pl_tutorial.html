@@ -279,7 +279,7 @@ REM<i> * IT'S ON THE LOWEST PRECEDENCE LEVEL AMONG ALL THE OPERATORS *</i></div>
 
 <p>Examples below are for your reference, not error free programs to run.</p>
 
-<p>(A) Literals</p>
+<p><a name="numlit">(A) Literals</a></p>
 <div class="code">MOL = 6.022E+23:REM<i> E MEANS "TIMES 10 TO THE POWER"</i>
 A = 10:REM<i> DECIMAL 10, REALLY TEN</i>
 B = %10:REM<i> BINARY 10, MEANING TWO</i>
@@ -288,7 +288,7 @@ D = !10:REM<i> FOUR-BASE 10, MEANING FOUR</i>
 E = 1.2:REM<i> 1 AND 2 TENTHS</i>
 F = .2:REM<i> 2 TENTHS</i>
 G = .2E-2:REM<i> 0.002</i></div>
-<p>(B) Operators</p>
+<p><a name="numop">(B) Operators</a></p>
 <div class="code">C = A+B:REM<i> ADD</i>
 C = A-B:REM<i> SUBTRACT</i>
 C = A*B:REM<i> MULTIPLY</i>
@@ -492,6 +492,7 @@ Here are all the commands that you can use on the command line:<ul>
 <li>NEW</li>
 <li>OLD</li>
 <li>Question mark: enter <a href="#201">an expression</a> following ? to see its value.</li>
+<li>If you enter a programming instruction, you add a line to the end of the program</li>
 </ul>
 <h2><a name="465">FOR and NEXT</a></h2>
 <p>Wanna do something 10 times?</p>
@@ -727,12 +728,7 @@ YY=0:REM<i> TOO LATE</i>
 A$(1) = ""
 PRINT A$(1):REM<i> FINE</i>
 PRINT A$(2):REM<i> NO VALUE</i>
-REM<i> * MAKE SURE YOU INITIALIZE ALL MEMBERS OF YOUR ARRAY BEFORE USE *</i>
-<hr/>A=8
-PRINT A:REM<i> FINE</i>
-A=
-REM<i> * VARIABLE A IS NOW UNASSIGNED *</i>
-PRINT A:REM<i> NO VALUE</i></div>
+REM<i> * MAKE SURE YOU INITIALIZE ALL MEMBERS OF YOUR ARRAY BEFORE USE *</i></div>
 <h3>INVALID REFERENCE</h3>
 <div class="code">CLR
 INPUT UNARRAY(0)
@@ -782,11 +778,12 @@ But not:<ul>
 <li>Any intent to converge to C64 in the future versions of imeight.</li>
 <li>That they would be comparable in performance.</li>
 </ul>
+<p>In other words, imeight is not what C64 was, it is what it should have been.</p>
 <h3>List of Intentional Differences</h3>
 Dollar or percent sign at the end of names is a convention
 <div class="code">A% = "HELLO"
 A$ = 3
-REM<i> * BOTH WORK *</i></div>
+REM<i> * BOTH WORK BUT DISCOURAGED *</i></div>
 The full name of the variable identifies
 <div class="code">VAR1 = 1:VAR2 = 2:REM<i> TWO DISTINCT VARIABLES HERE</i>
 PRINT VAR1,VAR2</div>
@@ -807,12 +804,13 @@ REM<i> * ALL OF THE ABOVE IS LEGAL ALTHOUGH THE CODE IS MISLEADING *</i></div>
 More differences that are already mentioned:<div class="contents">
 <a href="#d1">DATA evaluation</a>
 &bull; <a href="#642">Abbreviations</a>
-&bull; Concept of labels
+&bull; <a href="#299">Concept of labels</a>
 &bull; <a href="#rtl">RESTORE to a label</a>
-&bull; <a href="#novalue">Unassigned variables</a>
-&bull; Built-in variables
-&bull; FRAC function, MOD and XOR operators added
-&bull; Distinguishing interactive commands from programming instructions
+&bull; <a href="#novalue">Unassigned variables: initialization enforced</a>
+&bull; <a href="#567">Built-in variables</a>
+&bull; <a href="#numop">FRAC function, MOD and XOR operators added</a>
+&bull; <a href="#numlit">Hexadecimal, binary, 4-based number literals</a>
+&bull; <a href="#460">Distinguishing interactive commands from programming instructions</a>
 &bull; More sophisticated data structures internally to speed up execution
 </div>
 
