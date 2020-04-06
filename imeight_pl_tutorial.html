@@ -122,7 +122,44 @@ Command Line, press Enter.</p>
 <h3>Game Programming Tutorial</h3><div class="contents">
 	<a href="#2001">WAIT and GET</a>
 &bull;	<a href="#2002">TIME and TIME$</a>
-</div>
+&bull;	<a href="#2003">Sprites!</a></div>
+<h3>Reference Sheet Index</h3><div class="contents">
+		<a href="#126">Names</a>
+&bull;	<a href="#201">Expressions</a>
+&bull;	<a href="#383">Operator Summary</a>
+<br/>	<a href="#460">Command Summary</a>
+&bull;	<a href="#642">Abbreviations</a>
+&bull;  <a href="#663">Run Time Errors</a></div>
+<h3>Fun Projects</h3><div class="contents">
+		<a href="#fp1" title="PRINT * ASCII art">1</a>
+&bull; 	<a href="#fp2" title="Expressions * Moo">2</a>
+&bull; 	<a href="#fp3" title="IF and THEN * Text Adventure">3</a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <h1>Programming Instruction by Instruction</h1>
 <h2><a name="72">PRINT</a></h2>
 <div class="code">PRINT "HELLO WORLD"
@@ -170,6 +207,25 @@ PRINT A</div>
  To prove it, we do a PRINT A in the 2nd line.</p><p>
  In the 3rd line INPUT will assign again. Which means, the old value is replaced by the new.
  See what gets printed in the 4th line: the new value of A, regardless of its previous value.</p>
+<h2><a name="fp1">Fun Project: PRINT</a></h2>
+Write a program with a lot of PRINT instructions to make beautiful ASCII art.
+Wanna see my submission?
+<div class="code">
+PRINT "         ,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+PRINT "     /\ ==                                                       "
+PRINT "    /L_\||                                                       "
+PRINT "   /L_L_\|                                                       "
+PRINT "  /L_L_L_\                                   __                  "
+PRINT " /L_L_L_LJ\                                 /  oo\               "
+PRINT "  LL]  [_U                                 (      )              "
+PRINT "  L_]__[LJ                   L_o~          (\\)(//)              "
+PRINT "  LL_L_L_U                    (_)>    _      \\//                "
+PRINT "  L_L_L_LJ                   _/ L    ( )      ||                 "
+PRINT "'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''"</div>
+<p>The key take-away from this project task was that the lines appear on the 
+Command Line the same order as in the Program Listing, which we call the normal
+program flow. Another take-away is that the writer of this paper has substandard
+drawing skills.</p>
 <h2><a name="126">Names</a></h2>
 <p>
 In the INPUT examples we could see that there are variables named A and B, which help us store numbers.
@@ -329,6 +385,22 @@ Y$ = STR$(X):REM<i> A DECIMAL REPRESENTATION OF THE NUMBER X</i></div>
 <div class="code">PRINT RND(8)-RND(8):REM<i> RND EVALUATED TWICE, CAN RETURN DIFFERENT VALUES</i>
 <hr/>X = RND(8):REM<i> EVALUATED ONCE</i>
 PRINT X - X:REM<i> ALWAYS RETURNS ZERO</i></div>
+<h2><a name="fp2">Fun Project</a></h2>
+<p>Make an ASCII art cow say something that the user enters.</p>
+<div class="code">INPUT "WHAT DOES THE COW SAY?", MSG$
+PRINT "                         ____________"
+PRINT "                 ^oo ___/" + LEFT$(MSG$ + "            ", 12) + "\"
+PRINT "           ______//''   \____________/"
+PRINT "          /\_____/       "
+PRINT "         '  || ||        "</div>
+<p>What expressions can you find in my code?</p><ul>
+<li>String literals? Find all 8.</li>
+<li>Is there a number literal, too?</li>
+<li>Can you find a function?</li>
+<li>Maybe infix operators?</li>
+<li>Are the plus signs conactenations or number additions here?</li>
+</ul>
+<p>Do you have a better version?</p>
 <h2><a name="299">GOTO</a></h2>
 
 <p>Flow instructions can break the <a href="#normal-flow">normal flow</a> of the program. GOTO instructs the runner to immediately go to a specified
@@ -358,6 +430,11 @@ GOTO FIN
 PRINT "I SAY GOTO IS FINE"
 GOTO CONTINUATION
 @FIN</div>
+<p>Note: there is a built-in label called START, which points to the beginning
+of the program. Therefore:</p><ul>
+<li>To restart the program, say GOTO START.</li>
+<li>The name START is reserved.</li>
+</ul>
 <h2><a name="331">IF and THEN</a></h2>
 <h3>Logical Operators</h3>
 <div class="code">INPUT A
@@ -406,6 +483,87 @@ PRINT "TRY AGAIN":GOTO ASK</div>
 <p>If the user input is correct then the program will not only PRINT "CORRECT" but also GOTO TASK. 
 If the condition is not met then the rest of the line is skipped, even if it contains          
 several instructions separated with colon.                                                     </p> 
+
+<h2><a name="fp3">Fun Project</a></h2>
+<p>Have you noticed that you know everything you need to create a text 
+adventure game? Feel free to change or add more options!</p>
+<div class="code">BOREDOM=0:MONEY=0:GF=0
+@HOME
+PRINT "YOU ARE AT HOME. LIVING ALONE FEELS LONELY SOMETIMES..."
+PRINT "BUT YOU CAN JUMP ON YOUR BED IF YOU LIKE."
+BOREDOM=BOREDOM+1
+IF BOREDOM>10 THEN GOTO DEATH
+IF BOREDOM<>3 THEN GOTO HOMEASK
+PRINT "YOU STAND UP ON THE BED TO JUMP. YOU FEEL SOMETHING..."
+PRINT "PUSHING YOUR FOOT. HEY! YOU FOUND A COIN BELOW THE BEDSHEET!"
+MONEY=1
+@HOMEASK
+INPUT "STAY OR LEAVE?", MOVE$
+IF MOVE$="STAY" THEN GOTO HOME
+IF MOVE$="LEAVE" THEN GOTO STREET
+GOTO HOMEASK
+@DEATH
+PRINT "LIFE IS SO BORING THAT YOU DIED. GRAY RATS WHO JUST HAD BEEN"
+PRINT "LINGERING THERE ARE LISTLESSLY EATING YOUR BODY."
+END
+@STREET
+PRINT "FRESH AIR! THE STREET IS CROWDED AS USUAL."
+PRINT "YOU STAND JUST IN FRONT OF YOUR HOME"
+IF BOREDOM>3 AND MONEY=0 THEN GOTO SELL
+@STREETASK
+INPUT "WHERE WOULD YOU GO? CENTER, OUTSKIRTS, HOME?", MOVE$
+IF MOVE$="CENTER" THEN GOTO CENTER
+IF LEFT$(MOVE$, 3)="OUT" THEN GOTO OUTSKIRTS
+IF MOVE$="HOME" THEN GOTO HOME
+GOTO STREETASK
+@CENTER
+PRINT "MALLS AND RESTAURANTS ALL AROUND. YOU FEEL LIKE SHOPPING!"
+IF MONEY=0 THEN PRINT "WISH YOU HAD ANY MONEY :(":GOTO CENTERASK
+IF GF=1 THEN GOTO FLOWERS
+PRINT "YOU BOUGHT A GOLDEN PIGLET. IT'S A PERFECT PRESENT. YOU JUST NEED..."
+PRINT "SOMEBODY TO GIVE IT."
+GOTO BOUGHT
+@FLOWERS
+PRINT "YOU BOUGHT SOME FLOWERS FOR YOUR GF."
+PRINT "IT'S SO NICE TO HAVE HER."
+END
+@BOUGHT
+MONEY=0
+@CENTERASK
+INPUT "STAY OR STREET?", MOVE$
+IF MOVE$="STAY" THEN GOTO CENTER
+IF MOVE$="STREET" THEN GOTO STREET
+GOTO CENTERASK
+@OUTSKIRTS
+IF GF=1 THEN GOTO OUTASK
+PRINT "YOU REMEMBER A GIRL YOU USED TO KNOW FROM SCHOOL."
+PRINT "MAYBE IT'S BECAUSE SHE LIVED HERE."
+PRINT "OR MAYBE IT'S BECAUSE YOU ALWAYS THINK OF HER EVER SINCE."
+@OUTASK
+INPUT "YOU STAND RIGHT AT THE GIRL'S DOOR. KNOCK OR STREET?", MOVE$
+IF MOVE$="KNOCK" THEN GOTO KNOCK
+IF MOVE$="STREET" THEN GOTO STREET
+GOTO OUTASK
+@KNOCK
+IF GF=1 THEN GOTO LOVE
+PRINT "'HEY, IS THAT REALLY YOU? I REMEMBER THE SHY GUY FROM SCHOOL. HAHA!'"
+PRINT "YOU TALK A LITTLE. SHE ASKS ABOUT YOUR LIFE."
+IF MONEY=0 THEN GOTO DECLINE
+GF=1
+PRINT "SHE TELLS YOU THAT SHE LIKES FLOWERS. SHE FEELS ALONE. SHE LIKES TO"
+PRINT "JUMP ON HER BED. SHE SHOWS HOW."
+@LOVE
+PRINT "YOU STAY UNTIL THE MORNING COMES."
+@DECLINE
+PRINT "SHE ASKS YOU TO LEAVE AS SHE HAS IMPORTANT THINGS TO DO."
+GOTO OUTASK
+@SELL
+PRINT "A BAD LOOKING MAN IS APPROCHING. HE WANTS TO SELL YOU STOLEN WEAPONS."
+PRINT "HE WOULD BUY THINGS OF VALUE, TOO. YOU THINK OF SELLING THE PIGLET."
+INPUT "SELL OR LEAVE?", MOVE$
+IF MOVE$="SELL" THEN MONEY=1:PRINT "YOU GET A COIN."
+GOTO STREET</div>
+
 <h2><a name="383">Operator Summary</a></h2>
 <h3>Precedence</h3>
 <div class="code">REM<i> ^            	    LEVEL 1</i>
@@ -660,6 +818,7 @@ PRINT MAX(-3,MAX(5/2,8/4))</div>
 REM<i> * G. IS SHORT FOR GOTO *</i>
 REM<i> * N. IS SHORT FOR NEXT *</i>
 REM<i> * R. STANDS FOR RETURN *</i>
+REM<i> * <a href="#wait-abbr">W.  (COVERED LATER)</a>  *</i>
 '<i>OH, AND YOU CAN USE APOSTROPHE INSTEAD OF REM INSTRUCTION</i>
 INPUT "ENTER REQUESTED INDIAN COUNT", N '<i>NO NEED FOR A COLON</i>
 IF N>10 T.G.HANDLER
@@ -900,7 +1059,7 @@ PRINT "HIT A BUTTON NOW:"
 @LOOP:WAIT:GET A
 IF A=0 T.G.LOOP
 PRINT A</div>
-<h3>Abbreviation</h3>
+<h3><a name="wait-abbr">Abbreviation</a></h3>
 <div class="code">FOR I=1 TO 50:W.:N. '<i>WAIT >980 BUT &lt=1000 MILLISECONDS</i></div>
 <h2><a name="2002">TIME and TIME$</a></h2>
 <div class="code">PRINT TIME() '<i>MILLISECONDS SINCE EPOCH, 1 JAN 1970</i>
@@ -915,5 +1074,59 @@ REM<i> * LAST TWO LINES SHOULD DIFFER IN 1 SECOND *</i></div>
 <h3>Time Zones</h3>
 <div class="code">PRINT TIME$(TIME()+2*3.6E6) '<i>IN B TIME ZONE OFFSET</i>
 PRINT TIME$(TIME()+TZO) '<i>IN LOCAL TIME ZONE OFFSET</i></div>
+<h2><a name="2003">Sprites!</h2>
+<div class="code">SPRX(0)=180+160*COS(TIME()/600)
+SPRY(0)=96+60*SIN(TIME()/300)
+WAIT
+GOTO START</div>
+<p>Finally we can open the Graphic Screen and see something.</p>
+<p>SPRX and SPRY are built-in arrays. SPRX(K) for every K would mean the 
+horizontal coordinate of the sprite K; SPRY(K) is the vertical 
+coordinate of the same. Coordinates are in pixels, horizontal coordinate 
+0 is the left edge of the screen, screen is 384 pixels wide. Y coordinates
+go from top to bottom, screen is 216 pixels high. The sprite itself is 24 by 24
+pixels.</p>
+<div class="code">
+SCREENWIDTH=384:SCREENHEIGHT=216
+'START IN THE MIDDLE OF THE SCREEN
+SPRX(0)=SCREENWIDTH/2-12:SPRY(0)=SCREENHEIGHT/2-12
+@HIT 'HIT THE BALL IN A RANDOM DIRECTION
+SPEEDX=RND(40)/10-2:SPEEDY=RND(40)/10-2 'PIXELS PER 20 MILLISECONDS
+@LOOP
+'ADVANCE BALL POSITION ACCORDING TO SPEED
+SPRX(0)=SPRX(0)+SPEEDX
+SPRY(0)=SPRY(0)+SPEEDY
+'BOUNCE ON SCREEN EDGES
+IF SPRX(0) <= 0 OR SPRX(0) >= SCREENWIDTH-24 THEN SPEEDX = -SPEEDX
+IF SPRY(0) <= 0 OR SPRY(0) >= SCREENHEIGHT-24 THEN SPEEDY = -SPEEDY
+WAIT:GET A
+ON A+1 GOTO LOOP, HIT 'LOOP IF KEY CODE 0; GOES TO HIT OTHERWISE</div>
+<p>The above algorithm appears in Billiard games, Ping or Breakout.</p>
+<div class="code">
+WT=384:HT=216
+DIM SPEEDX(99):DIM SPEEDY(99)
+N=0
+@SPAWN
+N=N+1
+SPRX(N)=0:SPRY(N)=0
+SPEEDX(N)=RND(30)/10:SPEEDY(N)=0
+@LOOP
+FOR I=1 TO N
+	IF SPRY(I) < 0 THEN NEXT:GOTO OUT
+	SPRX(I)=SPRX(I)+SPEEDX(I)
+	SPRY(I)=SPRY(I)+SPEEDY(I)
+	IF SPRX(I) <= 0 OR SPRX(I) >= WT-24 THEN SPEEDX(I) = -SPEEDX(I)
+	'STOP A DEAD BALL
+	IF SPRY(I) >= HT-24 AND ABS(SPEEDY(I)) < .5 THEN SPRY(I)=-24
+	'BOUNCE FROM THE GROUND AND LOSE SOME ENERGY
+	IF SPRY(I) >= HT-24 THEN SPEEDY(I) = -SPEEDY(I)*.9
+	'ADD GRAVITY
+	IF SPRY(I) >= 0 THEN SPEEDY(I)=SPEEDY(I)+.1
+NEXT:@OUT
+WAIT:GET A
+ON A+1 GOTO LOOP, SPAWN</div>
+<p>Combine bouncing with gravity for an effect like in Flipper or ballistic
+games.</p>
+<p>Note that setting a coordinate to -24 makes the sprite invisible.</p>
 </body>
 </html>

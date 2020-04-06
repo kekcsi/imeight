@@ -151,3 +151,12 @@ button.tab {
 	height: 322px;
 	border: 0;
 }
+
+#tabGraphic {
+	display:none;
+	width:384px;
+	height:216px;
+	margin:52px auto;
+	position:relative;
+	overflow:hidden;
+}

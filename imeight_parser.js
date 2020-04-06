@@ -391,6 +391,7 @@ function parseText() {
 		listClean = true
 		videoPrint("PROGRAM UPDATED".bold())
 		divStatus.innerHTML = "&nbsp;"
+		userBreak()
 		inUserInput.value="RUN"
 	}
 	
