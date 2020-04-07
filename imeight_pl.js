@@ -576,7 +576,10 @@ var instructions = {
 		
 		run: function(pc) {
 			variables = Object.assign({}, builtInVariables)
-			arrays = Object.assign({}, builtInArrays)
+			arrays = {}
+			for (array in builtInArrays) {
+				arrays[array] = builtInArrays[array].slice()
+			}
 			loops = []
 			functions = Object.assign({}, builtInFunctions)
 			argumentStack = []

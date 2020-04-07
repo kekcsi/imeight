@@ -4,18 +4,39 @@
 	<title>editor</title>
 	<style>
 		#sprite-editor td {
-			width: 14px;
-			height: 14px;
 			background: black;
+		}
+		
+		td {
+			padding: 0;
+			height: 8px;
+		}
+		
+		table {
+			border-spacing: 1px;
+			table-layout: fixed;
+		}
+		
+		#inTitle, table {
+			width: 217px;
+			border: 0;
+			margin: 0;
+			padding: 0;
+		}
+		
+		#data {
+			font-size: 8px;
 		}
 	</style>
 	<script>
-		var monoSpriteData = []
+		var spriteData = []
+		var drawingColor = "#000000"
+		var drawingIdx = 0
 
 		function sprEdit(ev) {
 			if(ev.buttons > 0) {
-				ev.target.style.backgroundColor = "red"
-				monoSpriteData[ev.target.dataset.idx] = true
+				ev.target.style.backgroundColor = drawingColor
+				spriteData[ev.target.dataset.idx] = drawingIdx
 				document.getElementById("data").innerHTML = ""
 			}
 		}
@@ -25,30 +46,69 @@
 			for(var i = 0; i < cells.length; ++i) {
 				cells[i].addEventListener("mousedown", sprEdit);
 				cells[i].addEventListener("mouseover", sprEdit);
+				spriteData.push(0)
+			}
+			
+			cells = document.getElementById("colors").getElementsByTagName("td")
+			for(var i = 0; i < 16; ++i) {
+				var cell = cells[i]
+				var light = ((i >> 3)&1) ? "ff" : "cc"
+				var dark = ((i >> 3)&1) ? "33" : "00"
+				var red = (i&1) ? light : dark
+				var green = ((i >> 1)&1) ? light : dark
+				var blue = ((i >> 2)&1) ? light : dark
+				cell.style.backgroundColor = "#" + red + green + blue
+				
+				cell.addEventListener("mousedown", function(ev) {
+				    drawingColor = ev.target.style.backgroundColor
+					drawingIdx = ev.target.dataset.idx
+				})
 			}
 		}
 		
 		function getData() {
-			var str = ""
-			var sep = ""
-			for(var row = 0; row < 24; ++row) {
-				for(var octet = 0; octet < 3; ++octet) {
-					var currByte = 0
-					for(var bit = 0; bit < 8; ++bit) {
-						if(monoSpriteData[24*row + octet*8 + bit]) {
-							currByte |= (128>>bit)
-						}
-					}
-					str += sep + currByte
-					sep = ", "
+			var t = "@DGN" + inTitle.value.toUpperCase() + "\n"
+			var octet = 0
+			
+			for(var ro = 0; ro < 24; ro++) {
+				var sep = "DATA $"
+			
+				for (var end = octet + 12; octet < end; octet++) {
+					t += sep
+					sep = ", $"
+					t += "0123456789ABCDEF"[spriteData[2*octet]]
+					t += "0123456789ABCDEF"[spriteData[1 + 2*octet]]
 				}
-				sep += "\n"
+				
+				t += "\n"
 			}
-			document.getElementById("data").innerHTML = str
+			
+			document.getElementById("data").innerHTML = t
 		}
 	</script>
 </head>
 <body onload="init()">
+	<table id="colors">
+		<tr>
+			<td data-idx="0"></td>
+			<td data-idx="1"></td>
+			<td data-idx="2"></td>
+			<td data-idx="3"></td>
+			<td data-idx="4"></td>
+			<td data-idx="5"></td>
+			<td data-idx="6"></td>
+			<td data-idx="7"></td>
+			<td data-idx="8"></td>
+			<td data-idx="9"></td>
+			<td data-idx="10"></td>
+			<td data-idx="11"></td>
+			<td data-idx="12"></td>
+			<td data-idx="13"></td>
+			<td data-idx="14"></td>
+			<td data-idx="15"></td>
+		</tr>  
+	</table>
+	<input id="inTitle" value="TITLE"/>
 	<table id="sprite-editor">
 		<tr>
 			<td data-idx="0"></td>
@@ -677,6 +737,6 @@
 		<tr>
 	</table>
 	<a onclick="getData()">Get Data</a>
-	<pre style="position: absolute; top: 0; left: 640px" id="data"></pre>
+	<pre style="position: absolute; top: 0; left: 240px" id="data"></pre>
 </body>
 </html>
