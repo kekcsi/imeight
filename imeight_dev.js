@@ -3,35 +3,26 @@
 var listClean = true //does the tokenized program match the text in the lising?
 var oldText = ""
 
-function programTab() {
-	btnProgram.style.borderStyle="inset"
-	tabProgram.style.display="block"
-	btnOutput.style.borderStyle="outset"
-	tabOutput.style.display="none"
-	btnGraphic.style.borderStyle="outset"
-	tabGraphic.style.display="none"
-	taList.focus()
+var tabs
+
+function selectTab(selected) {
+	for (var i in tabs) {
+		if (i == selected) {
+			tabs[i].btn.style.borderStyle="inset"
+			tabs[i].tab.style.display="block"
+		} else {
+			tabs[i].btn.style.borderStyle="outset"
+			tabs[i].tab.style.display="none"
+		}
+	}
+
+	tabs[selected].focused.focus()
 }
 
-function outputTab() {
-	btnProgram.style.borderStyle="outset"
-	tabProgram.style.display="none"
-	btnOutput.style.borderStyle="inset"
-	tabOutput.style.display="block"
-	btnGraphic.style.borderStyle="outset"
-	tabGraphic.style.display="none"
-	inUserInput.focus()
-}
-
-function graphicTab() {
-	btnProgram.style.borderStyle="outset"
-	tabProgram.style.display="none"
-	btnOutput.style.borderStyle="outset"
-	tabOutput.style.display="none"
-	btnGraphic.style.borderStyle="inset"
-	tabGraphic.style.display="block"
-	tabGraphic.focus()
-}
+function programTab() { selectTab("Program") }
+function outputTab() { selectTab("Output") }
+function graphicTab() { selectTab("Graphic") }
+function designerTab() { selectTab("Designer") }
 
 function tutorRight() {
 	divTutor.style.display = "block"
@@ -50,6 +41,13 @@ function tutorBelow() {
 }
 
 function pageLoad() {
+	tabs = {
+		Program: { btn: btnProgram, tab: tabProgram, focused: taList }, 
+		Output: { btn: btnOutput, tab: tabOutput, focused: inUserInput }, 
+		Graphic: { btn: btnGraphic, tab: tabGraphic, focused: tabGraphic }, 
+		Designer: { btn: btnDesigner, tab: tabDesigner, focused: tabDesigner }
+	}
+
 	btnTutorBelow.addEventListener("mouseout", function(event) {
 		btnTutorRight.style.display = "inline"
 		btnTutorBelow.style.display = "none"
@@ -94,7 +92,8 @@ function pageLoad() {
 	})
 
 	setInterval(function() { eventHandler() }, 20)
-	
+
+	// initialize built-in variables for direct expressions (?) on Command Line
 	instructions.CLR.run(0)
 }
 

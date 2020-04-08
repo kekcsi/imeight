@@ -13,6 +13,7 @@
     	<button id="btnProgram" onclick="programTab()" class="tab" style="border-style:inset">Program Listing</button>
     	<button id="btnOutput" onclick="outputTab()" class="tab" style="border-style:outset">Command Line</button>
     	<button id="btnGraphic" onclick="graphicTab()" class="tab" style="border-style:outset">Graphic Screen</button>
+    	<button id="btnDesigner" onclick="designerTab()" class="tab" style="border-style:outset">Designer</button>
     	<div class="dark" id="tabProgram">
     		<textarea id="taList"></textarea><div>
     		<input id="inLine" size="5" type="text" onchange="goLine(this.value)"/>
@@ -31,8 +32,8 @@
     			<button class="glow" onclick="userBreak()" id="btnStop" title="Esc">&#x2715;</button>
     		</span>
     	</div>
-    	<div tabindex="0" class="dark" id="tabGraphic">
-    	</div>
+    	<div tabindex="0" class="dark" id="tabGraphic"></div>
+    	<iframe id="tabDesigner" src="spr-editor.html" style="display:none" width="600" height="320"></iframe>
     </div>
     <div id="divTutor" style="display:none" class="win">
 		<iframe id="taTutor" src="imeight_pl_tutorial.html"></iframe>

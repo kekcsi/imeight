@@ -80,10 +80,10 @@
 <h1>Programming Tutorials</h1>
 <p>This is the imeight programming language. One that resembles those 80s
 languages when programming was still fun to learn. Do you want to experience, too?</p>
-<p>This emulated imaginary machine has three screen modes:</p><ul>
+<p>This emulated imaginary machine has these screen modes:</p><ul>
 <li>Program Listing: for writing and editing your program text.</li>
 <li>Command Line: for issuing interactive commands and reading output of your program as it runs.</li>
-<li>Graphic Screen: to be covered in the Game Programming Tutorial.</li>
+<li>Graphic Screen and Designer: to be covered in the Game Programming Tutorial.</li>
 </ul>
 <p>You can use the usual Copy and Paste function in your browser to transfer
 example codes from the tutorial to the Program Listing panel.</p>
@@ -644,11 +644,12 @@ REM<i> * ENTER INTERACTIVE COMMAND RUN TO START OVER *</i>
 REM<i> * ?STATUS TO TELL STOP (1) FROM END (0) OR ERROR (-1) *</i></div>
 <h2><a name="460">Command Summary</a></h2>
 Here are all the commands that you can use on the command line:<ul>
-<li>RUN</li>
-<li>CONT</li>
-<li>LIST</li>
-<li>NEW</li>
-<li>OLD</li>
+<li>RUN - run the program that is tokenized in the runner</li>
+<li>CONT - continue where the program exited (at a STOP instruction or if user hit Esc)</li>
+<li>LIST - change screen mode to Program Listing</li>
+<li>NEW - clear the program from both the Program Listing and runner</li>
+<li>OLD - restore the program after NEW</li>
+<li>DGNS - see Game Programming Tutorial</li>
 <li>Question mark: enter <a href="#201">an expression</a> following ? to see its value.</li>
 <li>If you enter a programming instruction, you add a line to the end of the program</li>
 </ul>
@@ -1102,8 +1103,7 @@ IF SPRY(0) <= 0 OR SPRY(0) >= SCREENHEIGHT-24 THEN SPEEDY = -SPEEDY
 WAIT:GET A
 ON A+1 GOTO LOOP, HIT 'LOOP IF KEY CODE 0; GOES TO HIT OTHERWISE</div>
 <p>The above algorithm appears in Billiard games, Ping or Breakout.</p>
-<div class="code">
-WT=384:HT=216
+<div class="code">WT=384:HT=216
 DIM SPEEDX(99):DIM SPEEDY(99)
 N=0
 @SPAWN
@@ -1128,5 +1128,10 @@ ON A+1 GOTO LOOP, SPAWN</div>
 <p>Combine bouncing with gravity for an effect like in Flipper or ballistic
 games.</p>
 <p>Note that setting a coordinate to -24 makes the sprite invisible.</p>
+<h3>Tired of Balls?</h3>
+<p>Issue the command DGNS on the Command Line to see the names of all built-in 
+designs for your sprites. Use them like this:</p>
+<div class="code">SPRDGN(0)=DGNMAN():SPRX(0)=0:SPRY(0)=0 '<i>MAN IS A BUILT-IN DESIGN</i>
+SPRDGN(1)=DGNWALL():SPRX(1)=0:SPRY(1)=24 '<i>SO IS WALL</i></div>
 </body>
 </html>
