@@ -3,22 +3,28 @@ builtInArrays.SPRY = [] //vertical coordinate of each sprite (-24 to 216)
 builtInArrays.SPRDGN = [] //design pointer of each sprite
 
 var builtInDesigns = [
-    "ball10",
     "ball24",
+    "ball10",
     "ball4",
     "bomb",
-    "clock",
+    "car",
+    "death",
     "door",
+    "dragon",
     "dust",
     "gem",
     "hammer",
     "key",
+    "ladder",
     "man",
     "medikit",
     "padhorz",
     "padvert",
     "plane",
+    "robot",
     "rocket",
+    "switchlt",
+    "switchrt",
     "ufo",
     "wall"
 ]
