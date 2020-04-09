@@ -5,6 +5,8 @@
 	<style>
 		body {
 			background: silver;
+			overflow-x: hidden;
+			overflow-y: scroll;
 		}
 		
 		body .code {
@@ -83,7 +85,7 @@ languages when programming was still fun to learn. Do you want to experience, to
 <p>This emulated imaginary machine has these screen modes:</p><ul>
 <li>Program Listing: for writing and editing your program text.</li>
 <li>Command Line: for issuing interactive commands and reading output of your program as it runs.</li>
-<li>Graphic Screen and Designer: to be covered in the Game Programming Tutorial.</li>
+<li>Graphic Screen and Designer: see Game Programming Tutorial.</li>
 </ul>
 <p>You can use the usual Copy and Paste function in your browser to transfer
 example codes from the tutorial to the Program Listing panel.</p>
@@ -92,6 +94,19 @@ Command Line, press Enter.</p>
 <p>Return to the Program Listing by entering the LIST command.</p>
 <p>NEW command will also erase the program text.</p>
 <h2><a name="contents">Contents</a></h2>
+<div style="float: right; width: 30%; padding: 0 0 16px 24px; margin: 0">
+<h3 style="margin-top: 4px">Reference Sheets</h3><div class="contents">
+		<a href="#126">Names</a>
+<br/>	<a href="#201">Expressions</a>
+<br/>	<a href="#383">Operator Summary</a>
+<br/>	<a href="#460">Command Summary</a>
+<br/>	<a href="#642">Abbreviations</a>
+<br/>  <a href="#663">Run Time Errors</a></div>
+<h3>Fun Projects</h3><div class="contents">
+		<a href="#fp1" title="PRINT * ASCII art">1</a>
+&bull; 	<a href="#fp2" title="Expressions * Moo">2</a>
+&bull; 	<a href="#fp3" title="IF and THEN * Text Adventure">3</a></div>
+</div>
 <h3>Programming Instruction by Instruction</h3><div class="contents">
 	<a href="#72">PRINT</a>
 &bull;	<a href="#89">INPUT</a>
@@ -123,18 +138,6 @@ Command Line, press Enter.</p>
 	<a href="#2001">WAIT and GET</a>
 &bull;	<a href="#2002">TIME and TIME$</a>
 &bull;	<a href="#2003">Sprites!</a></div>
-<h3>Reference Sheet Index</h3><div class="contents">
-		<a href="#126">Names</a>
-&bull;	<a href="#201">Expressions</a>
-&bull;	<a href="#383">Operator Summary</a>
-<br/>	<a href="#460">Command Summary</a>
-&bull;	<a href="#642">Abbreviations</a>
-&bull;  <a href="#663">Run Time Errors</a></div>
-<h3>Fun Projects</h3><div class="contents">
-		<a href="#fp1" title="PRINT * ASCII art">1</a>
-&bull; 	<a href="#fp2" title="Expressions * Moo">2</a>
-&bull; 	<a href="#fp3" title="IF and THEN * Text Adventure">3</a></div>
-
 
 
 
@@ -208,20 +211,19 @@ PRINT A</div>
  In the 3rd line INPUT will assign again. Which means, the old value is replaced by the new.
  See what gets printed in the 4th line: the new value of A, regardless of its previous value.</p>
 <h2><a name="fp1">Fun Project: PRINT</a></h2>
-Write a program with a lot of PRINT instructions to make beautiful ASCII art.
-Wanna see my submission?
-<div class="code">
-PRINT "         ,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-PRINT "     /\ ==                                                       "
-PRINT "    /L_\||                                                       "
-PRINT "   /L_L_\|                                                       "
-PRINT "  /L_L_L_\                                   __                  "
-PRINT " /L_L_L_LJ\                                 /  oo\               "
-PRINT "  LL]  [_U                                 (      )              "
-PRINT "  L_]__[LJ                   L_o~          (\\)(//)              "
-PRINT "  LL_L_L_U                    (_)>    _      \\//                "
-PRINT "  L_L_L_LJ                   _/ L    ( )      ||                 "
-PRINT "'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''"</div>
+<p>Write a program with a lot of PRINT instructions to make beautiful ASCII art.
+Wanna see my submission?</p>
+<div class="code">PRINT "              ,                                          , "
+PRINT "             /,!\                                       /TZ)"
+PRINT "             ` V/\__   _                         _   __/\/"
+PRINT "              _(LL||TTT )                       ( TTT||JJ)_"
+PRINT "              \,      \)                         (/      _/"
+PRINT "      __               \_                      __/              _"
+PRINT "     / /_ _____________(_)___ ____   _______  / /______________( \"
+PRINT "    / / // / , , ) _  ) / _  7 _  ) (_  / , \/ _  ) ,_/ _  / __/ /"
+PRINT "   / / (/ / / / / (/ / / // / (/ / / __/  __/ (/ / / / (/ /_  /_/"
+PRINT " _/ /\__,(_/_/_/ ___/_(_//_(\_  / /___/\___/\___/_/  \__,_\__(_)"
+PRINT "(__/          (_/         (____/"</div>
 <p>The key take-away from this project task was that the lines appear on the 
 Command Line the same order as in the Program Listing, which we call the normal
 program flow. Another take-away is that the writer of this paper has substandard
@@ -386,13 +388,13 @@ Y$ = STR$(X):REM<i> A DECIMAL REPRESENTATION OF THE NUMBER X</i></div>
 <hr/>X = RND(8):REM<i> EVALUATED ONCE</i>
 PRINT X - X:REM<i> ALWAYS RETURNS ZERO</i></div>
 <h2><a name="fp2">Fun Project</a></h2>
-<p>Make an ASCII art cow say something that the user enters.</p>
-<div class="code">INPUT "WHAT DOES THE COW SAY?", MSG$
-PRINT "                         ____________"
-PRINT "                 ^oo ___/" + LEFT$(MSG$ + "            ", 12) + "\"
-PRINT "           ______//''   \____________/"
-PRINT "          /\_____/       "
-PRINT "         '  || ||        "</div>
+<p>Make an ASCII art zebra say something that the user enters.</p>
+<div class="code">INPUT "WHAT DOES THE ZEBRA SAY?", MSG$
+PRINT "                  ,,     ____________"
+PRINT "                 /oo)___/" + LEFT$(MSG$ + "            ", 12) + "\"
+PRINT "          _   __/=/     \____________/"
+PRINT "         ( TTT||JJ) "
+PRINT "           ||   ||  "</div>
 <p>What expressions can you find in my code?</p><ul>
 <li>String literals? Find all 8.</li>
 <li>Is there a number literal, too?</li>
@@ -770,6 +772,9 @@ CLR
 DIM TWICE(10):REM<i> NOT AN OVERDEFINITION</i>
 DEF ARRAY(N) = 2*N:REM<i> NOT AN OVERDEFINITION</i></div>
 <h2><a name="593">ON</a></h2>
+<p>With IF instruction, you gave your program two possible continuation paths: one 
+to go when the condition is true, one if it is false. What if you want three
+or more continuation paths, depending on a numeric expression?</p>
 <div class="code">INPUT "CHOOSE FROM MENU 1-3", CHOICE
 ON CHOICE GOTO M1, M2, M3
 @M1: PRINT "YOU CHOSE #1"
@@ -789,6 +794,7 @@ RETURN
 @M3: PRINT "YOU DIDN'T CHOOSE 1 OR 2 BUT SOMETHING ELSE"
 RETURN</div>
 <h2><a name="613">Multidimensional Arrays</a></h2>
+<p>You may use the comma operator in the array index to create a matrix.</p>
 <div class="code">DIM MANCALA(6,2)
 MANCALA(4,1) = 0
 MANCALA(5,1) = MANCALA(4,1)+1</div>
@@ -999,7 +1005,7 @@ More differences that are already mentioned:<div class="contents">
 <h1>Game Programming Tutorial</h1>
 <p>OK, that was boring. Fortunately this imaginary little machine has all the
 necessary stuff for action game programming, too. You'll need controls,
-timing and graphics. Let's go.</p>
+timing and graphics. Let's go!</p>
 <h2><a name="2001">WAIT and GET</a></h2>
 <p>WAIT instruction halts execution of your program until one of the 
 events occur:</p><ul>
@@ -1076,6 +1082,7 @@ REM<i> * LAST TWO LINES SHOULD DIFFER IN 1 SECOND *</i></div>
 <div class="code">PRINT TIME$(TIME()+2*3.6E6) '<i>IN B TIME ZONE OFFSET</i>
 PRINT TIME$(TIME()+TZO) '<i>IN LOCAL TIME ZONE OFFSET</i></div>
 <h2><a name="2003">Sprites!</h2>
+<h3>My First Animation</h3>
 <div class="code">SPRX(0)=180+160*COS(TIME()/600)
 SPRY(0)=96+60*SIN(TIME()/300)
 WAIT
@@ -1087,8 +1094,8 @@ coordinate of the same. Coordinates are in pixels, horizontal coordinate
 0 is the left edge of the screen, screen is 384 pixels wide. Y coordinates
 go from top to bottom, screen is 216 pixels high. The sprite itself is 24 by 24
 pixels.</p>
-<div class="code">
-SCREENWIDTH=384:SCREENHEIGHT=216
+<h3>Physical Animations</h3>
+<div class="code">SCREENWIDTH=384:SCREENHEIGHT=216
 'START IN THE MIDDLE OF THE SCREEN
 SPRX(0)=SCREENWIDTH/2-12:SPRY(0)=SCREENHEIGHT/2-12
 @HIT 'HIT THE BALL IN A RANDOM DIRECTION
@@ -1133,5 +1140,13 @@ games.</p>
 designs for your sprites. Use them like this:</p>
 <div class="code">SPRDGN(0)=DGNMAN():SPRX(0)=0:SPRY(0)=0 '<i>MAN IS A BUILT-IN DESIGN</i>
 SPRDGN(1)=DGNWALL():SPRX(1)=0:SPRY(1)=24 '<i>SO IS WALL</i></div>
+<h3>How About Some Art?</h3>
+<p>Or design your own sprite in the Designer screen mode. Once done, push Get Data, 
+copy-and-paste the code fragment appering into your Program Listing. Here is a
+code that reads the data into memory:</p>
+<div class="code">BASE=9*144:RESTORE DGNGHOST '<i>BASE MUST BE DIVISIBLE BY 144</i>
+FOR I=0 TO 143:READ BYTE:POKE BASE+I,BYTE:NEXT '<i>ONE DESIGN IS 144 BYTES</i>
+SPRX(5)=0:SPRY(5)=0:SPRDGN(5)=BASE '<i>SHOW IT IN THE UPPER LEFT CORNER</i>
+@DGNGHOST '<i>PASTE DATA LINES HERE FROM THE DESIGNER</i></div>
 </body>
 </html>

@@ -12,6 +12,12 @@
 			height: 8px;
 		}
 		
+		#colors td {
+			border-width: 0 0 2px 0;
+			border-style: solid;
+			border-color: gray;
+		}
+		
 		table {
 			border-spacing: 1px;
 			table-layout: fixed;
@@ -27,8 +33,10 @@
 		#data {
 			font-size: 8px;
 			position: absolute; 
-			top: 0; 
+			top: 2px; 
 			left: 240px;
+			background: gray;
+			border: none;
 		}
 	</style>
 	<script>
@@ -37,7 +45,7 @@
 		var drawingIdx = 0
 
 		function sprEdit(ev) {
-			if(ev.buttons > 0) {
+			if (ev.buttons > 0) {
 				ev.target.style.backgroundColor = drawingColor
 				spriteData[ev.target.dataset.idx] = drawingIdx
 				document.getElementById("data").innerHTML = ""
@@ -65,6 +73,11 @@
 				cell.addEventListener("mousedown", function(ev) {
 				    drawingColor = ev.target.style.backgroundColor
 					drawingIdx = ev.target.dataset.idx
+					
+					cells = document.getElementById("colors").getElementsByTagName("td")
+					for (var j = 0; j < 16; j++) {
+						cells[j].style.borderColor = (j == drawingIdx) ? "white" : "gray"
+					}
 				})
 			}
 		}
@@ -86,7 +99,9 @@
 				t += "\n"
 			}
 			
-			document.getElementById("data").innerHTML = t
+			var ta = document.getElementById("data")
+			ta.innerHTML = t
+			ta.select()
 		}
 	</script>
 </head>
@@ -740,6 +755,6 @@
 		<tr>
 	</table>
 	<a onclick="getData()">Get Data</a>
-	<pre id="data"></pre>
+	<textarea id="data" cols="72" rows="27"></textarea>
 </body>
 </html>

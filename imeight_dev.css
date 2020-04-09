@@ -126,6 +126,7 @@ button.tab {
 #tabOutput {
 	position: relative;
 	height: 320px;
+	overflow-x: hidden;
 }
 
 #divOutput div {
@@ -147,9 +148,10 @@ iframe {
 }
 
 #taTutor {
-	width: 592px;
-	height: 322px;
+	width: 600px;
+	height: 320px;
 	border: 0;
+	overflow-x: hidden;
 }
 
 #tabGraphic {
