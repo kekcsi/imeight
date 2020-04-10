@@ -18,6 +18,7 @@ var arrays = {}
 var loops = []
 var memory = []
 var eventQueue = []
+var pressedKeys = []
 var eventHandler = function() {}
 var bugLocator
 

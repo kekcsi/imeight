@@ -26,7 +26,7 @@
 		h1, h2, h3 {
 			font-family: Westminster, "Data 70";
 			letter-spacing: 1px;
-			font-size: 24px;
+			font-size: 23px;
 		}
 		
 		body h2 {
@@ -104,7 +104,7 @@ Command Line, press Enter.</p>
 <br/>  <a href="#663">Run Time Errors</a></div>
 <h3>Fun Projects</h3><div class="contents">
 		<a href="#fp1" title="PRINT * ASCII art">1</a>
-&bull; 	<a href="#fp2" title="Expressions * Moo">2</a>
+&bull; 	<a href="#fp2" title="Expressions * Zebra say">2</a>
 &bull; 	<a href="#fp3" title="IF and THEN * Text Adventure">3</a></div>
 </div>
 <h3>Programming Instruction by Instruction</h3><div class="contents">
@@ -1009,8 +1009,8 @@ timing and graphics. Let's go!</p>
 <h2><a name="2001">WAIT and GET</a></h2>
 <p>WAIT instruction halts execution of your program until one of the 
 events occur:</p><ul>
-<li>A button on the keyboard is hit. Note that in the emulator, you need
-to focus on the Graphic Screen to get keystroke events.</li>
+<li>A button on the keyboard is hit or released. Note that in the emulator, you 
+need to focus (click) on the Graphic Screen to get keystroke events.</li>
 <li>Clock ticks. It constantly ticks every 20 milliseconds. So a WAIT 
 instruction returns after 20 milliseconds max, depending on what moment
 it started to run. E.g. just after another WAIT, it's exactly 20 ms.</li>
@@ -1021,19 +1021,22 @@ chronological order.</p>
 <p>Key codes:</p><ul>
 <li>If no button has been hit (since all of the events had been processed by GET 
 instructions) then GET assigns the value 0.</li>
-<li>Buttons for alphanumeric characters and space have key codes 32 through 
-127, according to ASCII.</li>
-<li>27 means Escape button, 13 is Enter.</li>
-<li>Shift and Ctrl buttons 16 and 17, respectively.</li>
+<li>Letter buttons have key codes 65 through 90, according to ASCII.</li>
+<li>Number buttons have key codes 48 through 57, according to ASCII.</li>
+<li>Numpad is differentiated, encoded 96 to 105.</li>
+<li>32 is Space bar, 27 means Escape button, 13 is Enter, 9: Tab.</li>
+<li>Shift and Ctrl buttons - 16 and 17, respectively.</li>
+<li>Function keys 112-123 (those may activate functions in your browser, too.)</li>
 <li>When Shift or Ctrl is still pressed while another key is hit, .5 or .25 is 
 added to its key code, respectively.</li>
+<li>On release, the negated key code is assigned by GET.</li>
 </ul>
 <div class="code">SECS=10:AN=10
 PRINT "ENTER "+AN+" ANIMALS IN "+SECS+" SECONDS"
 T$="":TICKS=0
 @LOOP:GET KEY
 IF KEY=27 THEN PRINT "GIVEN UP?":END
-IF KEY=0 THEN WAIT:TICKS=TICKS+1
+IF KEY&lt;=0 THEN WAIT:TICKS=TICKS+1
 IF KEY>31 AND 128>KEY THEN T$=T$+CHR$(KEY)
 IF KEY=13 THEN AN=AN-1:PRINT T$+" ACCEPTED, "+AN+" STILL TO GO!":T$=""
 IF AN=0 THEN PRINT "YOU WIN.":END

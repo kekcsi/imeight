@@ -33,9 +33,9 @@ for (var i in builtInDesigns) {
 	var fun = "DGN" + builtInDesigns[i].toUpperCase()
 
 	builtInFunctions[fun] = (function () {
-		var gif = builtInDesigns[i] + ".gif"
+		var url = "url('" + builtInDesigns[i] + ".gif')"
 
-		return function () { return gif }
+		return function () { return url }
 	})()
 }
 
@@ -65,18 +65,9 @@ setInterval(function() {
 	for (var i in arrays.SPRX) {
 		if (i in arrays.SPRY) {
 			if (!(i in sprites)) {
-				if (i in arrays.SPRDGN) {
-					if (typeof arrays.SPRDGN[i] == "number") {
-						//TODO decode from memory
-						sprites[i] = document.createElement("canvas")
-					} else {
-						// library design
-						sprites[i] = document.createElement("img")
-					}
-				} else {
-					sprites[i] = document.createElement("img")
-					sprites[i].src = "ball24.gif"
-				}
+				sprites[i] = document.createElement("div")
+				sprites[i].style.width = "24px"
+				sprites[i].style.height = "24px"
 				sprites[i].style.position = "absolute"
 				tabGraphic.appendChild(sprites[i])
 			}
@@ -84,12 +75,15 @@ setInterval(function() {
 			sprites[i].style.left = arrays.SPRX[i] + "px"
 			sprites[i].style.top = arrays.SPRY[i] + "px"
 			
-			if ((i in arrays.SPRDGN) && (i in sprites)) {
+			if (i in arrays.SPRDGN) {
 				if (typeof arrays.SPRDGN[i] == "number") {
 					//TODO decode from memory
+					sprites[i].innerHTML = "" + arrays.SPRDGN[i]
+					sprites[i].style.background = "none"
 				} else {
 					// library design
-					sprites[i].src = arrays.SPRDGN[i]
+					sprites[i].style.background = arrays.SPRDGN[i]
+					sprites[i].innerHTML = "&nbsp;"
 				}
 			}
 		}

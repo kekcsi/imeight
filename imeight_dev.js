@@ -27,7 +27,7 @@ function designerTab() { selectTab("Designer") }
 function tutorRight() {
 	divTutor.style.display = "block"
     divTutor.style.top = "8px"
-    divTutor.style.left = "624px";
+    divTutor.style.left = "624px"
 	btnTutorRight.style.display = "none"
 	btnTutorBelow.style.display = "inline"
 }
@@ -54,9 +54,10 @@ function pageLoad() {
 	})
 	
 	inUserInput.addEventListener("keydown", function(event) {
-		if (interact != inputAction) {
+		if (!(event.keyCode in pressedKeys)) { //ignore repeats
 			eventQueue.push(event.keyCode + 0.5*event.shiftKey + 0.25*event.ctrlKey)
 			eventHandler()
+			pressedKeys[event.keyCode] = Date.now()
 		}
 	})
 
@@ -70,6 +71,10 @@ function pageLoad() {
 			event.preventDefault()
 			userBreak()
 		}
+
+		eventQueue.push(-event.keyCode)
+		eventHandler()
+		delete pressedKeys[event.keyCode] 
 	})
 	
 	taList.addEventListener("keyup", function(event) {
@@ -87,8 +92,19 @@ function pageLoad() {
 	
 	tabGraphic.addEventListener("keydown", function(event) {
 		event.preventDefault()
-		eventQueue.push(event.keyCode)
+
+		if (!(event.keyCode in pressedKeys)) { //ignore repeats
+			eventQueue.push(event.keyCode + 0.5*event.shiftKey + 0.25*event.ctrlKey)
+			eventHandler()
+			pressedKeys[event.keyCode] = Date.now()
+		}
+	})
+	
+	tabGraphic.addEventListener("keyup", function(event) {
+		event.preventDefault()
+		eventQueue.push(-event.keyCode)
 		eventHandler()
+		delete pressedKeys[event.keyCode] 
 	})
 
 	setInterval(function() { eventHandler() }, 20)
