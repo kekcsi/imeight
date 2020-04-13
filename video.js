@@ -1,6 +1,7 @@
 builtInArrays.SPRX = [] //horizontal coordinate of each sprite (-24 to 384)
 builtInArrays.SPRY = [] //vertical coordinate of each sprite (-24 to 216)
 builtInArrays.SPRDGN = [] //design pointer of each sprite
+builtInVariables.BACKGROUND = 0
 
 var builtInDesigns = [
     "ball24",
@@ -61,7 +62,17 @@ commands["DGNS"] = function() {
 
 var sprites = []
 
+function decodeColor(i) {
+	var light = ((i >> 3)&1) ? "ff" : "cc"
+	var dark = ((i >> 3)&1) ? "33" : "00"
+	var red = (i&1) ? light : dark
+	var green = ((i >> 1)&1) ? light : dark
+	var blue = ((i >> 2)&1) ? light : dark
+	return "#" + red + green + blue
+}
+
 setInterval(function() {
+	tabGraphic.style.backgroundColor = decodeColor(variables.BACKGROUND)
 	for (var i in arrays.SPRX) {
 		if (i in arrays.SPRY) {
 			if (!(i in sprites)) {
