@@ -27,6 +27,16 @@ var runErrorHook = function(message) {} // only react in dev env - not in prod
 var videoPrint = function(message) {
 	console.log(message)
 } // print to Command Line in dev env - browser logs instead in prod
+var pageLoadHooks = []
+
+function pageLoad() {
+	for (var i in pageLoadHooks) {
+		var pageLoadHook = pageLoadHooks[i]
+		pageLoadHook()
+	}
+	
+	setInterval(function() { eventHandler() }, 20)
+}
 
 //runner constant
 var safetyWait = 10000

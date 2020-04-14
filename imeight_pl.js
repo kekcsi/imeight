@@ -1,4 +1,16 @@
 //parser + runner shared constants
+var NAME_RE = /^[A-Z][A-Z0-9]*[%!$]?/
+var ASSIGN_RE = /^[A-Z][A-Z0-9]*[%!$]?([(][^:]*[)])?[ \t]*=/
+var INDEXED_RE = /^[A-Z][A-Z0-9]*[%!$]?[(]/
+
+function getRegexPrefix(regex, fragment) {
+    var m = fragment.match(regex)
+	
+	if (!m) return false
+	
+	return m[0]
+}
+
 var instructions = {
     "@": {
         //text label for GOTO/GOSUB/RESTORE (put them on the list while relinking)
@@ -20,7 +32,7 @@ var instructions = {
     },
               
     END: {
-        parse: expectEnd,
+        parse: function() { expectEnd() },
                   
         run: function(pc) {
             return program.length
@@ -356,7 +368,7 @@ var instructions = {
 	},
 	
     RETURN: {
-		parse: expectEnd,
+		parse: function() { expectEnd() },
 		
 		run: function(pc) {
 			var target = argumentStack.pop()
@@ -388,7 +400,7 @@ var instructions = {
 	},
 	
     STOP: {
-		parse: expectEnd,
+		parse: function() { expectEnd() },
 
 		run: function(pc) {
 			stopped = pc + 1
@@ -425,7 +437,7 @@ var instructions = {
 	},
 
     WAIT: {
-		parse: expectEnd,
+		parse: function() { expectEnd() },
 		
 		run: function(pc) {
 			stopped = pc + 1
@@ -572,7 +584,7 @@ var instructions = {
 	},
 	
     CLR: {
-		parse: expectEnd,
+		parse: function() { expectEnd() },
 		
 		run: function(pc) {
 			variables = Object.assign({}, builtInVariables)

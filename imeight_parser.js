@@ -24,18 +24,6 @@ function parseError(message) {
 	parseSuccess = false
 }
 
-var NAME_RE = /^[A-Z][A-Z0-9]*[%!$]?/
-var ASSIGN_RE = /^[A-Z][A-Z0-9]*[%!$]?([(][^:]*[)])?[ \t]*=/
-var INDEXED_RE = /^[A-Z][A-Z0-9]*[%!$]?[(]/
-
-function getRegexPrefix(regex, fragment) {
-    var m = fragment.match(regex)
-	
-	if (!m) return false
-	
-	return m[0]
-}
-
 function nameArg() {
     text = text.trim()
     var name = getRegexPrefix(NAME_RE, text)

@@ -40,22 +40,24 @@ for (var i in builtInDesigns) {
 	})()
 }
 
-commands["DGNS"] = function() {
-	var ln = ""
-	
-	for (var dgn in builtInDesigns) {
-		ln += builtInDesigns[dgn].toUpperCase()
+if (typeof commands == "object") {
+	commands.DGNS = function() {
+		var ln = ""
 		
-		if (dgn == builtInDesigns.length - 1) {
-			videoPrint(ln)
-			break
-		}
-		
-		ln += ","
-		
-		if (ln.length > 40) {
-			videoPrint(ln)
-			ln = ""
+		for (var dgn in builtInDesigns) {
+			ln += builtInDesigns[dgn].toUpperCase()
+			
+			if (dgn == builtInDesigns.length - 1) {
+				videoPrint(ln)
+				break
+			}
+			
+			ln += ","
+			
+			if (ln.length > 40) {
+				videoPrint(ln)
+				ln = ""
+			}
 		}
 	}
 }
@@ -71,36 +73,55 @@ function decodeColor(i) {
 	return "#" + red + green + blue
 }
 
-setInterval(function() {
-	tabGraphic.style.backgroundColor = decodeColor(variables.BACKGROUND)
-	for (var i in arrays.SPRX) {
-		if (i in arrays.SPRY) {
-			if (!(i in sprites)) {
-				sprites[i] = document.createElement("div")
-				sprites[i].style.width = "24px"
-				sprites[i].style.height = "24px"
-				sprites[i].style.position = "absolute"
-				tabGraphic.appendChild(sprites[i])
-			}
+pageLoadHooks.push(function() {
+	tabGraphic.addEventListener("keydown", function(event) {
+		event.preventDefault()
 
-			sprites[i].style.left = arrays.SPRX[i] + "px"
-			sprites[i].style.top = arrays.SPRY[i] + "px"
-			
-			if (i in arrays.SPRDGN) {
-				if (typeof arrays.SPRDGN[i] == "number") {
-					//TODO decode from memory
-					sprites[i].innerHTML = "" + arrays.SPRDGN[i]
-					sprites[i].style.background = "none"
+		if (!(event.keyCode in pressedKeys)) { //ignore repeats
+			eventQueue.push(event.keyCode + 0.5*event.shiftKey + 0.25*event.ctrlKey)
+			eventHandler()
+			pressedKeys[event.keyCode] = Date.now()
+		}
+	})
+	
+	tabGraphic.addEventListener("keyup", function(event) {
+		event.preventDefault()
+		eventQueue.push(-event.keyCode)
+		eventHandler()
+		delete pressedKeys[event.keyCode] 
+	})
+
+	setInterval(function() {
+		tabGraphic.style.backgroundColor = decodeColor(variables.BACKGROUND)
+		for (var i in arrays.SPRX) {
+			if (i in arrays.SPRY) {
+				if (!(i in sprites)) {
+					sprites[i] = document.createElement("div")
+					sprites[i].style.width = "24px"
+					sprites[i].style.height = "24px"
+					sprites[i].style.position = "absolute"
+					tabGraphic.appendChild(sprites[i])
+				}
+
+				sprites[i].style.left = arrays.SPRX[i] + "px"
+				sprites[i].style.top = arrays.SPRY[i] + "px"
+				
+				if (i in arrays.SPRDGN) {
+					if (typeof arrays.SPRDGN[i] == "number") {
+						//TODO decode from memory
+						sprites[i].innerHTML = "" + arrays.SPRDGN[i]
+						sprites[i].style.background = "none"
+					} else {
+						// library design
+						sprites[i].style.background = arrays.SPRDGN[i]
+						sprites[i].innerHTML = "&nbsp;"
+					}
 				} else {
-					// library design
-					sprites[i].style.background = arrays.SPRDGN[i]
+					// default design
+					sprites[i].style.background = "url(ball24.gif)"
 					sprites[i].innerHTML = "&nbsp;"
 				}
-			} else {
-				// default design
-				sprites[i].style.background = "url(ball24.gif)"
-				sprites[i].innerHTML = "&nbsp;"
 			}
 		}
-	}
-}, 40)
+	}, 40)
+})

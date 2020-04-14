@@ -40,7 +40,7 @@ function tutorBelow() {
 	btnTutorBelow.style.display = "none"
 }
 
-function pageLoad() {
+pageLoadHooks.push(function() {
 	tabs = {
 		Program: { btn: btnProgram, tab: tabProgram, focused: taList }, 
 		Output: { btn: btnOutput, tab: tabOutput, focused: inUserInput }, 
@@ -93,31 +93,12 @@ function pageLoad() {
 
 		localStorage.setItem("proglist", taList.value)
 	})
-	
-	tabGraphic.addEventListener("keydown", function(event) {
-		event.preventDefault()
-
-		if (!(event.keyCode in pressedKeys)) { //ignore repeats
-			eventQueue.push(event.keyCode + 0.5*event.shiftKey + 0.25*event.ctrlKey)
-			eventHandler()
-			pressedKeys[event.keyCode] = Date.now()
-		}
-	})
-	
-	tabGraphic.addEventListener("keyup", function(event) {
-		event.preventDefault()
-		eventQueue.push(-event.keyCode)
-		eventHandler()
-		delete pressedKeys[event.keyCode] 
-	})
-
-	setInterval(function() { eventHandler() }, 20)
 
 	// initialize built-in variables for direct expressions (?) on Command Line
 	instructions.CLR.run(0)
 	
 	taList.value = localStorage.getItem("proglist")
-}
+})
 
 function updateLineNumber() {
 	inLine.value = taList.value.substring(0, taList.selectionStart).split("\n").length
