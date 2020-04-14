@@ -839,6 +839,17 @@ RETURN
 RETURN
 @M3: PRINT "YOU DIDN'T CHOOSE 1 OR 2 BUT SOMETHING ELSE"
 RETURN</div>
+<p>A trick to save a line of code:</p>
+<div class="code">INPUT N
+ON N>0 GOTO POSITIVE, NONPOSITIVE:REM<i> IF N>0 IS TRUE, BRANCH 1 IS SELECTED</i>
+@POSITIVE:PRINT "POSITIVE":END
+@NONPOSITIVE:PRINT "NONPOSITIVE":END
+<hr/>INPUT N
+IF N>0 GOTO POSITIVE
+GOTO NONPOSITIVE:REM<i> THIS NEEDS TO BE ON A SEPARATE LINE</i>
+@POSITIVE:PRINT "POSITIVE":END
+@NONPOSITIVE:PRINT "NONPOSITIVE":END
+</div>
 <h2><a name="613">Multidimensional Arrays</a></h2>
 <p>You may use the comma operator in the array index to create a matrix.</p>
 <div class="code">DIM MANCALA(6,2)
@@ -1177,7 +1188,7 @@ SPRY(0)=SPRY(0)+SPEEDY
 IF SPRX(0) <= 0 OR SPRX(0) >= SCREENWIDTH-24 THEN SPEEDX = -SPEEDX
 IF SPRY(0) <= 0 OR SPRY(0) >= SCREENHEIGHT-24 THEN SPEEDY = -SPEEDY
 WAIT:GET A
-<a href="#593">ON</a> A>0 GOTO HIT, LOOP 'LOOP IF KEY CODE 0; GOES TO HIT OTHERWISE</div>
+<a href="#593">ON</a> A>0 GOTO HIT, LOOP 'LOOP IF KEY CODE&lt;=0; GOES TO HIT OTHERWISE</div>
 <p>The above algorithm appears in Billiard games, Ping or Breakout.</p>
 <div class="code">WT=384:HT=216
 <a href="#540" title="About the DIM instruction from Part 2">DIM</a> SPEEDX(99):DIM SPEEDY(99)
@@ -1200,7 +1211,7 @@ FOR I=1 TO N
 	IF SPRY(I) >= 0 THEN SPEEDY(I)=SPEEDY(I)+.1
 NEXT:@OUT
 WAIT:GET A
-ON A+1 GOTO LOOP, SPAWN</div>
+ON A>0 GOTO SPAWN, LOOP</div>
 <p>Combine bouncing with gravity for an effect like in Flipper or ballistic
 games.</p>
 <p>Note that setting a coordinate to -24 makes the sprite invisible.</p>
