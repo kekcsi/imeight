@@ -96,6 +96,10 @@ setInterval(function() {
 					sprites[i].style.background = arrays.SPRDGN[i]
 					sprites[i].innerHTML = "&nbsp;"
 				}
+			} else {
+				// default design
+				sprites[i].style.background = "url(ball24.gif)"
+				sprites[i].innerHTML = "&nbsp;"
 			}
 		}
 	}
