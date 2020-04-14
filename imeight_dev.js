@@ -88,7 +88,11 @@ function pageLoad() {
 	
 	taList.addEventListener("mouseup", updateLineNumber)
 	
-	taList.addEventListener("change", function() { listClean = false })
+	taList.addEventListener("change", function() { 
+		listClean = false
+
+		localStorage.setItem("proglist", taList.value)
+	})
 	
 	tabGraphic.addEventListener("keydown", function(event) {
 		event.preventDefault()
@@ -111,6 +115,8 @@ function pageLoad() {
 
 	// initialize built-in variables for direct expressions (?) on Command Line
 	instructions.CLR.run(0)
+	
+	taList.value = localStorage.getItem("proglist")
 }
 
 function updateLineNumber() {
@@ -173,7 +179,7 @@ var interact = function(input) {
 		
 		var evalPC = program.length
 
-		var rest = expressionArg(command.substring(1))
+		var rest = expressionArg(input.trim().substring(1))
 		if (rest !== "") {
 			parseError("EXTRA ARGUMENT")
 		} else {
