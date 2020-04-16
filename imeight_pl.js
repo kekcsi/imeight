@@ -563,7 +563,9 @@ var instructions = {
 		
 		run: function(pc) {
 			var value = popAndEvaluate()
-			memory[popAndEvaluate()] = value
+			var address = popAndEvaluate()
+			memory[address] = value
+			memoryUpdateHook(address)
 			
 			return pc + 1
 		}
@@ -598,6 +600,8 @@ var instructions = {
 			readDataBuffer = []
 			readDataPointer = 0
 			eventQueue = []
+			
+			varUpdateHook(null, null)
 			
 			return pc + 1
 		}
@@ -690,7 +694,7 @@ var builtInFunctions = {
     SIN: { apply: Math.sin },
     TAN: { apply: Math.tan },
     ATN: { apply: Math.atan },
-    PEEK: { apply: arg => (arg in memory ? memory[arg] : 255) },
+    PEEK: { apply: arg => (arg in memory ? memory[arg] : 0) },
     LEN: { apply: arg => ("" + arg).length },
     "STR$": { apply: arg => "" + arg },
     VAL: { apply: parseFloat },

@@ -1,80 +1,14 @@
-TO DO
-
-render sprites
-execute program
-render text layer
-[developer] initial_memory_content.js export (zip with runtime)
-[developer] draw and export default pixmaps: $x0..$x7 tiles (tree etc.), $x8..$xB mono, $xC..$xF mult
-[developer] copy in pixmap array map
-[developer] roll in tile layer designer
-[developer] mono sprite editor (extract from spr-editor.html)
-[developer] multicolor sprite editor (see design below + mult-mock.txt for css dims)
-[developer] onscreen text editing (only for developer but runs on the emu)
-[developer] memory organizer (entry point for pixmaps, assembly and font; can copy current state of text layer also)
-[developer] assembly monitor
-[developer] font editor
-keyboard input
-tile layer offsets, borders
-(music)
-[developer] (music editor)
-[developer] (default routines: tile layer smooth scroll, sprite smooth move)
-[developer] (default data: sinetable)
-[developer] (sprite state, layering, text colors)
-
-*****
-
-MULT editor mockup
-
-    ,---- 16-color palette, select drawing color by clicking, 
-    |     highlight current drawing color, re-click to change LUT entry
-    v
-    ##  ######################## \
-    ##  # 24×24 pixel editor ### |
-    ##  ######################## |
-    ##  ######################## |
-    ##  ######################## > region A: rows 0..5
-    ##  ######################## |
-    ##  ######################## |
-    ##  ######################## |
-    P1  ######################## /
-    ##  ######################## \
-    ##  ######################## |
-    ##  ######################## |
-    ##  ######################## |
-    ##  ######################## > region B: rows 6..11
-    ##  ######################## |
-    ##  ######################## |
-    ##  ######################## |
-    P3  ######################## /
-    ##  ######################## \
-    ##  ######################## |
-    ##  ######################## |
-    ##  ######################## |
-    ##  ######################## > region C: rows 12..17
-    ##  ######################## |
-    ##  ######################## |
-    ##  ######################## |
-    P3  ######################## /
-    ##  ######################## \
-    ##  ######################## |
-    ##  ######################## |
-    ##  ######################## |
-    ##  ######################## > region D: rows 18..23
-    ##  ######################## |
-    ##  ######################## |
-    ##  ######################## |
-    P0  ######################## /
-    ^
-    |
-    `-------- cycle button P0 P1 P2 P3 to select palette for the region
-
-
-* palettes in a 4×1 table, border: 1px solid orange; cell-spacing: 2px
-* each palette is a 9×2 table (with a cycle-button in the bottommost row + 16 color cells)
-* palette cycle-button height: 15px //+2px spacing = 17px; colspan="2"
-* color cell either border or padding: 1px; width: 32px; height: 10px //full height with border and spacing = 14px
-
-
-Pixmap Array Map Design
-^^^^^^^^^^^^^^^^^^^^^^^
-* buttons below table: Tile, Mult, Mono; Copy
+TODO
+* designer data local storage
+* Look redesign
+		* graphics zoom 2 by 2
+		* dynamic screen size for editor
+		* Tutor button belongs outside list tab
+		* Add forum post button
+* Tiles
+* Designs decoded from memory
+* Text layer
+* Vector layer?
+* LOAD/SAVE memory/routines
+* Music
+* Pack js files and gifs with lwrunner.php

@@ -344,6 +344,27 @@ function parseToEndOfLine(deStart) {
 	elseBranches[deStart] = program.length + 1
 }
 
+var urlbase = ""
+
+function updateDownloadBlob() {
+	while(memory.length > 256 && memory[memory.length - 1] == 0) {
+		memory.pop()
+	}
+
+	var lwrunner = document.scripts.namedItem("lwrunnerTmpl").text
+	lwrunner = lwrunner.replace(/^\<\!--(.*)--\>$/s, "$1")
+	lwrunner = lwrunner.replace(/\<\?\=urlbase\?\>/g, urlbase)
+	var spec = lwrunner
+	spec = spec.replace(/\<\?\=\s*programJson\s*\?\>/g, JSON.stringify(program))
+	spec = spec.replace(/\<\?\=\s*labelsJson\s*\?\>/g, JSON.stringify(labels))
+	spec = spec.replace(/\<\?\=\s*dataLookupJson\s*\?\>/g, JSON.stringify(dataLookup))
+	spec = spec.replace(/\<\?\=\s*elseBranchesJson\s*\?\>/g, JSON.stringify(elseBranches))
+	spec = spec.replace(/\<\?\=\s*memoryJson\s*\?\>/g, JSON.stringify(memory))
+	var data = new Blob([spec], {type: 'text/html'})
+	var url = window.URL.createObjectURL(data)
+	document.getElementById('download_link').href = url
+}
+
 function parseLine() {
     rollback = program.length
 	charsParsed += text.length
@@ -355,6 +376,8 @@ function parseLine() {
 	if (parseSuccess) {
 		lineNumber++
 		charsParsed++
+
+		updateDownloadBlob()
 	} else {
 		program.splice(rollback, program.length - rollback)
 	}

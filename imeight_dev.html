@@ -6,9 +6,50 @@
     <script type="text/javascript" src="imeight_dev.js"></script>
     <script type="text/javascript" src="imeight_pl.js"></script>
     <script type="text/javascript" src="video.js"></script>
+    <script type="text/javascript" src="spr-editor.js"></script>
+
+    <script type="text/html" id="lwrunnerTmpl"><!--
+		<html>
+		<head>
+			<script type="text/javascript" src="<?=urlbase?>imeight_runner.js"></script>
+			<script type="text/javascript" src="<?=urlbase?>imeight_pl.js"></script>
+			<script type="text/javascript" src="<?=urlbase?>video.js"></script>
+			<script type="application/json" id="programJson"><?=programJson?></script>
+			<script type="application/json" id="labelsJson"><?=labelsJson?></script>
+			<script type="application/json" id="dataLookupJson"><?=dataLookupJson?></script>
+			<script type="application/json" id="elseBranchesJson"><?=elseBranchesJson?></script>
+			<script type="application/json" id="memoryJson"><?=memoryJson?></script>
+			<script type="text/javascript">
+				program = JSON.parse(document.scripts.namedItem("programJson").text)
+				labels = JSON.parse(document.scripts.namedItem("labelsJson").text)
+				dataLookup = JSON.parse(document.scripts.namedItem("dataLookupJson").text)
+				elseBranches = JSON.parse(document.scripts.namedItem("elseBranchesJson").text)
+				memory = JSON.parse(document.scripts.namedItem("memoryJson").text)
+				var interact = function() {}
+				pageLoadHooks.push(runProgram)
+			</script>
+			<style type="text/css">
+				#tabGraphic {
+					width:384px;
+					height:216px;
+					position:relative;
+					overflow:hidden;
+					background:black;
+				}
+			</style>
+		</head>
+		<body onload="pageLoad()" topmargin="0" leftmargin="0">
+			<div id="tabGraphic"></div>
+		</body>
+	--></script>
+
 	<link rel="stylesheet" type="text/css" href="imeight_dev.css"/>
+	<link rel="stylesheet" type="text/css" href="spr-editor.css"/>
 </head>
+	
 <body onload="pageLoad()">
+	<a id="download_link" download="index.html" href="" title="The tokenized program with the current memory content, for publishing as a static web page.">Download Program</a>
+	<a href="im8runner.zip" title="The built-in designs and runner code in a zip.">Download Environment</a>
     <div class="win">
     	<button id="btnProgram" onclick="programTab()" class="tab" style="border-style:inset">Program Listing</button>
     	<button id="btnOutput" onclick="outputTab()" class="tab" style="border-style:outset">Command Line</button>
@@ -33,7 +74,915 @@
     		</span>
     	</div>
     	<div tabindex="0" class="dark" id="tabGraphic"></div>
-    	<iframe id="tabDesigner" src="spr-editor.html" style="display:none" width="600" height="320"></iframe>
+    	<div id="tabDesigner" style="display:none; width:600; height:320; position: relative">
+			<table id="tblColors">
+				<tr>
+					<td data-idx="0"></td>
+					<td data-idx="1"></td>
+					<td data-idx="2"></td>
+					<td data-idx="3"></td>
+					<td data-idx="4"></td>
+					<td data-idx="5"></td>
+					<td data-idx="6"></td>
+					<td data-idx="7"></td>
+					<td data-idx="8"></td>
+					<td data-idx="9"></td>
+					<td data-idx="10"></td>
+					<td data-idx="11"></td>
+					<td data-idx="12"></td>
+					<td data-idx="13"></td>
+					<td data-idx="14"></td>
+					<td data-idx="15"></td>
+				</tr>  
+			</table>
+			<table id="sprite-editor">
+				<tr>
+					<td data-idx="0"></td>
+					<td data-idx="1"></td>
+					<td data-idx="2"></td>
+					<td data-idx="3"></td>
+					<td data-idx="4"></td>
+					<td data-idx="5"></td>
+					<td data-idx="6"></td>
+					<td data-idx="7"></td>
+					<td data-idx="8"></td>
+					<td data-idx="9"></td>
+					<td data-idx="10"></td>
+					<td data-idx="11"></td>
+					<td data-idx="12"></td>
+					<td data-idx="13"></td>
+					<td data-idx="14"></td>
+					<td data-idx="15"></td>
+					<td data-idx="16"></td>
+					<td data-idx="17"></td>
+					<td data-idx="18"></td>
+					<td data-idx="19"></td>
+					<td data-idx="20"></td>
+					<td data-idx="21"></td>
+					<td data-idx="22"></td>
+					<td data-idx="23"></td>
+				</tr>
+				<tr>
+					<td data-idx="24"></td>
+					<td data-idx="25"></td>
+					<td data-idx="26"></td>
+					<td data-idx="27"></td>
+					<td data-idx="28"></td>
+					<td data-idx="29"></td>
+					<td data-idx="30"></td>
+					<td data-idx="31"></td>
+					<td data-idx="32"></td>
+					<td data-idx="33"></td>
+					<td data-idx="34"></td>
+					<td data-idx="35"></td>
+					<td data-idx="36"></td>
+					<td data-idx="37"></td>
+					<td data-idx="38"></td>
+					<td data-idx="39"></td>
+					<td data-idx="40"></td>
+					<td data-idx="41"></td>
+					<td data-idx="42"></td>
+					<td data-idx="43"></td>
+					<td data-idx="44"></td>
+					<td data-idx="45"></td>
+					<td data-idx="46"></td>
+					<td data-idx="47"></td>
+				</tr>
+				<tr>
+					<td data-idx="48"></td>
+					<td data-idx="49"></td>
+					<td data-idx="50"></td>
+					<td data-idx="51"></td>
+					<td data-idx="52"></td>
+					<td data-idx="53"></td>
+					<td data-idx="54"></td>
+					<td data-idx="55"></td>
+					<td data-idx="56"></td>
+					<td data-idx="57"></td>
+					<td data-idx="58"></td>
+					<td data-idx="59"></td>
+					<td data-idx="60"></td>
+					<td data-idx="61"></td>
+					<td data-idx="62"></td>
+					<td data-idx="63"></td>
+					<td data-idx="64"></td>
+					<td data-idx="65"></td>
+					<td data-idx="66"></td>
+					<td data-idx="67"></td>
+					<td data-idx="68"></td>
+					<td data-idx="69"></td>
+					<td data-idx="70"></td>
+					<td data-idx="71"></td>
+				</tr>
+				<tr>
+					<td data-idx="72"></td>
+					<td data-idx="73"></td>
+					<td data-idx="74"></td>
+					<td data-idx="75"></td>
+					<td data-idx="76"></td>
+					<td data-idx="77"></td>
+					<td data-idx="78"></td>
+					<td data-idx="79"></td>
+					<td data-idx="80"></td>
+					<td data-idx="81"></td>
+					<td data-idx="82"></td>
+					<td data-idx="83"></td>
+					<td data-idx="84"></td>
+					<td data-idx="85"></td>
+					<td data-idx="86"></td>
+					<td data-idx="87"></td>
+					<td data-idx="88"></td>
+					<td data-idx="89"></td>
+					<td data-idx="90"></td>
+					<td data-idx="91"></td>
+					<td data-idx="92"></td>
+					<td data-idx="93"></td>
+					<td data-idx="94"></td>
+					<td data-idx="95"></td>
+				</tr>
+				<tr>
+					<td data-idx="96"></td>
+					<td data-idx="97"></td>
+					<td data-idx="98"></td>
+					<td data-idx="99"></td>
+					<td data-idx="100"></td>
+					<td data-idx="101"></td>
+					<td data-idx="102"></td>
+					<td data-idx="103"></td>
+					<td data-idx="104"></td>
+					<td data-idx="105"></td>
+					<td data-idx="106"></td>
+					<td data-idx="107"></td>
+					<td data-idx="108"></td>
+					<td data-idx="109"></td>
+					<td data-idx="110"></td>
+					<td data-idx="111"></td>
+					<td data-idx="112"></td>
+					<td data-idx="113"></td>
+					<td data-idx="114"></td>
+					<td data-idx="115"></td>
+					<td data-idx="116"></td>
+					<td data-idx="117"></td>
+					<td data-idx="118"></td>
+					<td data-idx="119"></td>
+				</tr>
+				<tr>
+					<td data-idx="120"></td>
+					<td data-idx="121"></td>
+					<td data-idx="122"></td>
+					<td data-idx="123"></td>
+					<td data-idx="124"></td>
+					<td data-idx="125"></td>
+					<td data-idx="126"></td>
+					<td data-idx="127"></td>
+					<td data-idx="128"></td>
+					<td data-idx="129"></td>
+					<td data-idx="130"></td>
+					<td data-idx="131"></td>
+					<td data-idx="132"></td>
+					<td data-idx="133"></td>
+					<td data-idx="134"></td>
+					<td data-idx="135"></td>
+					<td data-idx="136"></td>
+					<td data-idx="137"></td>
+					<td data-idx="138"></td>
+					<td data-idx="139"></td>
+					<td data-idx="140"></td>
+					<td data-idx="141"></td>
+					<td data-idx="142"></td>
+					<td data-idx="143"></td>
+				</tr>
+				<tr>
+					<td data-idx="144"></td>
+					<td data-idx="145"></td>
+					<td data-idx="146"></td>
+					<td data-idx="147"></td>
+					<td data-idx="148"></td>
+					<td data-idx="149"></td>
+					<td data-idx="150"></td>
+					<td data-idx="151"></td>
+					<td data-idx="152"></td>
+					<td data-idx="153"></td>
+					<td data-idx="154"></td>
+					<td data-idx="155"></td>
+					<td data-idx="156"></td>
+					<td data-idx="157"></td>
+					<td data-idx="158"></td>
+					<td data-idx="159"></td>
+					<td data-idx="160"></td>
+					<td data-idx="161"></td>
+					<td data-idx="162"></td>
+					<td data-idx="163"></td>
+					<td data-idx="164"></td>
+					<td data-idx="165"></td>
+					<td data-idx="166"></td>
+					<td data-idx="167"></td>
+				</tr>
+				<tr>
+					<td data-idx="168"></td>
+					<td data-idx="169"></td>
+					<td data-idx="170"></td>
+					<td data-idx="171"></td>
+					<td data-idx="172"></td>
+					<td data-idx="173"></td>
+					<td data-idx="174"></td>
+					<td data-idx="175"></td>
+					<td data-idx="176"></td>
+					<td data-idx="177"></td>
+					<td data-idx="178"></td>
+					<td data-idx="179"></td>
+					<td data-idx="180"></td>
+					<td data-idx="181"></td>
+					<td data-idx="182"></td>
+					<td data-idx="183"></td>
+					<td data-idx="184"></td>
+					<td data-idx="185"></td>
+					<td data-idx="186"></td>
+					<td data-idx="187"></td>
+					<td data-idx="188"></td>
+					<td data-idx="189"></td>
+					<td data-idx="190"></td>
+					<td data-idx="191"></td>
+				</tr>
+				<tr>
+					<td data-idx="192"></td>
+					<td data-idx="193"></td>
+					<td data-idx="194"></td>
+					<td data-idx="195"></td>
+					<td data-idx="196"></td>
+					<td data-idx="197"></td>
+					<td data-idx="198"></td>
+					<td data-idx="199"></td>
+					<td data-idx="200"></td>
+					<td data-idx="201"></td>
+					<td data-idx="202"></td>
+					<td data-idx="203"></td>
+					<td data-idx="204"></td>
+					<td data-idx="205"></td>
+					<td data-idx="206"></td>
+					<td data-idx="207"></td>
+					<td data-idx="208"></td>
+					<td data-idx="209"></td>
+					<td data-idx="210"></td>
+					<td data-idx="211"></td>
+					<td data-idx="212"></td>
+					<td data-idx="213"></td>
+					<td data-idx="214"></td>
+					<td data-idx="215"></td>
+				</tr>
+				<tr>
+					<td data-idx="216"></td>
+					<td data-idx="217"></td>
+					<td data-idx="218"></td>
+					<td data-idx="219"></td>
+					<td data-idx="220"></td>
+					<td data-idx="221"></td>
+					<td data-idx="222"></td>
+					<td data-idx="223"></td>
+					<td data-idx="224"></td>
+					<td data-idx="225"></td>
+					<td data-idx="226"></td>
+					<td data-idx="227"></td>
+					<td data-idx="228"></td>
+					<td data-idx="229"></td>
+					<td data-idx="230"></td>
+					<td data-idx="231"></td>
+					<td data-idx="232"></td>
+					<td data-idx="233"></td>
+					<td data-idx="234"></td>
+					<td data-idx="235"></td>
+					<td data-idx="236"></td>
+					<td data-idx="237"></td>
+					<td data-idx="238"></td>
+					<td data-idx="239"></td>
+				</tr>
+				<tr>
+					<td data-idx="240"></td>
+					<td data-idx="241"></td>
+					<td data-idx="242"></td>
+					<td data-idx="243"></td>
+					<td data-idx="244"></td>
+					<td data-idx="245"></td>
+					<td data-idx="246"></td>
+					<td data-idx="247"></td>
+					<td data-idx="248"></td>
+					<td data-idx="249"></td>
+					<td data-idx="250"></td>
+					<td data-idx="251"></td>
+					<td data-idx="252"></td>
+					<td data-idx="253"></td>
+					<td data-idx="254"></td>
+					<td data-idx="255"></td>
+					<td data-idx="256"></td>
+					<td data-idx="257"></td>
+					<td data-idx="258"></td>
+					<td data-idx="259"></td>
+					<td data-idx="260"></td>
+					<td data-idx="261"></td>
+					<td data-idx="262"></td>
+					<td data-idx="263"></td>
+				</tr>
+				<tr>
+					<td data-idx="264"></td>
+					<td data-idx="265"></td>
+					<td data-idx="266"></td>
+					<td data-idx="267"></td>
+					<td data-idx="268"></td>
+					<td data-idx="269"></td>
+					<td data-idx="270"></td>
+					<td data-idx="271"></td>
+					<td data-idx="272"></td>
+					<td data-idx="273"></td>
+					<td data-idx="274"></td>
+					<td data-idx="275"></td>
+					<td data-idx="276"></td>
+					<td data-idx="277"></td>
+					<td data-idx="278"></td>
+					<td data-idx="279"></td>
+					<td data-idx="280"></td>
+					<td data-idx="281"></td>
+					<td data-idx="282"></td>
+					<td data-idx="283"></td>
+					<td data-idx="284"></td>
+					<td data-idx="285"></td>
+					<td data-idx="286"></td>
+					<td data-idx="287"></td>
+				</tr>
+				<tr>
+					<td data-idx="288"></td>
+					<td data-idx="289"></td>
+					<td data-idx="290"></td>
+					<td data-idx="291"></td>
+					<td data-idx="292"></td>
+					<td data-idx="293"></td>
+					<td data-idx="294"></td>
+					<td data-idx="295"></td>
+					<td data-idx="296"></td>
+					<td data-idx="297"></td>
+					<td data-idx="298"></td>
+					<td data-idx="299"></td>
+					<td data-idx="300"></td>
+					<td data-idx="301"></td>
+					<td data-idx="302"></td>
+					<td data-idx="303"></td>
+					<td data-idx="304"></td>
+					<td data-idx="305"></td>
+					<td data-idx="306"></td>
+					<td data-idx="307"></td>
+					<td data-idx="308"></td>
+					<td data-idx="309"></td>
+					<td data-idx="310"></td>
+					<td data-idx="311"></td>
+				</tr>
+				<tr>
+					<td data-idx="312"></td>
+					<td data-idx="313"></td>
+					<td data-idx="314"></td>
+					<td data-idx="315"></td>
+					<td data-idx="316"></td>
+					<td data-idx="317"></td>
+					<td data-idx="318"></td>
+					<td data-idx="319"></td>
+					<td data-idx="320"></td>
+					<td data-idx="321"></td>
+					<td data-idx="322"></td>
+					<td data-idx="323"></td>
+					<td data-idx="324"></td>
+					<td data-idx="325"></td>
+					<td data-idx="326"></td>
+					<td data-idx="327"></td>
+					<td data-idx="328"></td>
+					<td data-idx="329"></td>
+					<td data-idx="330"></td>
+					<td data-idx="331"></td>
+					<td data-idx="332"></td>
+					<td data-idx="333"></td>
+					<td data-idx="334"></td>
+					<td data-idx="335"></td>
+				</tr>
+				<tr>
+					<td data-idx="336"></td>
+					<td data-idx="337"></td>
+					<td data-idx="338"></td>
+					<td data-idx="339"></td>
+					<td data-idx="340"></td>
+					<td data-idx="341"></td>
+					<td data-idx="342"></td>
+					<td data-idx="343"></td>
+					<td data-idx="344"></td>
+					<td data-idx="345"></td>
+					<td data-idx="346"></td>
+					<td data-idx="347"></td>
+					<td data-idx="348"></td>
+					<td data-idx="349"></td>
+					<td data-idx="350"></td>
+					<td data-idx="351"></td>
+					<td data-idx="352"></td>
+					<td data-idx="353"></td>
+					<td data-idx="354"></td>
+					<td data-idx="355"></td>
+					<td data-idx="356"></td>
+					<td data-idx="357"></td>
+					<td data-idx="358"></td>
+					<td data-idx="359"></td>
+				</tr>
+				<tr>
+					<td data-idx="360"></td>
+					<td data-idx="361"></td>
+					<td data-idx="362"></td>
+					<td data-idx="363"></td>
+					<td data-idx="364"></td>
+					<td data-idx="365"></td>
+					<td data-idx="366"></td>
+					<td data-idx="367"></td>
+					<td data-idx="368"></td>
+					<td data-idx="369"></td>
+					<td data-idx="370"></td>
+					<td data-idx="371"></td>
+					<td data-idx="372"></td>
+					<td data-idx="373"></td>
+					<td data-idx="374"></td>
+					<td data-idx="375"></td>
+					<td data-idx="376"></td>
+					<td data-idx="377"></td>
+					<td data-idx="378"></td>
+					<td data-idx="379"></td>
+					<td data-idx="380"></td>
+					<td data-idx="381"></td>
+					<td data-idx="382"></td>
+					<td data-idx="383"></td>
+				</tr>
+				<tr>
+					<td data-idx="384"></td>
+					<td data-idx="385"></td>
+					<td data-idx="386"></td>
+					<td data-idx="387"></td>
+					<td data-idx="388"></td>
+					<td data-idx="389"></td>
+					<td data-idx="390"></td>
+					<td data-idx="391"></td>
+					<td data-idx="392"></td>
+					<td data-idx="393"></td>
+					<td data-idx="394"></td>
+					<td data-idx="395"></td>
+					<td data-idx="396"></td>
+					<td data-idx="397"></td>
+					<td data-idx="398"></td>
+					<td data-idx="399"></td>
+					<td data-idx="400"></td>
+					<td data-idx="401"></td>
+					<td data-idx="402"></td>
+					<td data-idx="403"></td>
+					<td data-idx="404"></td>
+					<td data-idx="405"></td>
+					<td data-idx="406"></td>
+					<td data-idx="407"></td>
+				</tr>
+				<tr>
+					<td data-idx="408"></td>
+					<td data-idx="409"></td>
+					<td data-idx="410"></td>
+					<td data-idx="411"></td>
+					<td data-idx="412"></td>
+					<td data-idx="413"></td>
+					<td data-idx="414"></td>
+					<td data-idx="415"></td>
+					<td data-idx="416"></td>
+					<td data-idx="417"></td>
+					<td data-idx="418"></td>
+					<td data-idx="419"></td>
+					<td data-idx="420"></td>
+					<td data-idx="421"></td>
+					<td data-idx="422"></td>
+					<td data-idx="423"></td>
+					<td data-idx="424"></td>
+					<td data-idx="425"></td>
+					<td data-idx="426"></td>
+					<td data-idx="427"></td>
+					<td data-idx="428"></td>
+					<td data-idx="429"></td>
+					<td data-idx="430"></td>
+					<td data-idx="431"></td>
+				</tr>
+				<tr>
+					<td data-idx="432"></td>
+					<td data-idx="433"></td>
+					<td data-idx="434"></td>
+					<td data-idx="435"></td>
+					<td data-idx="436"></td>
+					<td data-idx="437"></td>
+					<td data-idx="438"></td>
+					<td data-idx="439"></td>
+					<td data-idx="440"></td>
+					<td data-idx="441"></td>
+					<td data-idx="442"></td>
+					<td data-idx="443"></td>
+					<td data-idx="444"></td>
+					<td data-idx="445"></td>
+					<td data-idx="446"></td>
+					<td data-idx="447"></td>
+					<td data-idx="448"></td>
+					<td data-idx="449"></td>
+					<td data-idx="450"></td>
+					<td data-idx="451"></td>
+					<td data-idx="452"></td>
+					<td data-idx="453"></td>
+					<td data-idx="454"></td>
+					<td data-idx="455"></td>
+				</tr>
+				<tr>
+					<td data-idx="456"></td>
+					<td data-idx="457"></td>
+					<td data-idx="458"></td>
+					<td data-idx="459"></td>
+					<td data-idx="460"></td>
+					<td data-idx="461"></td>
+					<td data-idx="462"></td>
+					<td data-idx="463"></td>
+					<td data-idx="464"></td>
+					<td data-idx="465"></td>
+					<td data-idx="466"></td>
+					<td data-idx="467"></td>
+					<td data-idx="468"></td>
+					<td data-idx="469"></td>
+					<td data-idx="470"></td>
+					<td data-idx="471"></td>
+					<td data-idx="472"></td>
+					<td data-idx="473"></td>
+					<td data-idx="474"></td>
+					<td data-idx="475"></td>
+					<td data-idx="476"></td>
+					<td data-idx="477"></td>
+					<td data-idx="478"></td>
+					<td data-idx="479"></td>
+				</tr>
+				<tr>
+					<td data-idx="480"></td>
+					<td data-idx="481"></td>
+					<td data-idx="482"></td>
+					<td data-idx="483"></td>
+					<td data-idx="484"></td>
+					<td data-idx="485"></td>
+					<td data-idx="486"></td>
+					<td data-idx="487"></td>
+					<td data-idx="488"></td>
+					<td data-idx="489"></td>
+					<td data-idx="490"></td>
+					<td data-idx="491"></td>
+					<td data-idx="492"></td>
+					<td data-idx="493"></td>
+					<td data-idx="494"></td>
+					<td data-idx="495"></td>
+					<td data-idx="496"></td>
+					<td data-idx="497"></td>
+					<td data-idx="498"></td>
+					<td data-idx="499"></td>
+					<td data-idx="500"></td>
+					<td data-idx="501"></td>
+					<td data-idx="502"></td>
+					<td data-idx="503"></td>
+				</tr>
+				<tr>
+					<td data-idx="504"></td>
+					<td data-idx="505"></td>
+					<td data-idx="506"></td>
+					<td data-idx="507"></td>
+					<td data-idx="508"></td>
+					<td data-idx="509"></td>
+					<td data-idx="510"></td>
+					<td data-idx="511"></td>
+					<td data-idx="512"></td>
+					<td data-idx="513"></td>
+					<td data-idx="514"></td>
+					<td data-idx="515"></td>
+					<td data-idx="516"></td>
+					<td data-idx="517"></td>
+					<td data-idx="518"></td>
+					<td data-idx="519"></td>
+					<td data-idx="520"></td>
+					<td data-idx="521"></td>
+					<td data-idx="522"></td>
+					<td data-idx="523"></td>
+					<td data-idx="524"></td>
+					<td data-idx="525"></td>
+					<td data-idx="526"></td>
+					<td data-idx="527"></td>
+				</tr>
+				<tr>
+					<td data-idx="528"></td>
+					<td data-idx="529"></td>
+					<td data-idx="530"></td>
+					<td data-idx="531"></td>
+					<td data-idx="532"></td>
+					<td data-idx="533"></td>
+					<td data-idx="534"></td>
+					<td data-idx="535"></td>
+					<td data-idx="536"></td>
+					<td data-idx="537"></td>
+					<td data-idx="538"></td>
+					<td data-idx="539"></td>
+					<td data-idx="540"></td>
+					<td data-idx="541"></td>
+					<td data-idx="542"></td>
+					<td data-idx="543"></td>
+					<td data-idx="544"></td>
+					<td data-idx="545"></td>
+					<td data-idx="546"></td>
+					<td data-idx="547"></td>
+					<td data-idx="548"></td>
+					<td data-idx="549"></td>
+					<td data-idx="550"></td>
+					<td data-idx="551"></td>
+				</tr>
+				<tr>
+					<td data-idx="552"></td>
+					<td data-idx="553"></td>
+					<td data-idx="554"></td>
+					<td data-idx="555"></td>
+					<td data-idx="556"></td>
+					<td data-idx="557"></td>
+					<td data-idx="558"></td>
+					<td data-idx="559"></td>
+					<td data-idx="560"></td>
+					<td data-idx="561"></td>
+					<td data-idx="562"></td>
+					<td data-idx="563"></td>
+					<td data-idx="564"></td>
+					<td data-idx="565"></td>
+					<td data-idx="566"></td>
+					<td data-idx="567"></td>
+					<td data-idx="568"></td>
+					<td data-idx="569"></td>
+					<td data-idx="570"></td>
+					<td data-idx="571"></td>
+					<td data-idx="572"></td>
+					<td data-idx="573"></td>
+					<td data-idx="574"></td>
+					<td data-idx="575"></td>
+				</tr>
+			</table>
+			<input id="inPointer" value="0"/>
+			<table id="tblMemory">
+				<caption>Memory Map</caption>
+				<tr>
+					<td data-idx="0"></td>
+					<td data-idx="1"></td>
+					<td data-idx="2"></td>
+					<td data-idx="3"></td>
+					<td data-idx="4"></td>
+					<td data-idx="5"></td>
+					<td data-idx="6"></td>
+					<td data-idx="7"></td>
+					<td data-idx="8"></td>
+					<td data-idx="9"></td>
+					<td data-idx="10"></td>
+					<td data-idx="11"></td>
+					<td data-idx="12"></td>
+					<td data-idx="13"></td>
+					<td data-idx="14"></td>
+					<td data-idx="15"></td>
+				</tr>  
+				<tr>
+					<td data-idx="16"></td>
+					<td data-idx="17"></td>
+					<td data-idx="18"></td>
+					<td data-idx="19"></td>
+					<td data-idx="20"></td>
+					<td data-idx="21"></td>
+					<td data-idx="22"></td>
+					<td data-idx="23"></td>
+					<td data-idx="24"></td>
+					<td data-idx="25"></td>
+					<td data-idx="26"></td>
+					<td data-idx="27"></td>
+					<td data-idx="28"></td>
+					<td data-idx="29"></td>
+					<td data-idx="30"></td>
+					<td data-idx="31"></td>
+				</tr>  
+				<tr>
+					<td data-idx="32"></td>
+					<td data-idx="33"></td>
+					<td data-idx="34"></td>
+					<td data-idx="35"></td>
+					<td data-idx="36"></td>
+					<td data-idx="37"></td>
+					<td data-idx="38"></td>
+					<td data-idx="39"></td>
+					<td data-idx="40"></td>
+					<td data-idx="41"></td>
+					<td data-idx="42"></td>
+					<td data-idx="43"></td>
+					<td data-idx="44"></td>
+					<td data-idx="45"></td>
+					<td data-idx="46"></td>
+					<td data-idx="47"></td>
+				</tr>
+				<tr>
+					<td data-idx="48"></td>
+					<td data-idx="49"></td>
+					<td data-idx="50"></td>
+					<td data-idx="51"></td>
+					<td data-idx="52"></td>
+					<td data-idx="53"></td>
+					<td data-idx="54"></td>
+					<td data-idx="55"></td>
+					<td data-idx="56"></td>
+					<td data-idx="57"></td>
+					<td data-idx="58"></td>
+					<td data-idx="59"></td>
+					<td data-idx="60"></td>
+					<td data-idx="61"></td>
+					<td data-idx="62"></td>
+					<td data-idx="63"></td>
+				</tr>
+				<tr>
+					<td data-idx="64"></td>
+					<td data-idx="65"></td>
+					<td data-idx="66"></td>
+					<td data-idx="67"></td>
+					<td data-idx="68"></td>
+					<td data-idx="69"></td>
+					<td data-idx="70"></td>
+					<td data-idx="71"></td>
+					<td data-idx="72"></td>
+					<td data-idx="73"></td>
+					<td data-idx="74"></td>
+					<td data-idx="75"></td>
+					<td data-idx="76"></td>
+					<td data-idx="77"></td>
+					<td data-idx="78"></td>
+					<td data-idx="79"></td>
+				</tr>
+				<tr>
+					<td data-idx="80"></td>
+					<td data-idx="81"></td>
+					<td data-idx="82"></td>
+					<td data-idx="83"></td>
+					<td data-idx="84"></td>
+					<td data-idx="85"></td>
+					<td data-idx="86"></td>
+					<td data-idx="87"></td>
+					<td data-idx="88"></td>
+					<td data-idx="89"></td>
+					<td data-idx="90"></td>
+					<td data-idx="91"></td>
+					<td data-idx="92"></td>
+					<td data-idx="93"></td>
+					<td data-idx="94"></td>
+					<td data-idx="95"></td>
+				</tr>
+				<tr>
+					<td data-idx="96"></td>
+					<td data-idx="97"></td>
+					<td data-idx="98"></td>
+					<td data-idx="99"></td>
+					<td data-idx="100"></td>
+					<td data-idx="101"></td>
+					<td data-idx="102"></td>
+					<td data-idx="103"></td>
+					<td data-idx="104"></td>
+					<td data-idx="105"></td>
+					<td data-idx="106"></td>
+					<td data-idx="107"></td>
+					<td data-idx="108"></td>
+					<td data-idx="109"></td>
+					<td data-idx="110"></td>
+					<td data-idx="111"></td>
+				</tr>
+				<tr>
+					<td data-idx="112"></td>
+					<td data-idx="113"></td>
+					<td data-idx="114"></td>
+					<td data-idx="115"></td>
+					<td data-idx="116"></td>
+					<td data-idx="117"></td>
+					<td data-idx="118"></td>
+					<td data-idx="119"></td>
+					<td data-idx="120"></td>
+					<td data-idx="121"></td>
+					<td data-idx="122"></td>
+					<td data-idx="123"></td>
+					<td data-idx="124"></td>
+					<td data-idx="125"></td>
+					<td data-idx="126"></td>
+					<td data-idx="127"></td>
+				</tr>
+				<tr>
+					<td data-idx="128"></td>
+					<td data-idx="129"></td>
+					<td data-idx="130"></td>
+					<td data-idx="131"></td>
+					<td data-idx="132"></td>
+					<td data-idx="133"></td>
+					<td data-idx="134"></td>
+					<td data-idx="135"></td>
+					<td data-idx="136"></td>
+					<td data-idx="137"></td>
+					<td data-idx="138"></td>
+					<td data-idx="139"></td>
+					<td data-idx="140"></td>
+					<td data-idx="141"></td>
+					<td data-idx="142"></td>
+					<td data-idx="143"></td>
+				</tr>
+				<tr>
+					<td data-idx="144"></td>
+					<td data-idx="145"></td>
+					<td data-idx="146"></td>
+					<td data-idx="147"></td>
+					<td data-idx="148"></td>
+					<td data-idx="149"></td>
+					<td data-idx="150"></td>
+					<td data-idx="151"></td>
+					<td data-idx="152"></td>
+					<td data-idx="153"></td>
+					<td data-idx="154"></td>
+					<td data-idx="155"></td>
+					<td data-idx="156"></td>
+					<td data-idx="157"></td>
+					<td data-idx="158"></td>
+					<td data-idx="159"></td>
+				</tr>
+				<tr>
+					<td data-idx="160"></td>
+					<td data-idx="161"></td>
+					<td data-idx="162"></td>
+					<td data-idx="163"></td>
+					<td data-idx="164"></td>
+					<td data-idx="165"></td>
+					<td data-idx="166"></td>
+					<td data-idx="167"></td>
+					<td data-idx="168"></td>
+					<td data-idx="169"></td>
+					<td data-idx="170"></td>
+					<td data-idx="171"></td>
+					<td data-idx="172"></td>
+					<td data-idx="173"></td>
+					<td data-idx="174"></td>
+					<td data-idx="175"></td>
+				</tr>
+				<tr>
+					<td data-idx="176"></td>
+					<td data-idx="177"></td>
+					<td data-idx="178"></td>
+					<td data-idx="179"></td>
+					<td data-idx="180"></td>
+					<td data-idx="181"></td>
+					<td data-idx="182"></td>
+					<td data-idx="183"></td>
+					<td data-idx="184"></td>
+					<td data-idx="185"></td>
+					<td data-idx="186"></td>
+					<td data-idx="187"></td>
+					<td data-idx="188"></td>
+					<td data-idx="189"></td>
+					<td data-idx="190"></td>
+					<td data-idx="191"></td>
+				</tr>
+				<tr>
+					<td data-idx="192"></td>
+					<td data-idx="193"></td>
+					<td data-idx="194"></td>
+					<td data-idx="195"></td>
+					<td data-idx="196"></td>
+					<td data-idx="197"></td>
+					<td data-idx="198"></td>
+					<td data-idx="199"></td>
+					<td data-idx="200"></td>
+					<td data-idx="201"></td>
+					<td data-idx="202"></td>
+					<td data-idx="203"></td>
+					<td data-idx="204"></td>
+					<td data-idx="205"></td>
+					<td data-idx="206"></td>
+					<td data-idx="207"></td>
+				</tr>
+				<tr>
+					<td data-idx="208"></td>
+					<td data-idx="209"></td>
+					<td data-idx="210"></td>
+					<td data-idx="211"></td>
+					<td data-idx="212"></td>
+					<td data-idx="213"></td>
+					<td data-idx="214"></td>
+					<td data-idx="215"></td>
+					<td data-idx="216"></td>
+					<td data-idx="217"></td>
+					<td data-idx="218"></td>
+					<td data-idx="219"></td>
+					<td data-idx="220"></td>
+					<td data-idx="221"></td>
+					<td data-idx="222"></td>
+					<td data-idx="223"></td>
+				</tr>
+				<tr>
+					<td data-idx="224"></td>
+					<td data-idx="225"></td>
+					<td data-idx="226"></td>
+				</tr>
+			</table>
+		</div>
     </div>
     <div id="divTutor" style="display:none" class="win">
 		<iframe id="taTutor" src="imeight_pl_tutorial.html"></iframe>

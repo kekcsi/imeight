@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<script type="text/javascript" src="imeight_runner.js"></script>
-    <script type="text/javascript" src="imeight_pl.js"></script>
-    <script type="text/javascript" src="video.js"></script>
+	<script type="text/javascript" src="<?php echo $_POST["urlbase"]; ?>imeight_runner.js"></script>
+    <script type="text/javascript" src="<?php echo $_POST["urlbase"]; ?>imeight_pl.js"></script>
+    <script type="text/javascript" src="<?php echo $_POST["urlbase"]; ?>video.js"></script>
 	<script type="application/json" id="programJson"><?php echo $_POST["programJson"]; ?></script>
 	<script type="application/json" id="labelsJson"><?php echo $_POST["labelsJson"]; ?></script>
 	<script type="application/json" id="dataLookupJson"><?php echo $_POST["dataLookupJson"]; ?></script>

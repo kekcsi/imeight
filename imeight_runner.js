@@ -28,6 +28,8 @@ var videoPrint = function(message) {
 	console.log(message)
 } // print to Command Line in dev env - browser logs instead in prod
 var pageLoadHooks = []
+var varUpdateHook = function() {}
+var memoryUpdateHook = function() {}
 
 function pageLoad() {
 	for (var i in pageLoadHooks) {
@@ -261,10 +263,20 @@ function popAndAssign(valueSupplier, defaultName) {
 		var a = arrays[arrayName]
 		a[i] = valueSupplier(name + i + ")", a[i])
 		if (stopped === true) return // valueSupplier had a runError
+
+		if (arrayName in builtInArrays) {
+			varUpdateHook(arrayName, i)
+		}
+		
 		return { array: a, index: i }
 	} else if (getRegexPrefix(NAME_RE, name) === name) {
 		variables[name] = valueSupplier(name, variables[name])
 		if (stopped === true) return // valueSupplier had a runError
+
+		if (name in builtInVariables) {
+			varUpdateHook(null, name)
+		}
+
 		return { array: variables, index: name }
 	} else {
 		runError("INVALID REFERENCE")

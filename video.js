@@ -40,6 +40,9 @@ for (var i in builtInDesigns) {
 	})()
 }
 
+var designs = []
+var sprites = []
+
 if (typeof commands == "object") {
 	commands.DGNS = function() {
 		var ln = ""
@@ -62,15 +65,50 @@ if (typeof commands == "object") {
 	}
 }
 
-var sprites = []
+memoryUpdateHook = function(addr) {
+	// invalidating affected designs
+	var designIdx = Math.floor(addr/288)
+	delete designs[designIdx]
 
-function decodeColor(i) {
-	var light = ((i >> 3)&1) ? "ff" : "cc"
-	var dark = ((i >> 3)&1) ? "33" : "00"
+	// invalidating affected sprites
+	for (var i in sprites) {
+		if (arrays.SPRDGN[i] == 288*designIdx) {
+			sprites[i].remove()
+			delete sprites[i]
+		}
+	}
+}
+
+varUpdateHook = function(arrayName, index) {
+	if (index == null) {
+		//CLR
+		sprites = []
+		tabGraphic.innerHTML = ""
+	}
+	
+	if (arrayName == "SPRDGN") {
+		if (index in sprites) {
+			sprites[index].remove()
+			delete sprites[index]
+		}
+	}
+}
+
+function colorToCSS(i) {
+	var colorBytes = colorToBytes(i)
+	return "rgb(" + colorBytes[0] + 
+			"," + colorBytes[1] + 
+			"," + colorBytes[2] + ")"
+}
+
+function colorToBytes(i) {
+	var light = ((i >> 3)&1) ? 0xff : 0xcc
+	var dark = ((i >> 3)&1) ? 0x33 : 0
 	var red = (i&1) ? light : dark
 	var green = ((i >> 1)&1) ? light : dark
 	var blue = ((i >> 2)&1) ? light : dark
-	return "#" + red + green + blue
+	var opacity = (i == 0) ? 0 : 255
+	return [red, green, blue, opacity]
 }
 
 pageLoadHooks.push(function() {
@@ -92,7 +130,8 @@ pageLoadHooks.push(function() {
 	})
 
 	setInterval(function() {
-		tabGraphic.style.backgroundColor = decodeColor(variables.BACKGROUND)
+		tabGraphic.style.backgroundColor = colorToCSS(variables.BACKGROUND)
+		
 		for (var i in arrays.SPRX) {
 			if (i in arrays.SPRY) {
 				if (!(i in sprites)) {
@@ -106,20 +145,44 @@ pageLoadHooks.push(function() {
 				sprites[i].style.left = arrays.SPRX[i] + "px"
 				sprites[i].style.top = arrays.SPRY[i] + "px"
 				
-				if (i in arrays.SPRDGN) {
-					if (typeof arrays.SPRDGN[i] == "number") {
-						//TODO decode from memory
-						sprites[i].innerHTML = "" + arrays.SPRDGN[i]
-						sprites[i].style.background = "none"
-					} else {
-						// library design
-						sprites[i].style.background = arrays.SPRDGN[i]
-						sprites[i].innerHTML = "&nbsp;"
+				if (i in arrays.SPRDGN) { //not the default design
+					if (typeof arrays.SPRDGN[i] == "number") { //user-designed
+						var designIdx = Math.floor(arrays.SPRDGN[i]/288)
+						arrays.SPRDGN[i] = 288*designIdx //correct the alignment
+
+						if (!(designIdx in designs)) {
+							var pixels = new Uint8ClampedArray(4*24*24)
+							
+							for (var j = 0; j < 288; ++j) {
+								var addr = arrays.SPRDGN[i] + j
+								var bytes = colorToBytes(memory[addr] >> 4)
+								bytes = bytes.concat(colorToBytes(memory[addr] & 15))
+								for (var k = 0; k < 8; ++k) {
+									pixels[8*j + k] = bytes[k]
+								}
+							}
+							
+							designs[designIdx] = new ImageData(pixels, 24, 24)
+						}
+						
+						if (sprites[i].childElementCount == 0) {
+							// created just now
+							var canvas = document.createElement('canvas')
+							canvas.width = 24
+							canvas.height = 24
+							var ctx = canvas.getContext('2d')
+							ctx.putImageData(designs[designIdx], 0, 0)
+							sprites[i].appendChild(canvas)
+							sprites[i].style.background = "none"
+						}
+					} else { // library design
+						sprites[i].style.background = arrays.SPRDGN[i] //url
+						sprites[i].innerHTML = ""
 					}
 				} else {
 					// default design
 					sprites[i].style.background = "url(ball24.gif)"
-					sprites[i].innerHTML = "&nbsp;"
+					sprites[i].innerHTML = ""
 				}
 			}
 		}
