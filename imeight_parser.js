@@ -347,9 +347,11 @@ function parseToEndOfLine(deStart) {
 var urlbase = ""
 
 function updateDownloadBlob() {
-	while(memory.length > 256 && memory[memory.length - 1] == 0) {
-		memory.pop()
+	var i = memory.length - 1
+	while (i > 255 && memory[i] == 0) { 
+	    i--
 	}
+	memory.splice(i) 
 
 	var lwrunner = document.scripts.namedItem("lwrunnerTmpl").text
 	lwrunner = lwrunner.replace(/^\<\!--(.*)--\>$/s, "$1")

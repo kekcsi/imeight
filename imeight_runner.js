@@ -146,9 +146,9 @@ function contProgram() {
 	if (interact == inputAction) {
 		videoPrint("READY.")
 		outputTab()
+		updateDownloadBlob()
+		variables.STATUS = (stopped === true) ? -1 : ((stopped == 0) ? 0 : 1)
 	}
-
-	variables.STATUS = (stopped === true) ? -1 : ((stopped == 0) ? 0 : 1)
 }
 
 function evaluateDataInstruction() {

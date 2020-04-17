@@ -95,7 +95,7 @@
 					<td data-idx="15"></td>
 				</tr>  
 			</table>
-			<table id="sprite-editor">
+			<table id="tblDesigner">
 				<tr>
 					<td data-idx="0"></td>
 					<td data-idx="1"></td>
@@ -722,6 +722,11 @@
 				</tr>
 			</table>
 			<input id="inPointer" value="0"/>
+			<div id="divDesigerButtons">
+				<button id="btnDesignClear" onclick="clearDesigner()">CLEAR</button>
+				<button id="btnDesignGet" onclick="designFromMemory()" title="Reset Designer from Memory">GET</button>
+				<button id="btnDesignPut" onclick="designToMemory()" title="Update Memory from Designer">PUT</button>
+			</div>
 			<table id="tblMemory">
 				<caption>Memory Map</caption>
 				<tr>

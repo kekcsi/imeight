@@ -105,7 +105,7 @@ function updateLineNumber() {
 	divStatus.innerHTML = ""
 }
 
-function goLine(target) {
+function goLine(target, selectIt) {
 	var currPos = 0
 	var lines = taList.value.split("\n")
 	var target0based = parseInt(target) - 1
@@ -113,22 +113,24 @@ function goLine(target) {
 	taList.scrollTop = Math.max(taList.scrollTop, (target0based - 16)*15)
 	taList.scrollTop = Math.min(taList.scrollTop, (target0based - 4)*15)
 
-	for (var currLine in lines) {
-		var part = lines[currLine]
-		
-		if (currLine == target0based) {
-			taList.selectionStart = currPos
+	if (selectIt !== false) {
+		for (var currLine in lines) {
+			var part = lines[currLine]
+			
+			if (currLine == target0based) {
+				taList.selectionStart = currPos
+			}
+			
+			currPos += part.length + 1
+			
+			if (currLine == target0based) {
+				taList.selectionEnd = currPos
+				break
+			}
 		}
 		
-		currPos += part.length + 1
-		
-		if (currLine == target0based) {
-			taList.selectionEnd = currPos
-			break
-		}
+		taList.focus()
 	}
-	
-	taList.focus()
 }
 
 videoPrint = function(message) {
@@ -243,9 +245,9 @@ runErrorHook = function(message) {
 			+ bugLocator.colon + ", " + bugLocator.instruction)
 		
 		divStatus.innerHTML = message
+		goLine(bugLocator.line, false)
 		taList.selectionStart = bugLocator.chStart
 		taList.selectionEnd = bugLocator.chEnd
-		inLine.value = bugLocator.line
 		taList.focus()
 	} else {
 		videoPrint("?" + message + "  ERROR")
@@ -266,9 +268,9 @@ parseErrorHook = function(message) {
 
 	if (fullTextParse) {
 		inUserInput.value = "LIST"
+		goLine(lineNumber, false)
 		taList.selectionStart = charsParsed
 		taList.selectionEnd = (taList.value + "\n").indexOf("\n", charsParsed)
-		inLine.value = lineNumber
 		taList.focus()
 	}
 }
