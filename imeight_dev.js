@@ -34,7 +34,7 @@ function tutorRight() {
 
 function tutorBelow() {
 	divTutor.style.display = "block"
-    divTutor.style.top = "372px"
+    divTutor.style.top = "386px"
     divTutor.style.left = "8px";
 	btnTutorRight.style.display = "inline"
 	btnTutorBelow.style.display = "none"

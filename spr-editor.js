@@ -143,13 +143,14 @@ function designFromMemory() {
 }
 
 function updateThumb(designIndex) {
-	
 	cells = tblMemory.getElementsByTagName("td")
 	var thumb = new Uint8ClampedArray(4*24*24)
 	
+	if (designIndex > 226) return false
+	
 	for (var i = 0; i < 288; ++i) {
-		if (memory.length < i + 288*designIndex) return false
 		octet = memory[i + 288*designIndex]
+		if (!octet) octet = 0
 		var bytes = colorToBytes(octet>>4)
 		bytes = bytes.concat(colorToBytes(octet&15))
 		for (var k = 0; k < 8; ++k) {

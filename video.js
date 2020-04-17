@@ -40,8 +40,8 @@ for (var i in builtInDesigns) {
 	})()
 }
 
-var designs = []
-var sprites = []
+var designs = [] //ImageData
+var sprites = [] //div
 
 if (typeof commands == "object") {
 	commands.DGNS = function() {
@@ -73,8 +73,8 @@ memoryUpdateHooks.push(function(addr) {
 	// invalidating affected sprites
 	for (var i in sprites) {
 		if (arrays.SPRDGN[i] == 288*designIdx) {
-			sprites[i].remove()
-			delete sprites[i]
+			//flickerless design modifying animations
+			sprites[i].dataset.dirty = true
 		}
 	}
 })
@@ -88,8 +88,14 @@ varUpdateHook = function(arrayName, index) {
 	
 	if (arrayName == "SPRDGN") {
 		if (index in sprites) {
-			sprites[index].remove()
-			delete sprites[index]
+			if (typeof arrays.SPRDGN[index] == "number" && sprites[index].childElementCount > 0) {
+				//flickerless design swapping animations 
+				sprites[index].dataset.dirty = true
+			} else {
+				//library designs do flicker
+				sprites[index].remove()
+				delete sprites[index]
+			}
 		}
 	}
 }
@@ -132,8 +138,8 @@ pageLoadHooks.push(function() {
 	setInterval(function() {
 		tabGraphic.style.backgroundColor = colorToCSS(variables.BACKGROUND)
 		
-		for (var i in arrays.SPRX) {
-			if (i in arrays.SPRY) {
+		for (var i in arrays.SPRY) {
+			if (i in arrays.SPRX) {
 				if (!(i in sprites)) {
 					sprites[i] = document.createElement("div")
 					sprites[i].style.width = "24px"
@@ -163,6 +169,11 @@ pageLoadHooks.push(function() {
 							}
 							
 							designs[designIdx] = new ImageData(pixels, 24, 24)
+						}
+						
+						if ("dirty" in sprites[i].dataset) {
+							var ctx = sprites[i].firstChild.getContext('2d')
+							ctx.putImageData(designs[designIdx], 0, 0)
 						}
 						
 						if (sprites[i].childElementCount == 0) {

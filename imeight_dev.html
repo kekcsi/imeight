@@ -25,7 +25,8 @@
 				dataLookup = JSON.parse(document.scripts.namedItem("dataLookupJson").text)
 				elseBranches = JSON.parse(document.scripts.namedItem("elseBranchesJson").text)
 				memory = JSON.parse(document.scripts.namedItem("memoryJson").text)
-				var interact = function() {}
+				var interact = runProgram
+				var outputTab = function() {}
 				pageLoadHooks.push(runProgram)
 			</script>
 			<style type="text/css">
@@ -48,9 +49,7 @@
 </head>
 	
 <body onload="pageLoad()">
-	<a id="download_link" download="index.html" href="" title="The tokenized program with the current memory content, for publishing as a static web page.">Download Program</a>
-	<a href="im8runner.zip" title="The built-in designs and runner code in a zip.">Download Environment</a>
-    <div class="win">
+	<div class="win">
     	<button id="btnProgram" onclick="programTab()" class="tab" style="border-style:inset">Program Listing</button>
     	<button id="btnOutput" onclick="outputTab()" class="tab" style="border-style:outset">Command Line</button>
     	<button id="btnGraphic" onclick="graphicTab()" class="tab" style="border-style:outset">Graphic Screen</button>
@@ -998,6 +997,10 @@
     		<button onclick="divTutor.style.display='none'">Hide</button>
     		<button onclick="taTutor.src='imeight_pl_tutorial.html#contents'">Contents</button>
     	</div>
+    </div>
+	<div>
+		<a id="download_link" download="index.html" href="" title="The tokenized program with the current memory content, for publishing as a static web page.">Download Program</a>
+		<a href="im8runner.zip" title="The built-in designs and runner code in a zip.">Download Environment</a>
     </div>
 </body>		
 </html>

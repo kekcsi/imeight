@@ -143,8 +143,8 @@ Command Line, press Enter.</p>
 	<a href="#2001">WAIT and GET</a>
 &bull;	<a href="#2002">TIME and TIME$</a>
 &bull;	<a href="#2003">Sprites!</a>
-&bull;	<a href="#2004">Colors!</a></div>
-
+&bull;	<a href="#2004">Colors!</a>
+&bull;	<a href="#2005">How About Some Art?</a></div>
 
 
 
@@ -1297,7 +1297,8 @@ FOR I=1 TO 100
     SPRX(J)=SPRX(J)+RND(13)-6
     SPRY(J)=SPRY(J)+RND(13)-6
 N.:W.:N.</div>
-<h2><a name="2004">Colors!</h2>
+
+<h2><a name="2004">Colors!</a></h2>
 <div class="code">INPUT BACKGROUND '<i>YET ANOTHER BUILT-IN VARIABLE</i></div>
 <div style="border: 1px white solid; padding: 8px"><table style="border-spacing: 16px 0">
 	<tr>
@@ -1346,13 +1347,32 @@ N.:W.:N.</div>
 		<td align="right">15</td><td><span style="background:#ffffff">&nbsp;&nbsp;</span></td>
 	</tr>
 </table></div>
-<!-- h3>How About Some Art?</h3>
-<p>Design your own sprite in the Designer screen mode. Once done, push Get Data, 
-copy-and-paste the code fragment appering into your Program Listing. Here is a
-code that reads the data into memory:</p>
-<div class="code">BASE=9*144:<a href="#513">RESTORE</a> DGNGHOST '<i>BASE MUST BE DIVISIBLE BY 144</i>
-FOR I=0 TO 143:<a href="#496">READ</a> BYTE:<a href="#561">POKE</a> BASE+I,BYTE:NEXT '<i>ONE DESIGN IS 144 BYTES</i>
-SPRX(5)=0:SPRY(5)=0:SPRDGN(5)=BASE '<i>SHOW IT IN THE UPPER LEFT CORNER</i>
-@DGNGHOST '<i>PASTE DATA LINES HERE FROM THE DESIGNER</i></div -->
+
+<h2><a name="2005">How About Some Art?</a></h2>
+<p>Design your own sprites in the Designer screen mode. You will see 227 slots
+for designs in the Memory Map. Just choose slots, colors, and paint using the
+mouse. Once done, copy the number from below the Memory Map, and set SPRDGN(K) 
+to that number in the program.</p>
+<div class="code">SPRX(5)=0:SPRY(5)=0 '<i>THE UPPER LEFT CORNER</i>
+SPRDGN(5)=288 '<i>THE SECOND DESIGN FROM THE MEMORY</i></div>
+<p>You can use POKE instructions to redesign the sprite while the program is
+running.</p>
+<div class="code">DEF NEAR(A,B)=(A-B)^2&lt;2 '<i>DO NOT USE = TO COMPARE FLOATS</i>
+SPRX(0)=180:SPRY(0)=96 '<i>CENTER</i>
+SPRDGN(0)=0
+@LOOP
+WAIT:WAIT '<i>RECALCULATE ONCE PER SCREEN REFRESH</i>
+X=COS(TIME()/318):Y=SIN(TIME()/318) '<i>MOVE X,Y IN CIRCLES OVER TIME</i>
+FOR R=0 TO 23 '<i>FOR ALL ROWS OF THE DESIGN</i>
+  FOR C=0 TO 23 STEP 2 '<i>FOR EVERY 2ND COLUMN OF IT</i>
+    HI=0:LO=0 '<i>HIGH AND LOW NIBBLE OF THE DESIGN BYTE</i>
+    FOR A=-11 TO 11 STEP 2 '<i>PARAMETER OF THE LINE'S EQUATION</i>
+      IF NEAR(C, X*A+12) AND NEAR(R, Y*A+12) THEN HI=10*16
+      IF NEAR(C+1, X*A+12) AND NEAR(R, Y*A+12) THEN LO=10
+    NEXT
+    POKE 12*R+INT(C/2),HI OR LO '<i>PUT PIXELS</i>
+  NEXT
+NEXT
+GOTO LOOP</div>
 </body>
 </html>

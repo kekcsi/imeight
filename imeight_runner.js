@@ -83,7 +83,7 @@ function preparePush(result) {
 		result = '"' + result + '"'
 	} else if (typeof result === "boolean") {
 		result = (result ? 1 : 0)
-	} else if (isNaN(result)) {
+	} else if (typeof result === "number" && isNaN(result)) {
 		runError("ILLEGAL EXPRESSION")
 		return
 	}
