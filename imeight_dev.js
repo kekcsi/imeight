@@ -194,12 +194,15 @@ var interact = function(input) {
 				if (!taList.value.endsWith("\n") && taList.value.length > 0) {
 					taList.value += "\n"
 				}
+				
 				taList.value += input + "\n"
 				updateLineNumber()
 			} else {
 				divStatus.innerHTML = "[PROGRAM FORKED]"
 			}
+			
 			div.innerHTML = div.innerHTML.bold()
+			updateDownloadBlob()
 		} else {
 			inUserInput.value = input
 		}

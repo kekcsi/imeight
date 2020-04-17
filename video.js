@@ -65,7 +65,7 @@ if (typeof commands == "object") {
 	}
 }
 
-memoryUpdateHook = function(addr) {
+memoryUpdateHooks.push(function(addr) {
 	// invalidating affected designs
 	var designIdx = Math.floor(addr/288)
 	delete designs[designIdx]
@@ -77,7 +77,7 @@ memoryUpdateHook = function(addr) {
 			delete sprites[i]
 		}
 	}
-}
+})
 
 varUpdateHook = function(arrayName, index) {
 	if (index == null) {

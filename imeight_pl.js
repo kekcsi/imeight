@@ -694,7 +694,7 @@ var builtInFunctions = {
     SIN: { apply: Math.sin },
     TAN: { apply: Math.tan },
     ATN: { apply: Math.atan },
-    PEEK: { apply: arg => (arg in memory ? memory[arg] : 0) },
+    PEEK: { apply: arg => (memory[arg] ? memory[arg] : 0) },
     LEN: { apply: arg => ("" + arg).length },
     "STR$": { apply: arg => "" + arg },
     VAL: { apply: parseFloat },

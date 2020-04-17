@@ -348,10 +348,10 @@ var urlbase = ""
 
 function updateDownloadBlob() {
 	var i = memory.length - 1
-	while (i > 255 && !memory[i]) { 
+	while (i >= 0 && !memory[i]) { // skip over 0's and nulls and undefined stuff
 	    i--
 	}
-	memory.splice(i) 
+	var shrunk = memory.slice(0, i + 1)
 
 	var lwrunner = document.scripts.namedItem("lwrunnerTmpl").text
 	lwrunner = lwrunner.replace(/^\<\!--(.*)--\>$/s, "$1")
@@ -361,7 +361,7 @@ function updateDownloadBlob() {
 	spec = spec.replace(/\<\?\=\s*labelsJson\s*\?\>/g, JSON.stringify(labels))
 	spec = spec.replace(/\<\?\=\s*dataLookupJson\s*\?\>/g, JSON.stringify(dataLookup))
 	spec = spec.replace(/\<\?\=\s*elseBranchesJson\s*\?\>/g, JSON.stringify(elseBranches))
-	spec = spec.replace(/\<\?\=\s*memoryJson\s*\?\>/g, JSON.stringify(memory))
+	spec = spec.replace(/\<\?\=\s*memoryJson\s*\?\>/g, JSON.stringify(shrunk))
 	var data = new Blob([spec], {type: 'text/html'})
 	var url = window.URL.createObjectURL(data)
 	document.getElementById('download_link').href = url
@@ -378,8 +378,6 @@ function parseLine() {
 	if (parseSuccess) {
 		lineNumber++
 		charsParsed++
-
-		updateDownloadBlob()
 	} else {
 		program.splice(rollback, program.length - rollback)
 	}
@@ -406,6 +404,8 @@ function parseText() {
 		divStatus.innerHTML = "&nbsp;"
 		userBreak()
 		inUserInput.value="RUN"
+
+		updateDownloadBlob()
 	}
 	
 	fullTextParse = false

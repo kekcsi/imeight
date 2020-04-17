@@ -721,11 +721,11 @@
 					<td data-idx="575"></td>
 				</tr>
 			</table>
-			<input id="inPointer" value="0"/>
 			<div id="divDesigerButtons">
-				<button id="btnDesignClear" onclick="clearDesigner()">CLEAR</button>
-				<button id="btnDesignGet" onclick="designFromMemory()" title="Reset Designer from Memory">GET</button>
+				<button id="btnDesignClear" onclick="clearDesigner()" title="Clear Designer">CLEAR</button>
 				<button id="btnDesignPut" onclick="designToMemory()" title="Update Memory from Designer">PUT</button>
+				<button id="btnDesignGet" onclick="designFromMemory()" title="Reset Designer from Memory">GET</button>
+				<label title="Put design back to its original place automatically. Untick to enable moving the design to a different memory slot."><input type="checkbox" id="cbGetDesign" checked="true"/>Auto</label>
 			</div>
 			<table id="tblMemory">
 				<caption>Memory Map</caption>
@@ -985,6 +985,9 @@
 					<td data-idx="224"></td>
 					<td data-idx="225"></td>
 					<td data-idx="226"></td>
+					<td colspan="13" style="position: relative">
+						<input id="inPointer" value="0"/>
+					</td>
 				</tr>
 			</table>
 		</div>

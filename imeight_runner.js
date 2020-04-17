@@ -29,7 +29,14 @@ var videoPrint = function(message) {
 } // print to Command Line in dev env - browser logs instead in prod
 var pageLoadHooks = []
 var varUpdateHook = function() {}
-var memoryUpdateHook = function() {}
+var memoryUpdateHooks = []
+
+function memoryUpdateHook(addr) {
+	for (i in memoryUpdateHooks) {
+		var memoryUpdateHook = memoryUpdateHooks[i]
+		memoryUpdateHook(addr)
+	}
+}
 
 function pageLoad() {
 	for (var i in pageLoadHooks) {

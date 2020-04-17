@@ -1,14 +1,14 @@
 TODO
-* designer data local storage
 * Look redesign
 		* graphics zoom 2 by 2
 		* dynamic screen size for editor
 		* Tutor button belongs outside list tab
 		* Add forum post button
+		* design download links
 * Tiles
-* Designs decoded from memory
 * Text layer
 * Vector layer?
 * LOAD/SAVE memory/routines
 * Music
-* Pack js files and gifs with lwrunner.php
+* deploy script that creates im8runner.zip
+* design copy-paste

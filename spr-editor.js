@@ -4,6 +4,11 @@ var drawingIdx = 0
 var selDesign = 0
 
 var designerDirty = false
+var thumbsDirty = true
+
+memoryUpdateHooks.push(function() {
+	thumbsDirty = true
+})
 
 setInterval(function() {
 	if (designerDirty) {
@@ -11,6 +16,18 @@ setInterval(function() {
 		localStorage.setItem("seldesign", selDesign)
 		localStorage.setItem("memory", JSON.stringify(memory))
 		desigerDirty = false
+	}
+	
+	if (thumbsDirty) {
+		for (var i = 0; updateThumb(i); ++i) {}
+		thumbsDirty = false
+	}
+	
+	cells = tblMemory.getElementsByTagName("td")	
+	if (cells[selDesign].style.background != "white") {
+		cells[selDesign].style.background = "white"
+	} else {
+		cells[selDesign].style.background = "gray"
 	}
 }, 2000)
 
@@ -26,8 +43,8 @@ function clearDesigner() {
 
 	var pixCells = tblDesigner.getElementsByTagName("td")
 	for(var i = 0; i < pixCells.length; ++i) {
-		designData.push(0)
-		pixCells[i].style.backgroundColor = colorToCSS(designData[i])
+		designData.push(drawingIdx)
+		pixCells[i].style.backgroundColor = drawingColor
 	}
 }
 
@@ -50,8 +67,6 @@ pageLoadHooks.push(function() {
 		memory = JSON.parse(memoryJson)
 	}
 	
-	for (var i = 0; updateThumb(i); ++i) {}
-
 	var pixCells = tblDesigner.getElementsByTagName("td")
 	for(var i = 0; i < pixCells.length; ++i) {
 		pixCells[i].addEventListener("mousedown", sprEdit);
@@ -91,8 +106,10 @@ pageLoadHooks.push(function() {
 			cells[prevSel].style.background = "black"
 			cells[selDesign].style.background = "white"
 
-			designToMemory(prevSel)
-			designFromMemory()
+			if (cbGetDesign.checked) {
+				designToMemory(prevSel)
+				designFromMemory()
+			}
 		})
 	}
 })
@@ -117,7 +134,7 @@ function designFromMemory() {
 
 	for (var i = 0; i < 288; ++i) {
 		octet = memory[i + 288*selDesign]
-		if (octet == null) octet = 0
+		if (!octet) octet = 0
 		designData[2*i] = (octet >> 4)
 		designData[2*i + 1] = (octet & 15)
 		pixCells[2*i].style.backgroundColor = colorToCSS(designData[2*i])
@@ -126,12 +143,12 @@ function designFromMemory() {
 }
 
 function updateThumb(designIndex) {
-	if (memory.length < 288*(designIndex + 1)) return false
 	
 	cells = tblMemory.getElementsByTagName("td")
 	var thumb = new Uint8ClampedArray(4*24*24)
 	
 	for (var i = 0; i < 288; ++i) {
+		if (memory.length < i + 288*designIndex) return false
 		octet = memory[i + 288*designIndex]
 		var bytes = colorToBytes(octet>>4)
 		bytes = bytes.concat(colorToBytes(octet&15))
@@ -143,8 +160,8 @@ function updateThumb(designIndex) {
 	imd = new ImageData(thumb, 24, 24)
 	var canvas = document.createElement('canvas')
 	canvas.dataset.idx = designIndex
-	canvas.width = 14
-	canvas.height = 14
+	canvas.width = 15
+	canvas.height = 15
 	var ctx = canvas.getContext('2d')
 	ctx.putImageData(imd, 0, 0)
 	cells[designIndex].innerHTML = ""
