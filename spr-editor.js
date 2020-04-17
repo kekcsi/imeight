@@ -117,6 +117,7 @@ function designFromMemory() {
 
 	for (var i = 0; i < 288; ++i) {
 		octet = memory[i + 288*selDesign]
+		if (octet == null) octet = 0
 		designData[2*i] = (octet >> 4)
 		designData[2*i + 1] = (octet & 15)
 		pixCells[2*i].style.backgroundColor = colorToCSS(designData[2*i])

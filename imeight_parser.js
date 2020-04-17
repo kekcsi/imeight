@@ -348,7 +348,7 @@ var urlbase = ""
 
 function updateDownloadBlob() {
 	var i = memory.length - 1
-	while (i > 255 && memory[i] == 0) { 
+	while (i > 255 && !memory[i]) { 
 	    i--
 	}
 	memory.splice(i) 
