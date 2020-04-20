@@ -354,14 +354,14 @@ function updateDownloadBlob() {
 	var shrunk = memory.slice(0, i + 1)
 
 	var lwrunner = document.scripts.namedItem("lwrunnerTmpl").text
-	lwrunner = lwrunner.replace(/^\<\!--(.*)--\>$/s, "$1")
-	lwrunner = lwrunner.replace(/\<\?\=urlbase\?\>/g, urlbase)
+	lwrunner = lwrunner.substring(5, lwrunner.length - 4)
+	lwrunner = lwrunner.replace(/[<][?]=urlbase[?][>]/g, urlbase)
 	var spec = lwrunner
-	spec = spec.replace(/\<\?\=\s*programJson\s*\?\>/g, JSON.stringify(program))
-	spec = spec.replace(/\<\?\=\s*labelsJson\s*\?\>/g, JSON.stringify(labels))
-	spec = spec.replace(/\<\?\=\s*dataLookupJson\s*\?\>/g, JSON.stringify(dataLookup))
-	spec = spec.replace(/\<\?\=\s*elseBranchesJson\s*\?\>/g, JSON.stringify(elseBranches))
-	spec = spec.replace(/\<\?\=\s*memoryJson\s*\?\>/g, JSON.stringify(shrunk))
+	spec = spec.replace(/[<][?]=\s*programJson\s*[?][>]/g, JSON.stringify(program))
+	spec = spec.replace(/[<][?]=\s*labelsJson\s*[?][>]/g, JSON.stringify(labels))
+	spec = spec.replace(/[<][?]=\s*dataLookupJson\s*[?][>]/g, JSON.stringify(dataLookup))
+	spec = spec.replace(/[<][?]=\s*elseBranchesJson\s*[?][>]/g, JSON.stringify(elseBranches))
+	spec = spec.replace(/[<][?]=\s*memoryJson\s*[?][>]/g, JSON.stringify(shrunk))
 	var data = new Blob([spec], {type: 'text/html'})
 	var url = window.URL.createObjectURL(data)
 	document.getElementById('download_link').href = url

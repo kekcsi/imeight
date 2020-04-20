@@ -17,6 +17,8 @@
 			padding-bottom: 13px;
 			margin-left: 2em;
 			tab-size: 2em;
+			width: 540px;
+			overflow-x: hidden
 		}
 		
 		body .code i {
@@ -63,8 +65,16 @@
 			color: white;
 		}
 		
+		.toccontainer {
+			margin: 20px 0 0 0;
+		}
+		
+		.toccontainer h3 {
+			float: left; 
+			margin: 0 20px 0 0;
+		}
+
 		body div.contents {
-			text-align: center;
 		}
 		
 		@font-face {
@@ -93,24 +103,9 @@ example codes from the tutorial to the Program Listing panel.</p>
 Command Line, press Enter.</p>
 <p>Return to the Program Listing by entering the LIST command.</p>
 <p>NEW command will also erase the program text.</p>
+
 <h2><a name="contents">Contents</a></h2>
-<div style="float: right; width: 30%; padding: 0 0 16px 24px; margin: 0">
-<h3 style="margin-top: 4px">Reference Sheets</h3><div class="contents">
-		<a href="#126">Names</a>
-<br/>	<a href="#201">Expressions</a>
-<br/>	<a href="#383">Operator Summary</a>
-<br/>	<a href="#460">Command Summary</a>
-<br/>	<a href="#642">Abbreviations</a>
-<br/>   <a href="#663">Run Time Errors</a>
-<br/>	<a href="#2004">Color Codes</a></div>
-
-<h3>Fun Projects</h3><div class="contents">
-		<a href="#fp1" title="PRINT * ASCII art">1</a>
-&bull; 	<a href="#fp2" title="Expressions * Zebra say">2</a>
-&bull; 	<a href="#fp3" title="IF and THEN * Text Adventure">3</a>
-&bull; 	<a href="#fp4" title="Sprites * Racer">4</a></div>
-</div>
-
+<div class="toccontainer">
 <h3>Programming Instruction by Instruction</h3><div class="contents">
 	<a href="#72">PRINT</a>
 &bull;	<a href="#89">INPUT</a>
@@ -124,8 +119,11 @@ Command Line, press Enter.</p>
 &bull;	<a href="#438">GOSUB and RETURN</a>
 &bull;	<a href="#448">END and STOP</a>
 &bull;	<a href="#460">Command Summary</a>
-&bull;	<a href="#465">FOR and NEXT</a>
-<hr/>	<a href="#496">DATA and READ</a>
+&bull;	<a href="#465">FOR and NEXT</a></div>
+</div>
+<div class="toccontainer">
+<h3>Details of the Language</h3><div class="contents">
+<a href="#496">DATA and READ</a>
 &bull;	<a href="#513">RESTORE</a>
 &bull;	<a href="#540">DIM</a>
 &bull;	<a href="#561">POKE</a>
@@ -138,15 +136,32 @@ Command Line, press Enter.</p>
 &bull;  <a href="#653">PUSH and PULL</a>
 &bull;	<a href="#663">Run Time Errors</a>
 &bull;	<a href="#738">Contrasting C64</a></div>
-
+</div>
+<div class="toccontainer">
 <h3>Game Programming Tutorial</h3><div class="contents">
 	<a href="#2001">WAIT and GET</a>
 &bull;	<a href="#2002">TIME and TIME$</a>
 &bull;	<a href="#2003">Sprites!</a>
 &bull;	<a href="#2004">Colors!</a>
-&bull;	<a href="#2005">How About Some Art?</a></div>
-
-
+&bull;	<a href="#2005">Pixel Data Animations</a></div>
+</div>
+<div class="toccontainer">
+<h3>Reference Sheet Index</h3><div class="contents">
+		<a href="#126">Names</a>
+&bull;	<a href="#201">Expressions</a>
+&bull;	<a href="#383">Operator Summary</a>
+&bull;	<a href="#460">Command Summary</a>
+&bull;	<a href="#642">Abbreviations</a>
+&bull;	<a href="#663">Run Time Errors</a>
+&bull;	<a href="#2004">Color Codes</a></div>
+</div>
+<div class="toccontainer">
+<h3>Fun Projects</h3><div class="contents">
+		<a href="#fp1" title="PRINT * ASCII art">1</a>
+&bull; 	<a href="#fp2" title="Expressions * Zebra say">2</a>
+&bull; 	<a href="#fp3" title="IF and THEN * Text Adventure">3</a>
+&bull; 	<a href="#fp4" title="Sprites * Racer">4</a></div>
+</div>
 
 
 
@@ -170,6 +185,7 @@ Command Line, press Enter.</p>
 
 
 <h1>Programming Instruction by Instruction</h1>
+
 <h2><a name="72">PRINT</a></h2>
 <div class="code">PRINT "HELLO WORLD"
 REM<i>ARK: The PRINT instruction is for learning and debugging purposes only.</i>
@@ -186,6 +202,7 @@ REM<i>ARK: There are more operators to be covered later.</i></div>
 REM<i>ARK: 1.571 is approximately 90 degrees in radians. </i>
 REM<i>ARK: So this will print a number close to 1, sine of 90 degrees.</i>
 REM<i>ARK: You must not leave white space between SIN and the parenthesis.</i></div>
+
 <h2><a name="89">INPUT</a></h2>
 
 <h3>Full Syntax</h3>
@@ -222,6 +239,7 @@ PRINT A</div>
  To prove it, we do a PRINT A in the 2nd line.</p><p>
  In the 3rd line INPUT will assign again. Which means, the old value is replaced by the new.
  See what gets printed in the 4th line: the new value of A, regardless of its previous value.</p>
+
 <h2><a name="fp1">Fun Project: PRINT</a></h2>
 <p>Write a program with a lot of PRINT instructions to make beautiful ASCII art.
 Wanna see my submission?</p>
@@ -240,6 +258,7 @@ PRINT "(__/          (_/         (____/"</div>
 Command Line the same order as in the Program Listing, which we call the normal
 program flow. Another take-away is that the writer of this paper has substandard
 drawing skills.</p>
+
 <h2><a name="126">Names</a></h2>
 <p>
 In the INPUT examples we could see that there are variables named A and B, which help us store numbers.
@@ -258,6 +277,7 @@ The % sign suggests integer number value.
 <div class="code">INPUT N%:INPUT TEXT$</div></li>
 </ol>
 <p>These rules not only apply to variable names, but also function names and array names, which are covered later.</p>
+
 <h2><a name="143">LET</a></h2>
 <div class="code">LET SUM = 6+4
 PRINT SUM</div>
@@ -289,6 +309,7 @@ A = A+1
 PRINT A</div>
 <p>2nd line says, add 1 to the old value of A, and let the incremented value be the new value of A.
 So the 3rd line will print the successor of whatever the user enters.</p>
+
 <h2><a name="175">REM, The Colon, Spaces: Your Readable Code</a></h2>
 <p>You can make your code self documented by inserting REM instrucions. They make the runner ignore the rest of the line.</p>
 <div class="code">REM<i> * USER WILL ENTER A NUMBER *</i>
@@ -310,6 +331,7 @@ REM<i> * MAYBE I WILL WANT TO UNCOMMENT LATER *</i></div>
 <p>The REMARK lines in the examples before are also REM instructions.
 The space after the REM or any instruction is optional, so the text starting with ARK had been ignored by the runner.
 But you should keep your code readable, which means spaces are good for you.</p>
+
 <h2><a name="201">Expressions</a></h2>
 <div class="code">A$ = "THIS TEXT BETWEEN QUOTES IS A LITERAL, A SIMPLE EXPRESSION."
 A = 30:REM<i> THE NUMBER IS ALSO A LITERAL, WHICH IS AN EXPRESSION</i>
@@ -405,6 +427,7 @@ Y$ = STR$(X):REM<i> A DECIMAL REPRESENTATION OF THE NUMBER X</i></div>
 <div class="code">PRINT RND(8)-RND(8):REM<i> RND EVALUATED TWICE, CAN RETURN DIFFERENT VALUES</i>
 <hr/>X = RND(8):REM<i> EVALUATED ONCE</i>
 PRINT X - X:REM<i> ALWAYS RETURNS ZERO</i></div>
+
 <h2><a name="fp2">Fun Project</a></h2>
 <p>Make an ASCII art zebra say something that the user enters.</p>
 <div class="code">INPUT "WHAT DOES THE ZEBRA SAY?", MSG$
@@ -421,6 +444,7 @@ PRINT "           ||   ||  "</div>
 <li>Are the plus signs conactenations or number additions here?</li>
 </ul>
 <p>Do you have a better version?</p>
+
 <h2><a name="299">GOTO</a></h2>
 
 <p>Flow instructions can break the <a href="#normal-flow">normal flow</a> of the program. GOTO instructs the runner to immediately go to a specified
@@ -455,6 +479,7 @@ of the program. Therefore:</p><ul>
 <li>To restart the program, say GOTO START.</li>
 <li>The name START is reserved.</li>
 </ul>
+
 <h2><a name="331">IF and THEN</a></h2>
 
 <h3>Logical Operators</h3>
@@ -507,6 +532,7 @@ PRINT "TRY AGAIN":GOTO ASK</div>
 <p>If the user input is correct then the program will not only PRINT "CORRECT" but also GOTO TASK. 
 If the condition is not met then the rest of the line is skipped, even if it contains          
 several instructions separated with colon.                                                     </p> 
+
 
 <h2><a name="fp3">Fun Project</a></h2>
 <p>Have you noticed that you know everything you need to create a text 
@@ -588,6 +614,7 @@ INPUT "SELL OR LEAVE?", MOVE$
 IF MOVE$="SELL" THEN MONEY=1:PRINT "YOU GET A COIN."
 GOTO STREET</div>
 
+
 <h2><a name="383">Operator Summary</a></h2>
 
 <h3>Precedence</h3>
@@ -643,6 +670,7 @@ PRINT (-2)^2:REM<i> 4</i>
 REM<i> * UNARY MINUS HAS HIGHER PRECEDENCE THAN ADD OR SUBTRACT *</i>
 PRINT -2+2:REM<i> 0</i>
 PRINT -(2+2):REM<i> -4</i></div>
+
 <h2><a name="438">GOSUB and RETURN</a></h2>
 <div class="code">PRINT "VERSE 1"
 GOSUB CHORUS:REM<i> GO TO SUBPROGRAM AT @CHORUS BUT COME BACK WHEN IT'S DONE</i>
@@ -652,6 +680,7 @@ GOTO OUTRO
 @CHORUS: PRINT "CHORUS"
 RETURN:REM<i> SUB IS OVER, GO BACK TO THE POINT AFTER GOSUB (THE RIGHT GOSUB)</i>
 @OUTRO: PRINT "OUTRO"</div>
+
 <h2><a name="448">END and STOP</a></h2>
 <div class="code">PRINT "VERSE 1"
 GOSUB CHORUS
@@ -669,6 +698,7 @@ PRINT "STEP 3"
 REM<i> * ENTER INTERACTIVE COMMAND CONT TO CONTINUE *</i>
 REM<i> * ENTER INTERACTIVE COMMAND RUN TO START OVER *</i>
 REM<i> * ?STATUS TO TELL STOP (1) FROM END (0) OR ERROR (-1) *</i></div>
+
 <h2><a name="460">Command Summary</a></h2>
 Here are all the commands that you can use on the command line:<ul>
 <li>RUN - run the program that is tokenized in the runner</li>
@@ -681,6 +711,7 @@ Here are all the commands that you can use on the command line:<ul>
 <span style="code">?</span> to see its value.</li>
 <li>By entering a programming instruction, you add a line to the end of the program</li>
 </ul>
+
 <h2><a name="465">FOR and NEXT</a></h2>
 <p>Wanna do something 10 times?</p>
 <div class="code">FOR I=1 TO 10:PRINT "THIS OLD MAN, HE PLAYED " + I:NEXT</div>
@@ -724,11 +755,12 @@ Note]</span></li></ul></p>
 	<li>to jump over all the other NEXT instructions &ndash; GOTO OUT</li>
 </ol></p>
 </ul>
-<h1>Part 2</h2>
+<h1>Details of the Language</h2>
 <p>OK, the essentials are now done. You can jump to <a href="#game">Game 
 Programming Tutorial</a> if you are in a hurry. You'll be able to follow, but 
 some particular instructions you'll need to look up in the second part. There 
 are still some details about the language, so read on to learn them all.</p>
+
 <h2><a name="496">DATA and READ</a></h2>
 <div class="code">REM<i> * READ ASSIGNS THE NEXT VALUE FROM THE DATA LINE TO ITS ARGUMENT *</i>
 FOR I=1 TO 5:READ A:PRINT A:NEXT
@@ -744,6 +776,7 @@ DATA A, A + 1</div>
 the randomized number, so B gets the same value as A. </p><p>Then A=9 assignment happens.         
 C gets the already evaluated value, which is the random number plus 1 (the new value of A, 
 9, does not affect C's.)                               </p>                                
+
 
 <h2><a name="513">RESTORE</a></h2>
 <p>Restore to the beginning</p>
@@ -770,6 +803,7 @@ NEXT
 END
 DATA "MON", "TUE", "WED", "THU", "FRI"
 @WEEKEND: DATA "SAT", "SUN"</div>
+
 <h2><a name="540">DIM</a></h2>
 <div class="code">REM<i> * BUBBLE SORT *</i>
 DIM ARRAY(10)
@@ -790,11 +824,13 @@ NEXT K
 PRINT ARRAY(0)
 END
 DATA 1, 2, 3, 5, 9, 8, 7, 4, 6</div>
+
 <h2><a name="561">POKE</a></h2>
 <p>Store a byte in the memory by address.</p>
 <div class="code">POKE 5000,6
 REM<i> 5000 IS THE ADDRESS, 6 IS THE BYTE</i>
 PRINT PEEK(5000)</div>
+
 <h2><a name="567">CLR</a></h2>
 <p>Clear all variables and arrays. Built-in variables restored.</p>
 <div class="code">PI = 3.0
@@ -805,6 +841,7 @@ PRINT PI</div>
 <div class="code">POKE 5000,6
 CLR
 PRINT PEEK(5000):REM<i> 6</i></div>
+
 <h2><a name="579">DEF</a></h2>
 <div class="code">LOG2 = LOG(2)
 DEF LOG2(X) = LOG(X)/LOG2
@@ -817,6 +854,7 @@ DIM ARRAY(10)
 CLR
 DIM TWICE(10):REM<i> NOT AN OVERDEFINITION</i>
 DEF ARRAY(N) = 2*N:REM<i> NOT AN OVERDEFINITION</i></div>
+
 <h2><a name="593">ON</a></h2>
 <p>With IF instruction, you gave your program two possible continuation paths: one 
 to go when the condition is true, one if it is false. What if you want three
@@ -850,11 +888,13 @@ GOTO NONPOSITIVE:REM<i> THIS NEEDS TO BE ON A SEPARATE LINE</i>
 @POSITIVE:PRINT "POSITIVE":END
 @NONPOSITIVE:PRINT "NONPOSITIVE":END
 </div>
+
 <h2><a name="613">Multidimensional Arrays</a></h2>
 <p>You may use the comma operator in the array index to create a matrix.</p>
 <div class="code">DIM MANCALA(6,2)
 MANCALA(4,1) = 0
 MANCALA(5,1) = MANCALA(4,1)+1</div>
+
 <h2><a name="618">Non-Unary Functions</a></h2>
 
 <h3>Nullary</h3>
@@ -879,6 +919,7 @@ REM<i> * ROLLS THREE TIMES *</i></div>
 <h3>Higher Arities</h3>
 <div class="code">DEF MAX(A,B)=(A>=B)*A+(A&lt;B)*B
 PRINT MAX(-3,MAX(5/2,8/4))</div>
+
 <h2><a name="642">Abbreviations</a></h2>
 <div class="code">REM<i> * T. IS SHORT FOR THEN *</i>
 REM<i> * G. IS SHORT FOR GOTO *</i>
@@ -900,6 +941,7 @@ END
 @INDIAN: 
 	PRINT I+" LITTLE INDIAN"+S$
 	R.</div>
+
 <h2><a name="653">PUSH and PULL</a></h2>
 <p>Do you know the <a href="https://en.wikipedia.org/wiki/Stack_(abstract_data_type)" target="_BLANK">stack</a> data structure? You can use it like this:</p>
 <div class="code">PUSH 1:PUSH 2:PUSH 3
@@ -942,6 +984,7 @@ PUSH N:PUSH SOURCE:PUSH VIA:PUSH TARGET
 N=N-1:S=SOURCE:SOURCE=VIA:VIA=S:GOSUB MOVE
 PULL TARGET:PULL VIA:PULL SOURCE:PULL N
 RETURN</div>
+
 <h2><a name="663">Run Time Errors</a></h2>
 
 <h3>ILLEGAL EXPRESSION</h3>
@@ -1006,6 +1049,7 @@ DATA 1</div>
 
 <h3>DIVIDE BY ZERO</h3>
 <div class="code">A = 1/0</div>
+
 <h2><a name="738">Contrasting C64</a></h2>
 <p>This programming language is inspired by C64 BASIC V2.</p>
 Inspiration means that:<ul>
@@ -1080,6 +1124,7 @@ More differences that are already mentioned:<div class="contents">
 <p>OK, that was boring. Fortunately this imaginary little machine has all the
 necessary stuff for action game programming, too. You'll need controls,
 timing and graphics. Let's go!</p>
+
 <h2><a name="2001">WAIT and GET</a></h2>
 <p>WAIT instruction halts execution of your program until one of the 
 events occur:</p><ul>
@@ -1148,6 +1193,8 @@ PRINT A</div>
 
 <h3><a name="wait-abbr">Abbreviation</a></h3>
 <div class="code">FOR I=1 TO 50:W.:N. '<i>WAIT >980 BUT &lt=1000 MILLISECONDS</i></div>
+
+
 <h2><a name="2002">TIME and TIME$</a></h2>
 <div class="code">PRINT TIME() '<i>MILLISECONDS SINCE EPOCH, 1 JAN 1970</i>
 PRINT TIME$(0) '<i>THE EPOCH IN A HUMAN READABLE FORMAT</i>
@@ -1162,6 +1209,7 @@ REM<i> * LAST TWO LINES SHOULD DIFFER IN 1 SECOND *</i></div>
 <h3>Time Zones</h3>
 <div class="code">PRINT TIME$(TIME()+2*3.6E6) '<i>IN B TIME ZONE OFFSET</i>
 PRINT TIME$(TIME()+TZO) '<i>IN LOCAL TIME ZONE OFFSET</i></div>
+
 <h2><a name="2003">Sprites!</h2>
 
 <h3>My First Animation</h3>
@@ -1179,20 +1227,20 @@ pixels.</p>
 
 <h3>Physical Animations</h3>
 <div class="code">SCREENWIDTH=384:SCREENHEIGHT=216
-'START IN THE MIDDLE OF THE SCREEN
+'<i>START IN THE MIDDLE OF THE SCREEN</i>
 SPRX(0)=SCREENWIDTH/2-12:SPRY(0)=SCREENHEIGHT/2-12
-@HIT 'HIT THE BALL IN A RANDOM DIRECTION
-SPEEDX=RND(40)/10-2:SPEEDY=RND(40)/10-2 'PIXELS PER 20 MILLISECONDS
+@HIT '<i>HIT THE BALL IN A RANDOM DIRECTION</i>
+SPEEDX=RND(40)/10-2:SPEEDY=RND(40)/10-2 '<i>PIXELS PER 20 MILLISECONDS</i>
 @LOOP
-'ADVANCE BALL POSITION ACCORDING TO SPEED
+'<i>ADVANCE BALL POSITION ACCORDING TO SPEED</i>
 SPRX(0)=SPRX(0)+SPEEDX
 SPRY(0)=SPRY(0)+SPEEDY
-'BOUNCE ON SCREEN EDGES
-IF SPRX(0) <= 0 OR SPRX(0) >= SCREENWIDTH-24 THEN SPEEDX = -SPEEDX
-IF SPRY(0) <= 0 OR SPRY(0) >= SCREENHEIGHT-24 THEN SPEEDY = -SPEEDY
+'<i>BOUNCE ON SCREEN EDGES</i>
+IF SPRX(0) &lt;= 0 OR SPRX(0) >= SCREENWIDTH-24 THEN SPEEDX = -SPEEDX
+IF SPRY(0) &lt;= 0 OR SPRY(0) >= SCREENHEIGHT-24 THEN SPEEDY = -SPEEDY
 WAIT:GET A
 <a href="#593">ON</a> A>0 GOTO HIT, LOOP 'LOOP IF KEY CODE&lt;=0; GOES TO HIT OTHERWISE</div>
-<p>The above algorithm appears in Billiard games, Ping or Breakout.</p>
+<p>The above algorithm appears in Billiard games, Pong or Breakout.</p>
 <div class="code">WT=384:HT=216
 <a href="#540" title="About the DIM instruction from Part 2">DIM</a> SPEEDX(99):DIM SPEEDY(99)
 N=0
@@ -1202,21 +1250,21 @@ SPRX(N)=0:SPRY(N)=0
 SPEEDX(N)=RND(30)/10:SPEEDY(N)=0
 @LOOP
 FOR I=1 TO N
-	IF SPRY(I) < 0 THEN NEXT:GOTO OUT
+	IF SPRY(I) &lt; 0 THEN NEXT:GOTO OUT
 	SPRX(I)=SPRX(I)+SPEEDX(I)
 	SPRY(I)=SPRY(I)+SPEEDY(I)
-	IF SPRX(I) <= 0 OR SPRX(I) >= WT-24 THEN SPEEDX(I) = -SPEEDX(I)
-	'STOP A DEAD BALL
-	IF SPRY(I) >= HT-24 AND ABS(SPEEDY(I)) < .5 THEN SPRY(I)=-24
-	'BOUNCE FROM THE GROUND AND LOSE SOME ENERGY
+	IF SPRX(I) &lt;= 0 OR SPRX(I) >= WT-24 THEN SPEEDX(I) = -SPEEDX(I)
+	'<i>STOP A DEAD BALL</i>
+	IF SPRY(I) >= HT-24 AND ABS(SPEEDY(I)) &lt; .5 THEN SPRY(I)=-24
+	'<i>BOUNCE FROM THE GROUND AND LOSE SOME ENERGY</i>
 	IF SPRY(I) >= HT-24 THEN SPEEDY(I) = -SPEEDY(I)*.9
-	'ADD GRAVITY
+	'<i>ADD GRAVITY</i>
 	IF SPRY(I) >= 0 THEN SPEEDY(I)=SPEEDY(I)+.1
 NEXT:@OUT
 WAIT:GET A
 ON A>0 GOTO SPAWN, LOOP</div>
-<p>Combine bouncing with gravity for an effect like in Flipper or ballistic
-games.</p>
+<p>Combine bouncing with gravity for an effect like in Flipper, ballistic
+games. A jumping character can as well be animated using gravity like above.</p>
 <p>Note that setting a coordinate to -24 makes the sprite invisible.</p>
 
 <h3><a name="DGNS">Tired of Balls?</a></h3>
@@ -1224,49 +1272,68 @@ games.</p>
 designs for your sprites. Use them like this:</p>
 <div class="code">SPRDGN(0)=DGNMAN():SPRX(0)=0:SPRY(0)=0 '<i>MAN IS A BUILT-IN DESIGN</i>
 SPRDGN(1)=DGNWALL():SPRX(1)=0:SPRY(1)=24 '<i>SO IS WALL</i></div>
+
+<h3>How about some art?</h3>
+<p>Design your own sprites in the Designer screen mode. You will see 227 slots
+for designs in the Memory Map. Just choose slots, colors, and paint using the
+mouse. Once done, copy the number from below the Memory Map, and set SPRDGN(K) 
+to that number in the program.</p>
+<div class="code">REM<i> ASSUMING YOU DREW SOMETHING INTO SLOT 2 IN THE DESIGNER</i>
+SPRX(5)=0:SPRY(5)=0 '<i>THE UPPER LEFT CORNER</i>
+SPRDGN(5)=288 '<i>THE SECOND DESIGN FROM THE MEMORY</i></div>
+
+
 <h2><a name="fp4">Fun Project</a></h2>
 <p>Find one bug in the list below. Correct it and have fun.</p>
-<div class="code">WT=384:HT=216
+<div class="code">WT=384:HT=216 '<i>SCREEN WIDTH AND HEIGHT</i>
 BORINGNESS=10
+
+REM<i> SPRITES</i>
+REM<i> 0 TO 9:    ROAD LEFT SIDE</i>
+REM<i> 10 TO 19:  ROAD RIGHT SIDE</i>
+REM<i> 20:        CAR UNDER CONTROL</i>
+REM<i> 21 AND ON: SPARE LIVES DISPLAYED</i>
+REM<i> LAST:      CRASHED CAR</i>
 
 @INIT
 SPRX(20)=WT/2:SPRY(20)=180:SPRDGN(20)=DGNCAR()
 FOR I=0 TO 9
   SPRX(I)=WT/4:SPRX(I+10)=WT/4*3
   SPRY(I)=I*24-23:SPRY(I+10)=SPRY(I)
-  SPRDGN(I)=DGNPADVERT():SPRDGN(I+10)=DGNPADVERT()
+  SPRDGN(I)=DGNDUST():SPRDGN(I+10)=DGNDUST()
 N.
 FOR I=1 TO LIFE:SPRX(20+I)=0:SPRY(20+I)=I*26-25:SPRDGN(20+I)=DGNCAR():N.
 SPRY(21+LIFE)=0:SPRX(21+LIFE)=-24:SPRDGN(30)=DGNCAR()
-ROADWT=WT/4
-CARVX=0:CARVY=0:DIRY=2
+ROADWT=WT/4 '<i>CURRENT ROAD WIDTH IN 2-PIXEL UNITS</i>
+CARVX=0:CARVY=0 '<i>VELOCITY COMPONENTS</i>
+DIRY=2
 PRINT "HIT UP ARROW TO ACCELERATE"
 PRINT "HIT LEFT OR RIGHT ARROW TO STEER"
 
 @CONTROL
 WAIT:GET A
-IF A=-38 THEN CARVY=CARVY+1
-IF CARVY&lt;1 T.G.CONTROL
-IF A=37 THEN CARVX=-CARVY
-IF A=39 THEN CARVX=CARVY
-IF A=-37 OR A=-39 THEN CARVX=0
+IF A=-38 THEN CARVY=CARVY+1 '<i>UP</i>
+IF CARVY&lt;1 T.G.CONTROL '<i>WAIT FOR THE PLAYER TO START THE GAME</i>
+IF A=37 THEN CARVX=-CARVY '<i>LEFT</i>
+IF A=39 THEN CARVX=CARVY '<i>RIGHT</i>
+IF A=-37 OR A=-39 THEN CARVX=0 '<i>RELEASE</i>
 
-SPRX(20)=SPRX(20)+CARVX
+SPRX(20)=SPRX(20)+CARVX '<i>CAR MOVES ACCORDING TO CONTROL</i>
 FOR TM=1 TO CARVY
-  SPRY(21+LIFE)=SPRY(21+LIFE)+1
+  SPRY(21+LIFE)=SPRY(21+LIFE)+1 '<i>LEAVE CRASHED CAR BEHIND</i>
   FOR I=0 TO 9
-    SPRY(I)=SPRY(I)+1:SPRY(I+10)=SPRY(I)
-    IF SPRY(I)&lt;HT T.G.ROLLEND
-      OLDTOP=I+1:IF OLDTOP>9 THEN OLDTOP=0
-      DIRY=DIRY-1
-      IF RND(DIRY)=0 THEN DIRX=RND(WT-2*ROADWT)+ROADWT:DIRY=16
-      SPRY(I)=-23:SPRY(I+10)=-23
-      IF ROADWT>32 AND RND(BORINGNESS)=0 THEN ROADWT=ROADWT-2
-      SPRX(I)=(DIRX-ROADWT-SPRX(OLDTOP))/DIRY+SPRX(OLDTOP)
+    SPRY(I)=SPRY(I)+1:SPRY(I+10)=SPRY(I) '<i>MOVE ROAD DOWN ON SCREEN</i>
+    IF SPRY(I)&lt;HT T.G.ROLLEND '<i>24 RASTERS SCROLLED OUT?</i>
+      OLDTOP=I+1:IF OLDTOP>9 THEN OLDTOP=0 '<i>WHICH SPRITES WERE ON SCREEN TOP?</i>
+      DIRY=DIRY-1 '<i>Y COORDINATE OF WHERE THE ROAD IS HEADING</i>
+      IF RND(DIRY)=0 THEN DIRX=RND(WT-2*ROADWT)+ROADWT:DIRY=16 '<i>CHANGE HEADING</i>
+      SPRY(I)=-23:SPRY(I+10)=-23 '<i>REUSE THE SPRITES SCROLLED OUT</i>
+      IF ROADWT>40 AND RND(BORINGNESS)=0 THEN ROADWT=ROADWT-2 '<i>LEVEL UP</i>
+      SPRX(I)=(DIRX-ROADWT-SPRX(OLDTOP))/DIRY+SPRX(OLDTOP) '<i>LINEAR STEP</i>
       SPRX(I+10)=SPRX(I)+2*ROADWT
       @ROLLEND
     IF SPRY(I)&lt;=SPRY(20)-24 OR SPRY(I)>=SPRY(20)+24 T.G.COLLIDEEND
-      IF SPRX(20)>=SPRX(I)+6 AND SPRX(20)&lt;=SPRX(I+10)-24 T.G.COLLIDEEND
+      IF SPRX(20)>=SPRX(I)+24 AND SPRX(20)&lt;=SPRX(I+10)-24 T.G.COLLIDEEND
         PRINT "BUMP!"
         LIFE=LIFE-1
         IF LIFE&lt;0 THEN PRINT "CRASH!":GOTO OVER
@@ -1277,26 +1344,23 @@ N.:N.
 GOTO CONTROL
 
 @DIE
-XMID=(SPRX(I)+SPRX(I+10))/2-6
+XMID=(SPRX(I)+SPRX(I+10))/2
 DX=XMID/16
 DY=(SPRY(20)-SPRY(21+LIFE))/16
-FOR J=1 TO 16
+FOR J=0 TO 15
   SPRX(21+LIFE)=SPRX(21+LIFE)+DX+SIN(J*PI/8)*16
   SPRY(21+LIFE)=SPRY(21+LIFE)+DY
   WAIT:WAIT
 N.
-SPRX(21+LIFE)=SPRX(20)
-SPRY(21+LIFE)=SPRY(20)
-SPRX(22+LIFE)=-24
-SPRX(20)=XMID
+REM<i> CRASHED CAR APPEARS WHERE CAR UNDER CONTROL WAS</i>
+SPRX(21+LIFE)=SPRX(20):SPRY(21+LIFE)=SPRY(20)
+SPRX(22+LIFE)=-24 '<i>CAR CRASHED EARLIER STILL ON SCREEN?</i>
+SPRX(20)=XMID '<i>THE CONTROLLED CAR KEEPS INDEX 20</i>
 R.
 
 @OVER
-FOR I=1 TO 100
-  FOR J=0 TO 20
-    SPRX(J)=SPRX(J)+RND(13)-6
-    SPRY(J)=SPRY(J)+RND(13)-6
-N.:W.:N.</div>
+FOR I=1 TO 200:W.:N.</div>
+
 
 <h2><a name="2004">Colors!</a></h2>
 <div class="code">INPUT BACKGROUND '<i>YET ANOTHER BUILT-IN VARIABLE</i></div>
@@ -1348,15 +1412,10 @@ N.:W.:N.</div>
 	</tr>
 </table></div>
 
-<h2><a name="2005">How About Some Art?</a></h2>
-<p>Design your own sprites in the Designer screen mode. You will see 227 slots
-for designs in the Memory Map. Just choose slots, colors, and paint using the
-mouse. Once done, copy the number from below the Memory Map, and set SPRDGN(K) 
-to that number in the program.</p>
-<div class="code">SPRX(5)=0:SPRY(5)=0 '<i>THE UPPER LEFT CORNER</i>
-SPRDGN(5)=288 '<i>THE SECOND DESIGN FROM THE MEMORY</i></div>
+
+<h2><a name="2005">Pixel Data Animations</a></h2>
 <p>You can use POKE instructions to redesign the sprite while the program is
-running.</p>
+running. With love for fellow coordinate geometry lovers.</p>
 <div class="code">DEF NEAR(A,B)=(A-B)^2&lt;2 '<i>DO NOT USE = TO COMPARE FLOATS</i>
 SPRX(0)=180:SPRY(0)=96 '<i>CENTER</i>
 SPRDGN(0)=0
@@ -1364,15 +1423,37 @@ SPRDGN(0)=0
 WAIT:WAIT '<i>RECALCULATE ONCE PER SCREEN REFRESH</i>
 X=COS(TIME()/318):Y=SIN(TIME()/318) '<i>MOVE X,Y IN CIRCLES OVER TIME</i>
 FOR R=0 TO 23 '<i>FOR ALL ROWS OF THE DESIGN</i>
-  FOR C=0 TO 23 STEP 2 '<i>FOR EVERY 2ND COLUMN OF IT</i>
-    HI=0:LO=0 '<i>HIGH AND LOW NIBBLE OF THE DESIGN BYTE</i>
-    FOR A=-11 TO 11 STEP 2 '<i>PARAMETER OF THE LINE'S EQUATION</i>
-      IF NEAR(C, X*A+12) AND NEAR(R, Y*A+12) THEN HI=10*16
-      IF NEAR(C+1, X*A+12) AND NEAR(R, Y*A+12) THEN LO=10
-    NEXT
-    POKE 12*R+INT(C/2),HI OR LO '<i>PUT PIXELS</i>
-  NEXT
+	FOR C=0 TO 23 STEP 2 '<i>FOR EVERY 2ND COLUMN OF IT</i>
+		HI=0:LO=0 '<i>HIGH AND LOW NIBBLE OF THE DESIGN BYTE</i>
+		FOR A=-11 TO 11 STEP 2 '<i>PARAMETER OF THE LINE'S EQUATION</i>
+			IF NEAR(C, X*A+12) AND NEAR(R, Y*A+12) THEN HI=10*16
+			IF NEAR(C+1, X*A+12) AND NEAR(R, Y*A+12) THEN LO=10
+		NEXT
+		POKE 12*R+INT(C/2),HI OR LO '<i>PUT PIXELS</i>
+	NEXT
 NEXT
 GOTO LOOP</div>
+<p>And another animation technique here, using a set of prepared designs,
+swapping the design pointer of one sprite rapidly.</p>
+<div class="code">FOR I=0 TO 5*288-1:READ B:POKE I,B:NEXT
+SPRY(0)=192
+F=0:X=-23
+@LOOP
+SPRDGN(0)=INT(F)*288
+SPRX(0)=X
+X=X+1:IF X>384 THEN X=-23
+F=F+0.3:IF F>5 THEN F=0
+WAIT:WAIT
+GOTO LOOP
+DATA 0,0,0,0,0,221,208,0,0,0,0,0,0,0,0,0,13,0,221,0,0,0,0,0,0,0,0,0,13,0,0,208,0,0,0,0,0,0,0,0,13,0,13,208,0,0,0,0,0,0,0,0,0,208,208,0,0,0,0,0,0,0,0,0,0,13,0,0,0,0,0,0,0,0,0,0,13,221,0,0,0,0,0,0,0,0,0,0,221,0,208,0,0,0,0,0,0,0,0,13,0,208,13,13,0,0,0,0,0,0,0,13,0,208,13,221,208,0,0,0,0,0,0,13,0,208,13,0,0,0,0,0,0,0,0,13,221,0,221,0,0,0,0,0,0,0,0,13,13,0,0,208,0,0,0,0,0,0,0,0,0,221,208,13,208,0,0,0,0,0,0,0,13,13,13,208,13,0,0,0,0,13,221,221,208,208,0,13,208,208,0,0,0,13,0,0,13,0,0,0,13,13,0,0,0,13,13,221,208,0,0,0,13,13,221,0,0,13,13,0,0,0,0,0,0,208,13,0,0,0,208,0,0,0,0,0,0,221,208,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+DATA 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,221,208,0,0,0,0,0,0,0,0,0,13,0,221,0,0,0,0,0,0,0,0,0,13,0,0,208,0,0,0,0,0,0,0,0,13,0,13,208,13,0,0,0,0,0,0,0,0,208,208,0,221,0,0,0,0,0,0,0,0,13,0,0,13,0,0,0,0,0,0,221,221,221,0,0,208,0,0,0,0,0,0,208,13,0,221,221,208,0,0,0,0,0,0,208,0,208,13,0,0,0,0,0,0,0,0,221,0,208,13,0,0,0,0,0,0,0,0,208,0,208,13,0,0,0,0,0,0,0,0,0,13,0,13,0,0,0,0,0,0,0,0,0,13,0,0,208,0,0,0,0,0,0,0,0,0,221,0,13,0,0,0,0,0,0,13,208,13,13,221,0,208,0,0,0,0,0,208,13,208,208,0,208,13,0,0,0,0,0,208,208,13,0,0,13,13,0,0,0,0,13,13,13,208,0,0,13,13,0,0,0,0,13,208,0,0,0,0,13,13,0,0,0,0,0,0,0,0,0,0,13,13,221,0,0,0,0,0,0,0,0,0,13,0,13,0,0,0,0,0,0,0,0,0,13,221,208,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+REM<i> TOE IS AT X=15, Y=23 IN FRAME #2</i>
+DATA 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,221,208,0,0,0,0,0,0,0,0,0,13,0,221,0,0,0,0,0,0,0,0,0,13,0,0,208,0,0,0,0,0,0,0,0,13,0,13,208,0,0,0,0,0,0,0,0,0,208,208,0,0,0,0,0,0,0,0,0,0,13,0,0,0,0,0,0,0,0,0,0,0,221,0,0,0,0,0,0,0,0,0,0,13,0,221,0,0,0,0,0,0,0,0,0,13,208,13,0,0,0,0,0,0,0,0,0,208,208,13,13,0,0,0,0,0,0,0,0,208,208,13,221,208,0,0,0,0,0,0,0,13,0,13,0,0,0,0,0,0,0,0,0,13,0,13,0,0,0,0,0,0,0,0,0,0,208,0,208,0,0,0,0,0,0,0,0,0,221,0,208,0,0,0,0,0,0,0,0,0,208,208,13,0,0,0,0,0,0,0,0,0,13,13,13,0,0,0,0,0,0,0,0,13,208,13,0,208,0,0,0,0,0,0,221,208,13,221,13,0,0,0,0,0,0,0,208,13,208,208,13,0,0,0,0,0,0,0,208,208,0,208,208,0,0,0,0,0,0,0,221,0,13,0,13,0,0,0,0,0,0,0,0,0,13,221,221,0,0,0,0
+DATA 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,221,208,0,0,0,0,0,0,0,0,0,13,0,221,0,0,0,0,0,0,0,0,0,13,0,0,208,0,0,0,0,0,0,0,0,13,0,13,208,0,0,0,0,0,0,0,0,0,208,208,0,0,0,0,0,0,0,0,0,0,13,0,0,0,0,0,0,0,0,0,0,0,221,0,0,0,0,0,0,0,0,0,0,13,208,221,0,0,0,0,0,0,0,0,0,13,208,13,0,0,0,0,0,0,0,0,0,13,208,13,0,0,0,0,0,0,0,0,0,13,208,13,208,0,0,0,0,0,0,0,0,13,221,221,221,0,0,0,0,0,0,0,0,13,0,13,0,0,0,0,0,0,0,0,0,0,208,0,208,0,0,0,0,0,0,0,0,0,208,0,208,0,0,0,0,0,0,0,0,0,221,0,221,0,0,0,0,0,0,0,0,0,13,0,208,208,0,0,0,0,0,0,0,221,208,0,208,208,0,0,0,0,0,0,0,208,208,13,221,0,0,0,0,0,0,0,0,221,0,208,0,0,0,0,0,0,0,0,0,221,13,208,0,0,0,0,0,0,0,0,0,221,0,13,0,0,0,0,0,0,0,0,0,13,221,221,0,0,0,0,0
+REM<i> TOE IS AT X=9, Y=23 IN FRAME #4</i>
+REM<i> TO KEEP IT ON THE GROUND, MOVE THE SPRITE 3 PIXELS AHEAD PER FRAME</i>
+DATA 0,0,0,0,0,221,208,0,0,0,0,0,0,0,0,0,13,0,221,0,0,0,0,0,0,0,0,0,13,0,0,208,0,0,0,0,0,0,0,0,13,0,13,208,0,0,0,0,0,0,0,0,0,208,208,0,0,0,0,0,0,0,0,0,0,13,0,0,0,0,0,0,0,0,0,0,13,221,0,0,0,0,0,0,0,0,0,0,13,208,208,0,0,0,0,0,0,0,0,0,208,208,13,0,0,0,0,0,0,0,0,0,208,208,13,0,0,0,0,0,0,0,0,0,13,208,13,208,0,0,0,0,0,0,0,0,13,221,221,221,0,0,0,0,0,0,0,0,13,0,0,208,0,0,0,0,0,0,0,0,0,221,208,13,208,0,0,0,0,0,0,0,13,13,13,208,13,0,0,0,0,0,0,0,13,13,0,13,0,208,0,0,0,0,0,0,208,208,0,13,0,208,0,0,0,0,0,0,208,208,0,208,13,0,0,0,0,0,0,13,13,0,13,13,208,0,0,0,0,0,0,13,13,0,13,0,208,0,0,0,0,0,0,208,208,0,0,208,13,0,0,0,0,0,13,0,208,0,0,13,208,0,0,0,0,0,0,208,13,0,0,0,0,0,0,0,0,0,0,13,221,0,0,0,0,0,0,0
+REM<i> NORMALLY YOU WOULD USE THE DESIGNER TO PREDESIGN ANIMATION FRAMES</i>
+REM<i> BUT IN THIS TUTORIAL, IT'S EASIER TO COPY INSTRUCTIONS THAN MEMORY</i></div>
 </body>
 </html>

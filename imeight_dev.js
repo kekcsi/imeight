@@ -97,6 +97,8 @@ pageLoadHooks.push(function() {
 	// initialize built-in variables for direct expressions (?) on Command Line
 	instructions.CLR.run(0)
 	
+	if (window.navigator.userAgent.indexOf("Edge/") > 0) return
+		
 	taList.value = localStorage.getItem("proglist")
 })
 

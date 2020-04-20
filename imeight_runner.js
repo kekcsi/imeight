@@ -107,7 +107,7 @@ function evaluateOperator(token) {
 }
 
 function runProgram() {
-	stopped = 0
+	stopped = labels.START
 	instructions.CLR.run(0)
 	
 	contProgram()

@@ -32,10 +32,14 @@ setInterval(function() {
 }, 2000)
 
 function sprEdit(ev) {
+	var i = ev.target.dataset.idx
+
 	if (ev.buttons > 0) {
 		ev.target.style.backgroundColor = drawingColor
-		designData[ev.target.dataset.idx] = drawingIdx
+		designData[i] = drawingIdx
 	}
+
+	divDgnStatus.innerHTML = Math.floor(i/24) + ":" + i%24 + "=" + designData[i]
 }
 
 function clearDesigner() {
@@ -49,23 +53,25 @@ function clearDesigner() {
 }
 
 pageLoadHooks.push(function() {
-	var spriteDataJson = localStorage.getItem("designdata")
-	if (spriteDataJson == null) {
-		clearDesigner()
-	} else {
-		designData = JSON.parse(spriteDataJson)
-	}
+	if (window.navigator.userAgent.indexOf("Edge/") < 0 || window.location.protocol != "file:") {
+		var spriteDataJson = localStorage.getItem("designdata")
+		if (spriteDataJson == null) {
+			clearDesigner()
+		} else {
+			designData = JSON.parse(spriteDataJson)
+		}
 
-	selDesign = localStorage.getItem("seldesign")
-	if (selDesign == null) selDesign = 0
-	inPointer.value = 288*selDesign					
+		selDesign = localStorage.getItem("seldesign")
+		if (selDesign == null) selDesign = 0
+		inPointer.value = 288*selDesign					
 
-	var memoryJson = localStorage.getItem("memory")
-	if (memoryJson == null) {
-		memory = []
-	} else {
-		memory = JSON.parse(memoryJson)
-	}
+		var memoryJson = localStorage.getItem("memory")
+		if (memoryJson == null) {
+			memory = []
+		} else {
+			memory = JSON.parse(memoryJson)
+		}
+    }
 	
 	var pixCells = tblDesigner.getElementsByTagName("td")
 	for(var i = 0; i < pixCells.length; ++i) {
