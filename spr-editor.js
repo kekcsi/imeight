@@ -15,7 +15,7 @@ setInterval(function() {
 		localStorage.setItem("designdata", JSON.stringify(designData))
 		localStorage.setItem("seldesign", selDesign)
 		localStorage.setItem("memory", JSON.stringify(memory))
-		desigerDirty = false
+		designerDirty = false
 	}
 	
 	if (thumbsDirty) {
@@ -32,6 +32,8 @@ setInterval(function() {
 }, 2000)
 
 function sprEdit(ev) {
+	ev.preventDefault()
+	
 	var i = ev.target.dataset.idx
 
 	if (ev.buttons > 0) {
@@ -39,7 +41,8 @@ function sprEdit(ev) {
 		designData[i] = drawingIdx
 	}
 
-	divDgnStatus.innerHTML = Math.floor(i/24) + ":" + i%24 + "=" + designData[i]
+	divDgnStatus.innerHTML = Math.floor(i/24) + ":" + i%24 + "=" + 
+			designData[i].toString(16)
 }
 
 function clearDesigner() {
@@ -54,11 +57,12 @@ function clearDesigner() {
 
 pageLoadHooks.push(function() {
 	if (window.navigator.userAgent.indexOf("Edge/") < 0 || window.location.protocol != "file:") {
-		var spriteDataJson = localStorage.getItem("designdata")
-		if (spriteDataJson == null) {
+		var designDataJson = localStorage.getItem("designdata")
+		if (designDataJson == null) {
 			clearDesigner()
 		} else {
-			designData = JSON.parse(spriteDataJson)
+			designData = JSON.parse(designDataJson)
+			updateDesign()
 		}
 
 		selDesign = localStorage.getItem("seldesign")
@@ -80,24 +84,16 @@ pageLoadHooks.push(function() {
 		pixCells[i].addEventListener("mouseup", function() { designerDirty = true });
 	}
 	
-	designFromMemory()
-	
 	var cells = tblColors.getElementsByTagName("td")
 	for(var i = 0; i < 16; ++i) {
 		var cell = cells[i]
-		cell.style.backgroundColor = colorToCSS(i)
-		cell.style.borderColor = (i == drawingIdx) ? "white" : "gray"
 				
 		cell.addEventListener("mousedown", function(ev) {
-			drawingColor = ev.target.style.backgroundColor
-			drawingIdx = parseInt(ev.target.dataset.idx, 10)
-			
-			var cells = tblColors.getElementsByTagName("td")
-			for (var j = 0; j < 16; j++) {
-				cells[j].style.borderColor = (j == drawingIdx) ? "white" : "gray"
-			}
+			setDrawingIndex(parseInt(ev.target.dataset.idx, 10))
 		})
 	}
+	
+	setDrawingIndex(7)
 	
 	cells = tblMemory.getElementsByTagName("td")
 	cells[selDesign].style.background = "white"
@@ -118,6 +114,28 @@ pageLoadHooks.push(function() {
 			}
 		})
 	}
+	
+	inMove.addEventListener("keyup", function(event) {
+		if (event.keyCode == 38) { //up
+			transformDesign(false, false, false, 0, -1)
+		}
+		if (event.keyCode == 37) { //left
+			transformDesign(false, false, false, -1, 0)
+		}
+		if (event.keyCode == 39) { //right
+			transformDesign(false, false, false, 1, 0)
+		}
+		if (event.keyCode == 40) { //down
+			transformDesign(false, false, false, 0, 1)
+		}
+		if (event.keyCode >= 48 && event.keyCode <= 57) { //digit
+			swapColor(event.keyCode - 48)
+		}
+		if (event.keyCode >= 65 && event.keyCode <= 71) { //A-F
+			swapColor(event.keyCode - 55)
+		}
+		inMove.value = "MOVE"
+	})
 })
 
 function designToMemory(designIdx) {
@@ -133,16 +151,25 @@ function designToMemory(designIdx) {
 	updateThumb(designIdx)
 	memoryUpdateHook(288*designIdx)
 	updateDownloadBlob()
+	
+	designerDirty = true
 }
 
 function designFromMemory() {
-	var pixCells = tblDesigner.getElementsByTagName("td")
-
 	for (var i = 0; i < 288; ++i) {
 		octet = memory[i + 288*selDesign]
 		if (!octet) octet = 0
 		designData[2*i] = (octet >> 4)
 		designData[2*i + 1] = (octet & 15)
+	}
+	
+	updateDesign()
+}
+
+function updateDesign() {
+	var pixCells = tblDesigner.getElementsByTagName("td")
+
+	for (var i = 0; i < 288; ++i) {
 		pixCells[2*i].style.backgroundColor = colorToCSS(designData[2*i])
 		pixCells[2*i + 1].style.backgroundColor = colorToCSS(designData[2*i + 1])
 	}
@@ -175,4 +202,67 @@ function updateThumb(designIndex) {
 	cells[designIndex].appendChild(canvas)
 	
 	return true
+}
+
+function transformDesign(hFlip, vFlip, transpose, dx, dy) {
+	var transformed = []
+	
+	for (var ox = 0; ox < 24; ox++) {
+		for (var oy = 0; oy < 24; oy++) {
+			if (transpose) {
+				var x = (oy + dy + 24)%24
+				var y = (ox + dx + 24)%24
+			} else {
+				var x = (ox + dx + 24)%24
+				var y = (oy + dy + 24)%24
+			}
+			
+			if (hFlip) {
+				x = 23 - x
+			}
+			
+			if (vFlip) {
+				y = 23 - y
+			}
+			
+			transformed[x + 24*y] = designData[ox + 24*oy]
+		}
+	}
+	
+	designData = transformed
+	
+	updateDesign()
+}
+
+function swapColor(color) {
+	var transformed = []
+	
+	for (var x = 0; x < 24; x++) {
+		for (var y = 0; y < 24; y++) {
+			var oi = designData[x + 24*y]
+			if (oi == color) {
+				transformed[x + 24*y] = drawingIdx
+			} else if (oi == drawingIdx) {
+				transformed[x + 24*y] = color
+			} else {
+				transformed[x + 24*y] = oi
+			}
+		}
+	}
+	
+	setDrawingIndex(color)
+	designData = transformed
+	updateDesign()
+}
+
+function setDrawingIndex(colorIndex) {
+	drawingColor = colorToCSS(colorIndex)
+	drawingIdx = colorIndex
+
+	var cells = tblColors.getElementsByTagName("td")
+	for(var i = 0; i < 16; ++i) {
+		var cell = cells[i]
+		cell.style.backgroundColor = colorToCSS(i)
+		cell.style.borderColor = (i == drawingIdx) ? "white" : "gray"
+	}
 }

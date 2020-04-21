@@ -389,7 +389,12 @@ var instructions = {
 				}
 			}
 			
-			program.push(tokenEscape(text))
+			if (productionZip) {
+				program.push("")
+			} else {
+				program.push(tokenEscape(text))
+			}
+			
 			text = ""
 		},
 		
@@ -640,6 +645,11 @@ instructions["W."] = instructions.WAIT
 instructions["'"] = instructions.REM
 
 var goWords = ["GOTO", "GOSUB", "G."]
+
+var byteTokens = ["END", "FOR", "NEXT", "INPUT", "DIM", "READ", 
+	"LET", "PUSH", "PULL", "GOTO", "IF", "THEN", "_DEFER", "RESTORE", "GOSUB", 
+	"RETURN", "REM", "STOP", "ON", "WAIT", "_NAMELIST", "_FN", "POKE", 
+	"PRINT", "CLR", "GET", "_LET"]
 
 var operators = {
     "+": { precedenceLevel: 3, evaluate: (a, b) => a + b },

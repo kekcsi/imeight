@@ -6,6 +6,8 @@ var lineNumber = 1
 var colonCount = 1
 var charsParsed = 0
 
+var productionZip = true
+
 var parseErrorHook = function(message) {}
 
 function newProgram() {
@@ -305,7 +307,19 @@ function parseInstruction(pushed, parsed, displayed, sinceChars) {
 		bugLocators.push(bugLocator)
 		bugLocators[program.length] = bugLocator
 	}
-	if (pushed) program.push(pushed)
+	if (pushed) {
+		if (productionZip) {
+			var b = byteTokens.indexOf(pushed)
+			
+			if (b == -1) {
+				b = pushed
+			}
+			
+			program.push(b)
+		} else {
+			program.push(pushed)
+		}
+	}
 }
 
 function parseToEndOfLine(deStart) {

@@ -122,7 +122,12 @@ function contProgram() {
         var token = program[programCounter]
 		if (programCounter in bugLocators) bugLocator = bugLocators[programCounter]
 
-        if (token in instructions) {
+		if (typeof token === "number") {
+			//productionZip
+			token = byteTokens[token]
+		}
+		
+		if (token in instructions) {
             var instruction = instructions[token]
             programCounter = instruction.run(programCounter)
 			
