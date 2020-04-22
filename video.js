@@ -1,6 +1,12 @@
 builtInArrays.SPRX = [] //horizontal coordinate of each sprite (-24 to 384)
 builtInArrays.SPRY = [] //vertical coordinate of each sprite (-24 to 216)
-builtInArrays.SPRDGN = [] //design pointer of each sprite
+builtInArrays.SPRDGN = [] //design pointer of each sprite (0 to 226*288)
+
+builtInArrays.TILE = [] //16+1 by 9+1 design pointers (-1 for full transparent)
+
+builtInVariables.TILEX = 0 //X offset of the tile layer for smooth scrolling
+builtInVariables.TILEY = 0 //Y offset of the tile layer for smooth scrolling
+
 builtInVariables.BACKGROUND = 0
 
 var builtInDesigns = [
@@ -42,6 +48,10 @@ for (var i in builtInDesigns) {
 
 var designs = [] //ImageData
 var sprites = [] //div
+var tiles = []
+var tileCanvas
+var tilesDirty
+var divTileGrid
 
 if (typeof commands == "object") {
 	commands.DGNS = function() {
@@ -77,6 +87,8 @@ memoryUpdateHooks.push(function(addr) {
 			sprites[i].dataset.dirty = true
 		}
 	}
+	
+	tilesDirty = true
 })
 
 varUpdateHook = function(arrayName, index) {
@@ -84,6 +96,35 @@ varUpdateHook = function(arrayName, index) {
 		//CLR
 		sprites = []
 		tabGraphic.innerHTML = ""
+		
+		divTileGrid = document.createElement('div')
+		divTileGrid.style.width = 24*17 + "px"
+		divTileGrid.style.height = 24*10 + "px"
+		divTileGrid.style.position = "absolute"
+		tabGraphic.appendChild(divTileGrid)
+		
+		tileCanvas = document.createElement('canvas')
+		tileCanvas.width = 24*17
+		tileCanvas.height = 24*10
+		tileCanvas.style.position = "absolute"
+		tileCanvas.style.top = "0px"
+		tileCanvas.style.left = "0px"
+		divTileGrid.appendChild(tileCanvas)
+		
+		for (var row = 0; row <= 9; row++) {
+			for (var col = 0; col <= 16; col++) {
+				i = [row, col]
+				tiles[i] = document.createElement('div')
+				tiles[i].style.width = 24 + "px"
+				tiles[i].style.height = 24 + "px"
+				tiles[i].style.position = "absolute"
+				tiles[i].style.left = 24*col + "px"
+				tiles[i].style.top = 24*row + "px"
+				divTileGrid.appendChild(tiles[i])
+			}
+		}
+		
+		tilesDirty = true
 	}
 	
 	if (arrayName == "SPRDGN") {
@@ -92,11 +133,17 @@ varUpdateHook = function(arrayName, index) {
 				//flickerless design swapping animations 
 				sprites[index].dataset.dirty = true
 			} else {
-				//library designs do flicker
-				sprites[index].remove()
-				delete sprites[index]
+				if (sprites[index].dataset.dgnurl != arrays.SPRDGN[index]) {
+					//library designs do flicker on change
+					sprites[index].remove()
+					delete sprites[index]
+				}
 			}
 		}
+	}
+	
+	if (arrayName == "TILE") {
+		tilesDirty = true
 	}
 }
 
@@ -138,6 +185,7 @@ pageLoadHooks.push(function() {
 	setInterval(function() {
 		tabGraphic.style.backgroundColor = colorToCSS(variables.BACKGROUND)
 		
+		// render sprites
 		for (var i in arrays.SPRY) {
 			if (i in arrays.SPRX) {
 				if (!(i in sprites)) {
@@ -155,22 +203,9 @@ pageLoadHooks.push(function() {
 					if (typeof arrays.SPRDGN[i] == "number") { //user-designed
 						var designIdx = Math.floor(arrays.SPRDGN[i]/288)
 						arrays.SPRDGN[i] = 288*designIdx //correct the alignment
-
-						if (!(designIdx in designs)) {
-							var pixels = new Uint8ClampedArray(4*24*24)
-							
-							for (var j = 0; j < 288; ++j) {
-								var addr = arrays.SPRDGN[i] + j
-								var bytes = colorToBytes(memory[addr] >> 4)
-								bytes = bytes.concat(colorToBytes(memory[addr] & 15))
-								for (var k = 0; k < 8; ++k) {
-									pixels[8*j + k] = bytes[k]
-								}
-							}
-							
-							designs[designIdx] = new ImageData(pixels, 24, 24)
-						}
 						
+						cacheDesign(designIdx)
+
 						if ("dirty" in sprites[i].dataset) {
 							var ctx = sprites[i].firstChild.getContext('2d')
 							ctx.putImageData(designs[designIdx], 0, 0)
@@ -189,13 +224,55 @@ pageLoadHooks.push(function() {
 					} else { // library design
 						sprites[i].style.background = arrays.SPRDGN[i] //url
 						sprites[i].innerHTML = ""
+						sprites[i].dataset.dgnurl = arrays.SPRDGN[i]
 					}
 				} else {
 					// default design
 					sprites[i].style.background = "url(ball24.gif)"
 					sprites[i].innerHTML = ""
+					sprites[i].dataset.dgnurl = "url(ball24.gif)"
 				}
 			}
+		} //end of sprites
+		
+		//tiles
+		divTileGrid.style.left = variables.TILEX + "px"
+		divTileGrid.style.top = variables.TILEY + "px"
+		if (tilesDirty) {
+			ctx = tileCanvas.getContext('2d')
+			for (var row = 0; row <= 9; row++) {
+				for (var col = 0; col <= 16; col++) {
+					i = [row, col]
+					if (typeof arrays.TILE[i] === "number") {
+						designIdx = Math.floor(arrays.TILE[i]/288)
+						cacheDesign(designIdx)
+						ctx.putImageData(designs[designIdx], col*24, row*24)
+						tiles[i].style.backgroundImage = ""
+					} else {
+						tiles[i].style.backgroundImage = arrays.TILE[i]
+						ctx.clearRect(col*24, row*24, 24, 24)
+					}
+				}
+			}
+			
+			tilesDirty = false
 		}
 	}, 40)
 })
+
+function cacheDesign(designIdx) {
+	if (!(designIdx in designs)) {
+		var pixels = new Uint8ClampedArray(4*24*24)
+		
+		for (var j = 0; j < 288; ++j) {
+			var addr = 288*designIdx + j
+			var bytes = colorToBytes(memory[addr] >> 4)
+			bytes = bytes.concat(colorToBytes(memory[addr] & 15))
+			for (var k = 0; k < 8; ++k) {
+				pixels[8*j + k] = bytes[k]
+			}
+		}
+		
+		designs[designIdx] = new ImageData(pixels, 24, 24)
+	}
+}
