@@ -293,8 +293,9 @@ var instructions = {
 			var startTail = text.length
 			expressionArg()
 			parseInstruction(false, false, "IF", startTail - text.length - 1)
-			var thenWord = expectOne(["THEN", "T."])
-			var deStart = deferredEvaluation(thenWord)
+			var thenWords = ["THEN", "T."]
+			var thenWord = expectOne(thenWords)
+			var deStart = deferredEvaluation(thenWords[thenWord])
 			parseToEndOfLine(deStart)
 		},
 		
@@ -418,7 +419,7 @@ var instructions = {
 			expressionArg()
 			
 			var goWord = expectOne(goWords)
-			program.push("" + goWords.indexOf(goWord))
+			program.push(goWord)
 			
 			namesArg()
 

@@ -8,7 +8,8 @@ TODO
 * Tiles
 * Text layer
 * Vector layer?
+* 8 Palettes? 0: light colors, 1-7: intensity scale of the selected RGB color in the high 8 indices
 * LOAD/SAVE memory/routines
 * Music
 * deploy script that creates im8runner.zip
-* design copy-paste
+* designtouch/mouse control

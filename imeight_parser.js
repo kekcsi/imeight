@@ -127,7 +127,7 @@ function tryPrefix(pfx, fragment) {
     } else {
 		fragment = fragment.trim()
 
-		if (fragment.startsWith(pfx)) {
+		if (fragment.toUpperCase().startsWith(pfx)) {
 			fragment = fragment.substring(pfx.length)
 			return fragment
 		}
@@ -153,15 +153,11 @@ function expectOne(arr) {
 		
 		var rest = tryPrefix(pfx)
 		if (rest !== false) {
-			return pfx
+			return idx
 		}
 	}
 
 	parseError("SYNTAX")
-}
-
-function isName(ch) {
-    return "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".includes(ch)
 }
 
 function expressionArg(fragment) {
@@ -189,7 +185,7 @@ function expressionArgUpTo(endPrecedence, fragment) {
 					continue
 				}
 				
-                if (fragment.startsWith(operator)) {
+                if (fragment.toUpperCase().startsWith(operator)) {
                     while (shunt.length > 0 && operators[shunt[shunt.length - 1]].precedenceLevel <= operators[operator].precedenceLevel) {
                         program.push(shunt.pop())
                     }
@@ -230,11 +226,11 @@ function extractExpression(fragment) {
             prefix = token + "(" //spaces in between are _not_ allowed
         }
  
-        if (fragment.startsWith(prefix)) {
+        if (fragment.toUpperCase().startsWith(prefix)) {
             fragment = fragment.substring(prefix.length)
             fragment = expressionArg(fragment)
             fragment = expect(")", fragment)
-                     
+            
             program.push(token + "(")
                       
             return fragment
@@ -323,14 +319,14 @@ function parseInstruction(pushed, parsed, displayed, sinceChars) {
 }
 
 function parseToEndOfLine(deStart) {
-    text = text.trim().toUpperCase()
+    text = text.trim()
 
     while (text.length > 0) {
 		instructionPushed = false
                   
         for (var instruction in instructions) {
 			if ("parse" in instructions[instruction]) {
-				if (text.startsWith(instruction)) {
+				if (text.toUpperCase().startsWith(instruction)) {
 					text = text.substring(instruction.length)
 					parseInstruction(instruction, instruction, instruction, instruction.length)
 					instructionPushed = true
