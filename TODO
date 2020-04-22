@@ -5,11 +5,11 @@ TODO
 		* Tutor button belongs outside list tab
 		* Add forum post button
 		* design download links
-* Tiles
+* Tiles: example in tutorial
 * Text layer
 * Vector layer?
 * 8 Palettes? 0: light colors, 1-7: intensity scale of the selected RGB color in the high 8 indices
-* LOAD/SAVE memory/routines
+* LOAD/SAVE memory/routines: https://restdb.io/ ?
 * Music
 * deploy script that creates im8runner.zip
 * designtouch/mouse control

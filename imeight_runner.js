@@ -177,7 +177,7 @@ function evaluateDataInstruction() {
 	if (!Array.isArray(argumentStack[argumentStack.length - 1])) {
 		//there was no comma operator in the DATA argument, only a single element
 		//make it a singleton list
-		argumentStack[argumentStack.length - 1] = [argumentStack[argumentStack.length - 1]]
+		argumentStack[argumentStack.length - 1] = [getValue(argumentStack[argumentStack.length - 1])]
 	}
 }
 

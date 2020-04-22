@@ -167,6 +167,9 @@ function expressionArg(fragment) {
 function expressionArgUpTo(endPrecedence, fragment) {
     if (fragment === undefined) {
         text = expressionArgUpTo(endPrecedence, text)
+		if (text === undefined) {
+			text = ""
+		}
     } else {
         var shunt = []
  

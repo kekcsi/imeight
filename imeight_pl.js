@@ -169,6 +169,9 @@ var instructions = {
 				}
 				
 				videoPrint(response.italics())
+				if (!isNaN(response)) {
+					response = +response
+				}
 				target.array[target.index] = response
 				eventQueue = [] //don't let GET capture what is already processed
 				contProgram()
