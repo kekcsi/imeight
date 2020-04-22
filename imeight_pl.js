@@ -418,7 +418,7 @@ var instructions = {
 			expressionArg()
 			
 			var goWord = expectOne(goWords)
-			program.push(goWords.indexOf(goWord))
+			program.push("" + goWords.indexOf(goWord))
 			
 			namesArg()
 
