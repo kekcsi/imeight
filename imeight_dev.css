@@ -131,6 +131,8 @@ button.tab {
 
 #divOutput div {
 	white-space: pre;
+	line-height: 15px;
+	height: 15px;
 }
 
 #divTutor {

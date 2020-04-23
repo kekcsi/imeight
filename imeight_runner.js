@@ -97,6 +97,10 @@ function evaluateOperator(token) {
 	var b = getValue(argumentStack.pop())
 	var a = getValue(argumentStack.pop())
 
+	if (a === undefined || b === undefined) {
+		return
+	}
+
 	var result = o.evaluate(a, b)
 
 	if (result === undefined) {

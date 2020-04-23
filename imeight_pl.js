@@ -717,7 +717,7 @@ var builtInFunctions = {
     "LEFT$": { apply: arg => ("" + arg[0]).substr(0, arg[1]) },
     "RIGHT$": { apply: arg => ("" + arg[0]).substring(arg[0].length - arg[1]) },
     "MID$": { apply: arg => ("" + arg[0]).substr(arg[1] - 1, arg[2]) },
-    "TIME$": { apply: arg => new Date(arg == []?Date.now():arg).toUTCString().replace(/ GMT$/, '').toUpperCase() },
+    "TIME$": { apply: arg => new Date((Array.isArray(arg) && arg.length < 1)?Date.now():arg).toUTCString().replace(/ GMT$/, '').toUpperCase() },
 	TIME: { apply: function() { return Date.now() } },
     _PAREN: {
         listAs: "(", //explicitly marked parentheses - omit keyword in listing 

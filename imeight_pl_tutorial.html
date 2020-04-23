@@ -1165,9 +1165,9 @@ GOTO LOOP</div>
 <h3>Motivation</h3>
 <p>Busy loops without any WAIT in them run for times highly dependent on the 
 configuration that runs the program.</p>
-<div class="code">REM<i> * PROCESSOR HEATING CODE *</i>
-@BUSYLOOP:GOTO BUSYLOOP<hr/>@FRIENDLYLOOP:WAIT:GOTO FRIENDLYLOOP
-'<i>CPU IS COOLER AND PROGRAM STOPPABLE: HIT ESC ON THE COMMAND LINE</i></div>
+<div class="code">REM<i> * PROCESSOR HEATING CODE RUNS FOR 1 S ON MY LAPTOP, HOW ABOUT YOURS? *</i>
+FOR I=0 TO 2600000:NEXT<hr/>FOR I=0 TO 50:WAIT:NEXT
+'<i>CPU IS COOLER AND PROGRAM RUNS FOR 1 SECOND</i></div>
 
 <h3>Clearing Past Events</h3>
 <div class="code">FOR I=1 TO 500:WAIT:N. '<i>WAIT 10 SECS: USER MAY HIT KEYS MEANWHILE</i>
