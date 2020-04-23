@@ -532,10 +532,11 @@ var instructions = {
 					var saveX = []
 					
 					for (i in fnParams) {
-						var fnParam = fnParams[i]
-						
-						saveX[i] = variables[fnParam]
-						variables[fnParam] = arg[i]
+						if (i in arg) {
+							var fnParam = fnParams[i]
+							saveX[i] = variables[fnParam]
+							variables[fnParam] = arg[i]
+						}
 					}
 					
 					var evalPC = pc + 1
@@ -552,6 +553,10 @@ var instructions = {
 						var fnParam = fnParams[i]
 						
 						variables[fnParam] = saveX[i]
+						
+						if (variables[fnParam] === undefined) {
+							delete variables[fnParam]
+						}
 					}
 					
 					return popAndEvaluate()

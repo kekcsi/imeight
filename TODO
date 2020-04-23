@@ -12,4 +12,8 @@ TODO
 * LOAD/SAVE memory/routines: https://restdb.io/ ?
 * Music
 * deploy script that creates im8runner.zip
-* designtouch/mouse control
+* design touch/mouse control
+* to forum:
+		* games: graphic Hanoi
+		* routines: collisions
+* tutor in new window when in iframe/small screen (position:fixed; right:4px?)

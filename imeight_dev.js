@@ -27,15 +27,20 @@ function designerTab() { selectTab("Designer") }
 function tutorRight() {
 	divTutor.style.display = "block"
     divTutor.style.top = "8px"
-    divTutor.style.left = "624px"
+    divTutor.style.right = "4px"
+    divTutor.style.bottom = ""
+    divTutor.style.left = ""
 	btnTutorRight.style.display = "none"
 	btnTutorBelow.style.display = "inline"
 }
 
 function tutorBelow() {
+	document.body.height = "100%"
 	divTutor.style.display = "block"
-    divTutor.style.top = "386px"
-    divTutor.style.left = "8px";
+	divTutor.style.top = "384px"
+	divTutor.style.right = ""
+    divTutor.style.bottom = ""
+    divTutor.style.left = "8px"
 	btnTutorRight.style.display = "inline"
 	btnTutorBelow.style.display = "none"
 }
@@ -138,6 +143,7 @@ function goLine(target, selectIt) {
 
 videoPrint = function(message) {
 	while (divOutput.childElementCount >= 20) {
+		console.log("scrolled out " + divOutput.firstChild.innerText)
 		divOutput.removeChild(divOutput.firstChild)
 	}
 	divOutput.innerHTML = divOutput.innerHTML + "<div>" + message + "&nbsp;</div>"

@@ -143,7 +143,8 @@ Command Line, press Enter.</p>
 &bull;	<a href="#2002">TIME and TIME$</a>
 &bull;	<a href="#2003">Sprites!</a>
 &bull;	<a href="#2004">Colors!</a>
-&bull;	<a href="#2005">Pixel Data Animations</a></div>
+&bull;	<a href="#2005">Pixel Data Animations</a>
+&bull;	<a href="#2006">Tiles</a></div>
 </div>
 <div class="toccontainer">
 <h3>Reference Sheet Index</h3><div class="contents">
@@ -258,7 +259,9 @@ PRINT "(__/          (_/         (____/"</div>
 Command Line the same order as in the Program Listing, which we call the normal
 program flow. Another take-away is that the writer of this paper has substandard
 drawing skills.</p>
-
+<p>I have <a href="https://im8.boards.net/post/2/thread" target="_blank">a 
+forum topic</a> for you in case you want to tell the world how you 
+accomplished this task. Time to contact fellow imeight programmers!</p>
 <h2><a name="126">Names</a></h2>
 <p>
 In the INPUT examples we could see that there are variables named A and B, which help us store numbers.
@@ -1454,5 +1457,58 @@ REM<i> TO KEEP FOOT ON THE GROUND, MOVE THE SPRITE 3 PIXELS AHEAD PER FRAME</i>
 DATA 0,0,0,0,0,221,208,0,0,0,0,0,0,0,0,0,13,0,221,0,0,0,0,0,0,0,0,0,13,0,0,208,0,0,0,0,0,0,0,0,13,0,13,208,0,0,0,0,0,0,0,0,0,208,208,0,0,0,0,0,0,0,0,0,0,13,0,0,0,0,0,0,0,0,0,0,13,221,0,0,0,0,0,0,0,0,0,0,13,208,208,0,0,0,0,0,0,0,0,0,208,208,13,0,0,0,0,0,0,0,0,0,208,208,13,0,0,0,0,0,0,0,0,0,13,208,13,208,0,0,0,0,0,0,0,0,13,221,221,221,0,0,0,0,0,0,0,0,13,0,0,208,0,0,0,0,0,0,0,0,0,221,208,13,208,0,0,0,0,0,0,0,13,13,13,208,13,0,0,0,0,0,0,0,13,13,0,13,0,208,0,0,0,0,0,0,208,208,0,13,0,208,0,0,0,0,0,0,208,208,0,208,13,0,0,0,0,0,0,13,13,0,13,13,208,0,0,0,0,0,0,13,13,0,13,0,208,0,0,0,0,0,0,208,208,0,0,208,13,0,0,0,0,0,13,0,208,0,0,13,208,0,0,0,0,0,0,208,13,0,0,0,0,0,0,0,0,0,0,13,221,0,0,0,0,0,0,0
 REM<i> NORMALLY YOU WOULD USE THE DESIGNER TO PREDESIGN ANIMATION FRAMES</i>
 REM<i> BUT IN THIS TUTORIAL, IT'S EASIER TO COPY INSTRUCTIONS THAN MEMORY</i></div>
+
+<h2><a name="2006">Tiles</a></h2>
+<p>You can put any number of sprites on screen... but it may become cumbersome
+to move a lot of them together. A typical example is when you have a
+scrolled maze, platform or background in the game. For that purpose, we have 
+smoothly scrollable grid of tiles.</p>
+<div class="code">DIM MAZE(16,16)
+FOR RO=0 TO 15:FOR CO=0 TO 15
+    READ MAZE(RO,CO)
+N.:N.
+TILEX=0:TILEY=0 '<i>BUILT-IN VARIABLE - TRANSLATES THE WHOLE GRID OF DESIGNS</i>
+OX=0:OY=7
+FOR X=0 TO 15:FOR Y=0 TO 8
+  TILE(Y,X)=-1 '<i>BUILT-IN ARRAY OF DESIGN POINTERS - GETS VALUES LIKE SPRDGN()</i>
+  IF MAZE(Y+OY,X+OX) THEN TILE(Y,X)=DGNWALL()
+N.:N.
+PRINT "SWITCH TO GRAPHIC SCREEN AND HIT A BUTTON"
+@TRIG:WAIT:GET A:IF A&lt;=0 THEN GOTO TRIG
+REM<i> SMOOTH SCROLLING OF TILES</i>
+FOR OY=OY-1 TO 0 STEP -1
+	FOR X=0 TO 15:FOR Y=9 TO 1 STEP -1
+		TILE(Y,X)=TILE(Y-1,X) '<i>MOVE EVERY TILE A ROW LOWER</i>
+	N.:N.
+	FOR X=0 TO 15 '<i>GET A NEW ROW FROM THE ARRAY</i>
+		TILE(Y,X)=-1
+		IF MAZE(Y+OY,X+OX) THEN TILE(Y,X)=DGNWALL()
+	N.
+	TILEY=-23 '<i>RASTER-BY-RASTER SCROLLING STARTS 1 RASTER ABOVE PREVIOUS STATE</i>
+	FOR SM=0 TO 23
+		WAIT:WAIT
+		TILEY=TILEY+1
+	NEXT
+NEXT
+TILEY=0
+FOR I=0 TO 20:WAIT:WAIT:NEXT
+END
+REM<i> https://im8.boards.net/post/14</i>
+DATA 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 
+DATA 1,0,1,1,1,0,1,0,0,0,1,0,1,0,0,1 
+DATA 1,0,1,0,1,0,1,1,1,0,0,0,0,0,1,1 
+DATA 1,0,0,0,0,0,0,0,1,1,1,1,1,0,0,1 
+DATA 1,0,1,1,1,1,0,1,1,0,1,0,1,0,1,1 
+DATA 1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,1 
+DATA 1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1 
+DATA 1,1,1,0,1,0,1,0,1,0,1,0,1,0,0,1 
+DATA 1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1 
+DATA 1,0,0,1,0,1,0,1,0,1,1,1,1,0,0,1 
+DATA 1,1,0,1,1,1,1,1,1,1,1,0,1,0,1,1 
+DATA 1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1 
+DATA 1,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1 
+DATA 1,1,0,1,0,1,1,0,1,1,0,0,0,1,0,1 
+DATA 1,0,0,0,0,0,0,0,0,0,0,1,0,1,0,1 
+DATA 1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1</div>
 </body>
 </html>
