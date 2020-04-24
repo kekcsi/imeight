@@ -277,7 +277,8 @@ INPUT INCOME2020</div></li>
 <li> The name optionally ends in one $ or one % sign.
 Convention is that the name ends in $ if it is supposed to have a text value rather than number.
 The % sign suggests integer number value.
-<div class="code">INPUT N%:INPUT TEXT$</div></li>
+<div class="code">INPUT N%
+INPUT TEXT$</div></li>
 </ol>
 <p>These rules not only apply to variable names, but also function names and array names, which are covered later.</p>
 
@@ -1470,8 +1471,8 @@ N.:N.
 TILEX=0:TILEY=0 '<i>BUILT-IN VARIABLE - TRANSLATES THE WHOLE GRID OF DESIGNS</i>
 OX=0:OY=7
 FOR X=0 TO 15:FOR Y=0 TO 8
-  TILE(Y,X)=-1 '<i>BUILT-IN ARRAY OF DESIGN POINTERS - GETS VALUES LIKE SPRDGN()</i>
-  IF MAZE(Y+OY,X+OX) THEN TILE(Y,X)=DGNWALL()
+	TILE(Y,X)=-1 '<i>BUILT-IN ARRAY OF DESIGN POINTERS</i>
+	IF MAZE(Y+OY,X+OX) THEN TILE(Y,X)=DGNWALL()
 N.:N.
 PRINT "SWITCH TO GRAPHIC SCREEN AND HIT A BUTTON"
 @TRIG:WAIT:GET A:IF A&lt;=0 THEN GOTO TRIG
@@ -1484,8 +1485,8 @@ FOR OY=OY-1 TO 0 STEP -1
 		TILE(Y,X)=-1
 		IF MAZE(Y+OY,X+OX) THEN TILE(Y,X)=DGNWALL()
 	N.
-	TILEY=-23 '<i>RASTER-BY-RASTER SCROLLING STARTS 1 RASTER ABOVE PREVIOUS STATE</i>
-	FOR SM=0 TO 23
+	TILEY=-23 '<i>TILES ARE A ROW = 24 RASTERS LOWER THAN BEFORE, MAKE IT 1</i>
+	FOR SM=0 TO 23  '<i>SCROLL RASTER BY RASTER UNTIL A ROW GOES OFF SCREEN</i>
 		WAIT:WAIT
 		TILEY=TILEY+1
 	NEXT
@@ -1493,7 +1494,7 @@ NEXT
 TILEY=0
 FOR I=0 TO 20:WAIT:WAIT:NEXT
 END
-REM<i> https://im8.boards.net/post/14</i>
+REM<i> <a href="https://im8.boards.net/post/14" target="_blank">GENERATED: https://im8.boards.net/post/14</a></i>
 DATA 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 
 DATA 1,0,1,1,1,0,1,0,0,0,1,0,1,0,0,1 
 DATA 1,0,1,0,1,0,1,1,1,0,0,0,0,0,1,1 
@@ -1510,5 +1511,9 @@ DATA 1,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1
 DATA 1,1,0,1,0,1,1,0,1,1,0,0,0,1,0,1 
 DATA 1,0,0,0,0,0,0,0,0,0,0,1,0,1,0,1 
 DATA 1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1</div>
+<p>TILE array is indexed with row and column number. If you fill it with 
+design pointers similar to those of SPRDGN, a grid of designs will appear on 
+the graphical screen, altogether offset by the values in variables TILEX and 
+TILEY. Smooth scrolling means to change the TILEX or TILEY in small steps.</p>
 </body>
 </html>

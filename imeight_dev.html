@@ -26,7 +26,9 @@
 				elseBranches = JSON.parse(document.scripts.namedItem("elseBranchesJson").text)
 				memory = JSON.parse(document.scripts.namedItem("memoryJson").text)
 				var interact = runProgram
-				var outputTab = function() {}
+				var inputAction = interact
+				function outputTab() {}
+				function updateDownloadBlob() {}
 				pageLoadHooks.push(runProgram)
 			</script>
 			<style type="text/css">
@@ -40,7 +42,7 @@
 			</style>
 		</head>
 		<body onload="pageLoad()" topmargin="0" leftmargin="0">
-			<div id="tabGraphic"></div>
+			<div tabindex="0" id="tabGraphic"></div>
 		</body>
 	--></script>
 
