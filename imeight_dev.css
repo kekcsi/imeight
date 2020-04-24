@@ -117,6 +117,27 @@ button.tab {
 	font-size: 13px;
 }
 
+#tabMisc {
+	font-family: monospace;
+	font-size: 13px;
+	height: 304px;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	padding: 8px;
+}
+
+#tabMisc a:link, #tabMisc a:visited {
+	color: orange;
+}
+
+#tabMisc input {
+	border: 1px solid orange;
+	background: black;
+	width: 300px;
+	margin: 2px 0 0 0;
+	padding: 0;
+}
+
 #inputButtons {
 	position: absolute;
 	right: 0px;
@@ -163,4 +184,38 @@ iframe {
 	margin:52px auto;
 	position:relative;
 	overflow:hidden;
+}
+
+input.toggle {
+	opacity: 0;
+    width: 0;
+    height: 0;
+	border: none;
+}
+
+label.toggle {
+	position: relative;
+	top: 0;
+	left: 0;
+}
+
+span.toggle {
+	border: 1px solid orange;
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+
+#tabMisc span.toggle {
+	width: 300px;
+}
+
+#tabMisc td {
+	height: 19px;
+	margin: 0;
+	padding: 0 8px 0 0;
+}
+
+input:checked + span.toggle {
+	background: orange;
 }

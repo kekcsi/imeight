@@ -54,6 +54,7 @@
     	<button id="btnOutput" onclick="outputTab()" class="tab" style="border-style:outset">Command Line</button>
     	<button id="btnGraphic" onclick="graphicTab()" class="tab" style="border-style:outset">Graphic Screen</button>
     	<button id="btnDesigner" onclick="designerTab()" class="tab" style="border-style:outset">Designer</button>
+    	<button id="btnMisc" onclick="miscTab()" class="tab" style="border-style:outset">Misc.</button>
     	<div class="dark" id="tabProgram">
     		<textarea id="taList"></textarea><div>
     		<input id="inLine" size="5" type="text" onchange="goLine(this.value)"/>
@@ -725,7 +726,7 @@
 				<button id="btnDesignClear" onclick="clearDesigner()" title="Clear Designer">CLEAR</button>
 				<button id="btnDesignPut" onclick="designToMemory()" title="Update Memory from Designer">PUT</button>
 				<button id="btnDesignGet" onclick="designFromMemory()" title="Reset Designer from Memory">GET</button>
-				<label title="Put design back to its original place automatically. Untick to enable moving the design to a different memory slot."><input type="checkbox" id="cbGetDesign" checked="true"/>Auto</label>
+				<label class="toggle" style="width:24px" title="Put design back to its original place automatically. Untick to enable moving the design to a different memory slot."><input type="checkbox" class="toggle" id="cbGetDesign" checked="true"/><span class="toggle">Auto</span></label>
 				<button id="btnHFlip" onclick="transformDesign(true, false, false, 0, 0)">H-FLIP</button>
 				<button id="btnVFlip" onclick="transformDesign(false, true, false, 0, 0)">V-FLIP</button>
 				<button id="btnRot" onclick="transformDesign(false, true, true, 0, 0)">ROT</button>
@@ -995,6 +996,42 @@
 				</tr>
 			</table>
 		</div>
+    	<div class="dark" id="tabMisc" style="display:none">
+			<p><b>Credits:</b> kekcsi - imeight creator</p>
+			<p><b>Forum:</b> 
+			<a href="https://im8.boards.net/" target="_blank">connect with 
+			imeight users, creators and friends</a></p>
+			<p><b>Download Configuration</b></p>
+			<table cellspacing="0" border="0">
+				<tr>
+					<td>Base URL</td>
+					<td><input id="inBaseUrl"/></td>
+				</tr>
+				<tr>
+					<td>Graphics zoom</td>
+					<td><label class="toggle"><input class="toggle" type="checkbox" id="inZoom"/><span class="toggle">&nbsp;</div></label></td>
+				</tr>
+				<tr>
+					<td>Palette</td>
+					<td><input id="inPalette"/></td>
+				</tr>
+				<tr>
+					<td>Text Screen</td>
+					<td><label class="toggle"><input class="toggle" type="checkbox" id="inTextScreen"/><span class="toggle">&nbsp;</div></label></td>
+				</tr>
+			</table>
+			<p>
+				<a id="download_link" download="index.html" href="javascript:alert('First write a program.')" title="The tokenized program with the current memory content, for publishing as a static web page.">Download Program</a>
+				<a href="im8runner.zip" title="The built-in designs and runner code in a zip.">Download Environment</a>
+				<a href="https://im8.boards.net/post/7/thread" target="_blank">Help</a>
+			</p>
+			<p><b>Copyright.</b> Use the software and derived works for anything, 
+			including - but not limited to - commercial, educational or 
+			mean purposes (at your own risk); in modified or original form,
+			with correct or false attribution. Copyright text is allowed to be 
+			removed or replaced in copies and derived works. Absolutely no 
+			warranties and blah blah blah. No rights reserved.</p>
+		</div>
     </div>
     <div id="divTutor" style="display:none" class="win">
 		<iframe id="taTutor" src="imeight_pl_tutorial.html"></iframe>
@@ -1002,10 +1039,6 @@
     		<button onclick="divTutor.style.display='none'">Hide</button>
     		<button onclick="taTutor.src='imeight_pl_tutorial.html#contents'">Contents</button>
     	</div>
-    </div>
-	<div>
-		<a id="download_link" download="index.html" href="" title="The tokenized program with the current memory content, for publishing as a static web page.">Download Program</a>
-		<a href="im8runner.zip" title="The built-in designs and runner code in a zip.">Download Environment</a>
     </div>
 </body>		
 </html>

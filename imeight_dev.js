@@ -23,6 +23,7 @@ function programTab() { selectTab("Program") }
 function outputTab() { selectTab("Output") }
 function graphicTab() { selectTab("Graphic") }
 function designerTab() { selectTab("Designer") }
+function miscTab() { selectTab("Misc") }
 
 function tutorRight() {
 	divTutor.style.display = "block"
@@ -50,7 +51,8 @@ pageLoadHooks.push(function() {
 		Program: { btn: btnProgram, tab: tabProgram, focused: taList }, 
 		Output: { btn: btnOutput, tab: tabOutput, focused: inUserInput }, 
 		Graphic: { btn: btnGraphic, tab: tabGraphic, focused: tabGraphic }, 
-		Designer: { btn: btnDesigner, tab: tabDesigner, focused: tabDesigner }
+		Designer: { btn: btnDesigner, tab: tabDesigner, focused: tabDesigner },
+		Misc: { btn: btnMisc, tab: tabMisc, focused: tabMisc }
 	}
 
 	btnTutorBelow.addEventListener("mouseout", function(event) {

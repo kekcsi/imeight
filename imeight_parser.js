@@ -357,8 +357,6 @@ function parseToEndOfLine(deStart) {
 	elseBranches[deStart] = program.length + 1
 }
 
-var urlbase = ""
-
 function updateDownloadBlob() {
 	var i = memory.length - 1
 	while (i >= 0 && !memory[i]) { // skip over 0's and nulls and undefined stuff
@@ -368,7 +366,7 @@ function updateDownloadBlob() {
 
 	var lwrunner = document.scripts.namedItem("lwrunnerTmpl").text
 	lwrunner = lwrunner.substring(5, lwrunner.length - 4)
-	lwrunner = lwrunner.replace(/[<][?]=urlbase[?][>]/g, urlbase)
+	lwrunner = lwrunner.replace(/[<][?]=urlbase[?][>]/g, inBaseUrl.value)
 	var spec = lwrunner
 	spec = spec.replace(/[<][?]=\s*programJson\s*[?][>]/g, JSON.stringify(program))
 	spec = spec.replace(/[<][?]=\s*labelsJson\s*[?][>]/g, JSON.stringify(labels))
