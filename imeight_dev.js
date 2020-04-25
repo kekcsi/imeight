@@ -98,6 +98,7 @@ pageLoadHooks.push(function() {
 	taList.addEventListener("change", function() { 
 		listClean = false
 
+		if (window.navigator.userAgent.indexOf("Edge/") >= 0) return
 		localStorage.setItem("proglist", taList.value)
 	})
 
@@ -106,7 +107,6 @@ pageLoadHooks.push(function() {
 	
 	//Edge will fill the form automatically by default
 	if (window.navigator.userAgent.indexOf("Edge/") >= 0) return
-		
 	taList.value = localStorage.getItem("proglist")
 })
 

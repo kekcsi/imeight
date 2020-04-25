@@ -6,15 +6,20 @@ var selDesign = 0
 var designerDirty = false
 var thumbsDirty = true
 
+var mouseButtons = 0 // instead of event.buttons for Edge compatibility
+
 memoryUpdateHooks.push(function() {
 	thumbsDirty = true
 })
 
 setInterval(function() {
 	if (designerDirty) {
-		localStorage.setItem("designdata", JSON.stringify(designData))
-		localStorage.setItem("seldesign", selDesign)
-		localStorage.setItem("memory", JSON.stringify(memory))
+		if (window.navigator.userAgent.indexOf("Edge/") < 0 || window.location.protocol != "file:") {
+			localStorage.setItem("designdata", JSON.stringify(designData))
+			localStorage.setItem("seldesign", selDesign)
+			localStorage.setItem("memory", JSON.stringify(memory))
+		}
+
 		designerDirty = false
 	}
 	
@@ -36,7 +41,7 @@ function sprEdit(ev) {
 	
 	var i = ev.target.dataset.idx
 
-	if (ev.buttons > 0) {
+	if (mouseButtons > 0 || ev.buttons > 0) {
 		ev.target.style.backgroundColor = drawingColor
 		designData[i] = drawingIdx
 	}
@@ -75,7 +80,16 @@ pageLoadHooks.push(function() {
 		} else {
 			memory = JSON.parse(memoryJson)
 		}
-    }
+    } else {
+		clearDesigner()
+	}
+
+	document.body.addEventListener("mousedown", function(ev) {
+		mouseButtons = 1
+	})
+	document.body.addEventListener("mouseup", function(ev) {
+		mouseButtons = 0
+	})
 	
 	var pixCells = tblDesigner.getElementsByTagName("td")
 	for(var i = 0; i < pixCells.length; ++i) {
@@ -115,7 +129,9 @@ pageLoadHooks.push(function() {
 		})
 	}
 	
-	inMove.addEventListener("keyup", function(event) {
+	inMove.addEventListener("keydown", function(event) {
+		event.preventDefault()
+		
 		if (event.keyCode == 38) { //up
 			transformDesign(false, false, false, 0, -1)
 		}
@@ -134,8 +150,10 @@ pageLoadHooks.push(function() {
 		if (event.keyCode >= 65 && event.keyCode <= 71) { //A-F
 			swapColor(event.keyCode - 55)
 		}
-		inMove.value = "MOVE"
+		inMove.value = "<>"
 	})
+
+	inMove.value = "<>"
 })
 
 function designToMemory(designIdx) {

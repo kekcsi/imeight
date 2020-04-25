@@ -358,11 +358,21 @@ function parseToEndOfLine(deStart) {
 }
 
 function updateDownloadBlob() {
-	var i = memory.length - 1
-	while (i >= 0 && !memory[i]) { // skip over 0's and nulls and undefined stuff
+	var i = memory.length
+	var shrunk = []
+	while (i > 0) {
 	    i--
+		
+		// skip over trailing 0's and nulls and undefined stuff
+		if (!shrunk.length && memory[i]) { 
+			shrunk = memory.slice(0, i + 1)
+		}
+
+		// replace nulls in gaps with the shorter 0 literal
+		if (shrunk.length && !memory[i]) {
+			shrunk[i] = 0
+		}
 	}
-	var shrunk = memory.slice(0, i + 1)
 
 	var lwrunner = document.scripts.namedItem("lwrunnerTmpl").text
 	lwrunner = lwrunner.substring(5, lwrunner.length - 4)

@@ -1,4 +1,7 @@
 TODO
+* nulls in memory downloaded!
+* fix Edge designer
+* font editor
 * Look redesign
 		* graphics zoom 2 by 2
 		* dynamic screen size for editor
@@ -14,6 +17,5 @@ TODO
 * deploy script that creates im8runner.zip
 * design touch/mouse control
 * to forum:
-		* games: graphic Hanoi
-		* routines: collisions
-* tutor in new window when in iframe/small screen (position:fixed; right:4px?)
+		* routines: collisions, physics
+		* memory dump: chess set and letters
