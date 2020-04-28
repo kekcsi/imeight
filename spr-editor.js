@@ -147,8 +147,8 @@ function clearDesignModes() {
 }
 
 pageLoadHooks.push(function() {
-	designModes = [{ tab: tabSprTile, put: sprToMemory, get: sprFromMemory, data: designData, thumb: sprThumb }, 
-			{ tab: tabFont, put: fontToMemory, get: fontFromMemory, data: fontData, thumb: fontThumb }]
+	designModes = [{ tab: tabSprTile, put: sprToMemory, get: sprFromMemory, data: "designData", thumb: sprThumb }, 
+			{ tab: tabFont, put: fontToMemory, get: fontFromMemory, data: "fontData", thumb: fontThumb }]
 	
 	clearDesigner()
 	clearDesignModes()
@@ -417,7 +417,7 @@ function fontThumb(designIndex, thumb) {
 function transformDesign(hFlip, vFlip, transpose, dx, dy) {
 	var transformed = []
 	
-	var data = designModes[designModeMap[selSlot]].data
+	var data = window[designModes[designModeMap[selSlot]].data]
 	var sz = Math.sqrt(data.length)
 	
 	for (var ox = 0; ox < sz; ox++) {
