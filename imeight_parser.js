@@ -383,6 +383,7 @@ function updateDownloadBlob() {
 	spec = spec.replace(/[<][?]=\s*dataLookupJson\s*[?][>]/g, JSON.stringify(dataLookup))
 	spec = spec.replace(/[<][?]=\s*elseBranchesJson\s*[?][>]/g, JSON.stringify(elseBranches))
 	spec = spec.replace(/[<][?]=\s*memoryJson\s*[?][>]/g, JSON.stringify(shrunk))
+	spec = spec.replace(/[<][?]=\s*music\s*[?][>]/g, inMusic.value)
 	var data = new Blob([spec], {type: 'text/html'})
 	var url = window.URL.createObjectURL(data)
 	document.getElementById('download_link').href = url

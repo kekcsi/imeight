@@ -126,7 +126,11 @@ button.tab {
 	padding: 8px;
 }
 
-#tabMisc a:link, #tabMisc a:visited {
+a:link, a:visited {
+	color: black;
+}
+
+.dark a:link, .dark a:visited {
 	color: orange;
 }
 

@@ -1,21 +1,16 @@
 TODO
-* nulls in memory downloaded!
-* fix Edge designer
 * font editor
+* music
+* design touch/mouse control
 * Look redesign
 		* graphics zoom 2 by 2
 		* dynamic screen size for editor
 		* Tutor button belongs outside list tab
-		* Add forum post button
-		* design download links
-* Tiles: example in tutorial
 * Text layer
 * Vector layer?
 * 8 Palettes? 0: light colors, 1-7: intensity scale of the selected RGB color in the high 8 indices
 * LOAD/SAVE memory/routines: https://restdb.io/ ?
-* Music
 * deploy script that creates im8runner.zip
-* design touch/mouse control
 * to forum:
 		* routines: collisions, physics
 		* memory dump: chess set and letters
