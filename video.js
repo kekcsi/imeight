@@ -1,13 +1,18 @@
+builtInVariables.BACKGROUND = 0 //color
+
 builtInArrays.SPRX = [] //horizontal coordinate of each sprite (-24 to 384)
 builtInArrays.SPRY = [] //vertical coordinate of each sprite (-24 to 216)
 builtInArrays.SPRDGN = [] //design pointer of each sprite (0 to 226*288)
 
 builtInArrays.TILE = [] //16+1 by 9+1 design pointers (-1 for full transparent)
-
 builtInVariables.TILEX = 0 //X offset of the tile layer for smooth scrolling
 builtInVariables.TILEY = 0 //Y offset of the tile layer for smooth scrolling
 
-builtInVariables.BACKGROUND = 0
+builtInVariables.CHARGEN = -1 //pointer to font for the character generator
+builtInVariables.TEXTX = 0 //text layer X offset
+builtInVariables.TEXTY = 0 //text layer Y offset
+builtInVariables.TEXTCOLOR = 0
+builtInArrays.TEXTLINES = [] //27+1 strings, 48+1 chars each
 
 var builtInDesigns = [
     "ball24",
@@ -52,6 +57,10 @@ var tiles = []
 var tileCanvas
 var tilesDirty
 var divTileGrid
+var glyphs = [] //36*ImageData
+var glyphsDirty = false
+var textCanvas
+var textDirty = false
 
 if (typeof commands == "object") {
 	commands.DGNS = function() {
@@ -125,6 +134,14 @@ varUpdateHook = function(arrayName, index) {
 		}
 		
 		tilesDirty = true
+		
+		textCanvas = document.createElement('canvas')
+		textCanvas.width = 8*49
+		textCanvas.height = 8*28
+		textCanvas.style.position = "absolute"
+		textCanvas.style.top = "0px"
+		textCanvas.style.left = "0px"
+		tabGraphic.appendChild(textCanvas)
 	}
 	
 	if (arrayName == "SPRDGN") {
@@ -144,6 +161,14 @@ varUpdateHook = function(arrayName, index) {
 	
 	if (arrayName == "TILE") {
 		tilesDirty = true
+	}
+	
+	if (arrayName == "TEXTLINES") {
+		textDirty = true
+	}
+	
+	if ((index == "CHARGEN" || index == "TEXTCOLOR") && !arrayName) {
+		glyphsDirty = true
 	}
 }
 
@@ -256,6 +281,60 @@ pageLoadHooks.push(function() {
 			}
 			
 			tilesDirty = false
+		}
+
+		if (variables.CHARGEN in memory) {
+			if (glyphsDirty) {
+				var startAddress = variables.CHARGEN
+
+				for (var gi = 0; gi < 36; gi++) {
+					var ba = new Uint8ClampedArray(4*8*8)
+					
+					for (var ro = 0; ro < 8; ro++) {
+						var by = memory[startAddress + gi*8 + ro]
+
+						for (var co = 0; co < 8; co++) {
+							var bit = ((by>>(7 - co))&1)
+							
+							var tup = colorToBytes(variables.TEXTCOLOR)
+							tup[3] = (bit ? 255 : 0)
+							
+							for (var k = 0; k < 4; k++) {
+								ba[k + 4*(8*ro + co)] = tup[k]
+							}
+						}
+					}
+					
+					glyphs[gi] = new ImageData(ba, 8, 8)
+				}
+				
+				glyphs.push(new ImageData(new Uint8ClampedArray(4*8*8), 8, 8))
+				
+				textDirty = true
+				glyphsDirty = false
+			}
+			
+			if (textDirty) {
+				var txCtx = textCanvas.getContext("2d")
+
+				for (var lineNum in arrays.TEXTLINES) {
+					var str = arrays.TEXTLINES[lineNum]
+					
+					for (var x = 0; x < 49; x++) {
+						var ascii = str.charCodeAt(x)
+						var gi = 36
+						if (ascii >= 48 && ascii < 58) gi = ascii - 48
+						if (ascii > 64 && ascii <= 90) gi = ascii - 55
+						
+						txCtx.putImageData(glyphs[gi], 8*x, 8*lineNum)
+					}
+				}
+				
+				textDirty = false
+			}
+			
+			textCanvas.style.left = variables.TEXTX + "px"
+			textCanvas.style.top = variables.TEXTY + "px"
 		}
 	}, 40)
 })
