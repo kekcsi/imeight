@@ -318,7 +318,7 @@ pageLoadHooks.push(function() {
 				var txCtx = textCanvas.getContext("2d")
 
 				for (var lineNum in arrays.TEXTLINES) {
-					var str = arrays.TEXTLINES[lineNum]
+					var str = "" + arrays.TEXTLINES[lineNum]
 					
 					for (var x = 0; x < 49; x++) {
 						var ascii = str.charCodeAt(x)
