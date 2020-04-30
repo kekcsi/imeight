@@ -144,7 +144,8 @@ Command Line, press Enter.</p>
 &bull;	<a href="#2003">Sprites!</a>
 &bull;	<a href="#2004">Colors!</a>
 &bull;	<a href="#2005">Pixel Data Animations</a>
-&bull;	<a href="#2006">Tiles</a></div>
+&bull;	<a href="#2006">Tiles</a>
+&bull;	<a href="#2007">Text on the Graphic Screen</a></div>
 </div>
 <div class="toccontainer">
 <h3>Reference Sheet Index</h3><div class="contents">
@@ -1515,5 +1516,19 @@ DATA 1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1</div>
 design pointers similar to those of SPRDGN, a grid of designs will appear on 
 the graphical screen, altogether offset by the values in variables TILEX and 
 TILEY. Smooth scrolling means to change the TILEX or TILEY in small steps.</p>
+
+<h2><a name="2007">Text on the Graphic Screen</a></h2>
+<p>Alphanumeric characters, monochrome... But some games just need text printed
+on the screen like score or something. Smooth scroll demo below:</p>
+<div class="code">FOR I=0 TO 287:READ B:POKE I,B:NEXT
+DATA 124,198,198,198,198,198,124,0,56,24,24,24,24,24,126,0,252,6,6,124,192,192,254,0,252,6,6,124,6,6,252,0,12,28,60,108,204,254,12,0,254,192,192,252,6,6,252,0,124,192,192,252,198,198,124,0,254,6,12,24,24,48,48,0,124,198,198,124,198,198,124,0,124,198,198,126,6,6,124,0,124,198,198,198,254,198,198,0,252,198,198,252,198,198,252,0,124,198,192,192,192,198,124,0,248,204,198,198,198,198,252,0,254,192,192,252,192,192,254,0,254,192,192,252,192,192,192,0,124,192,192,222,198,198,126,0,198,198,198,254,198,198,198,0,126,24,24,24,24,24,126,0,30,6,6,6,6,198,124,0,198,204,216,252,198,198,198,0,192,192,192,192,192,192,254,0,130,198,238,214,198,198,198,0,134,198,230,214,206,198,194,0,124,198,198,198,198,198,124,0,252,198,198,198,252,192,192,0,124,198,198,194,218,124,24,14,252,198,198,252,216,204,198,0,124,198,192,124,6,198,124,0,126,24,24,24,24,24,24,0,198,198,198,198,198,198,124,0,198,198,198,108,108,56,16,0,198,198,198,214,214,238,68,0,198,198,108,56,108,198,198,0,102,102,102,60,24,24,24,0,126,6,12,24,48,96,126,0
+CHARGEN=0
+TEXTCOLOR=7
+TEXTX=0
+TEXTY=0
+TEXTLINES(12)="                                                 HELLO"
+@L:FOR TEXTX=0 TO -7 STEP -1:WAIT:WAIT:NEXT
+TEXTLINES(12)=RIGHT$(TEXTLINES(12), LEN(TEXTLINES(12))-1)
+IF LEN(TEXTLINES(12)) > 0 T.G.L</div>
 </body>
 </html>
