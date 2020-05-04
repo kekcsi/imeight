@@ -11,7 +11,8 @@ builtInVariables.TILEY = 0 //Y offset of the tile layer for smooth scrolling
 builtInVariables.CHARGEN = -1 //pointer to font for the character generator
 builtInVariables.TEXTX = 0 //text layer X offset
 builtInVariables.TEXTY = 0 //text layer Y offset
-builtInVariables.TEXTCOLOR = 0
+builtInVariables.TEXTCOLOR = 7
+builtInVariables.TEXTCOLOR2 = 15
 builtInArrays.TEXTLINES = [] //27+1 strings, 48+1 chars each
 
 var builtInDesigns = [
@@ -40,7 +41,6 @@ var builtInDesigns = [
     "ufo",
     "wall"
 ]
-
 for (var i in builtInDesigns) {
 	var fun = "DGN" + builtInDesigns[i].toUpperCase()
 
@@ -51,14 +51,92 @@ for (var i in builtInDesigns) {
 	})()
 }
 
+var builtInCharGen = {32: [0,0,0,0,0,0,0,0],
+33: [24,24,24,24,0,24,24,0],
+34: [102,102,102,0,0,0,0,0],
+35: [108,254,108,108,108,254,108,0],
+36: [16,124,208,124,22,124,16,0],
+37: [194,196,8,16,32,70,134,0],
+38: [112,216,216,118,204,204,126,0],
+39: [24,24,24,0,0,0,0,0],
+40: [12,24,24,24,24,24,12,0],
+41: [48,24,24,24,24,24,48,0],
+42: [16,214,124,254,124,214,16,0],
+43: [0,24,24,126,24,24,0,0],
+44: [0,0,0,0,0,24,24,48],
+45: [0,0,0,254,0,0,0,0],
+46: [0,0,0,0,0,24,24,0],
+47: [2,4,8,16,32,64,128,0],
+
+48: [24,198,198,198,198,198,124,0],
+49: [56,24,24,24,24,24,126,0],
+50: [252,6,6,124,192,192,254,0],
+51: [252,6,6,124,6,6,252,0],
+52: [12,28,60,108,204,254,12,0],
+53: [254,192,192,252,6,6,252,0],
+54: [124,192,192,252,198,198,124,0],
+55: [254,6,12,24,24,48,48,0],
+56: [124,198,198,124,198,198,124,0],
+57: [124,198,198,126,6,6,124,0],
+
+58: [0,0,24,24,0,24,24,0],
+59: [0,0,24,24,0,24,24,48],
+60: [12,24,48,96,48,24,12,0],
+61: [0,0,254,0,0,254,0,0],
+62: [96,48,24,12,24,48,96,0],
+63: [124,198,6,28,48,0,48,0],
+64: [124,198,222,214,222,192,124,0],
+
+65: [124,198,198,198,254,198,198,0],
+66: [252,198,198,252,198,198,252,0],
+67: [124,198,192,192,192,198,124,0],
+68: [248,204,198,198,198,198,252,0],
+69: [254,192,192,252,192,192,254,0],
+70: [254,192,192,252,192,192,192,0],
+71: [124,192,192,222,198,198,126,0],
+72: [198,198,198,254,198,198,198,0],
+73: [126,24,24,24,24,24,126,0],
+74: [30,6,6,6,6,198,124,0],
+75: [198,204,216,252,198,198,198,0],
+76: [192,192,192,192,192,192,254,0],
+77: [130,198,238,214,198,198,198,0],
+78: [134,198,230,214,206,198,194,0],
+79: [124,198,198,198,198,198,124,0],
+80: [252,198,198,198,252,192,192,0],
+81: [124,198,198,194,218,124,24,14],
+82: [252,198,198,252,216,204,198,0],
+83: [124,198,192,124,6,198,124,0],
+84: [126,24,24,24,24,24,24,0],
+85: [198,198,198,198,198,198,124,0],
+86: [198,198,198,108,108,56,16,0],
+87: [198,198,198,214,214,238,68,0],
+88: [198,198,108,56,108,198,198,0],
+89: [102,102,102,60,24,24,24,0],
+90: [126,6,12,24,48,96,126,0],
+
+91: [60,48,48,48,48,48,60,0],
+92: [192,96,48,24,12,6,3,0],
+93: [60,12,12,12,12,12,60,0],
+94: [56,108,198,0,0,0,0,0],
+95: [0,0,0,0,0,0,254,0],
+96: [48,24,12,0,0,0,0,0],
+
+123: [60,48,48,96,48,48,60,0],
+124: [24,24,24,24,24,24,24,0],
+125: [60,12,12,6,12,12,60,0],
+126: [112,214,28,0,0,0,0,0]}
+for (var alpha = 1; alpha <= 26; alpha++) {
+	builtInCharGen[96 + alpha] = builtInCharGen[64 + alpha]
+}
+
 var designs = [] //ImageData
 var sprites = [] //div
 var tiles = []
 var tileCanvas
 var tilesDirty
 var divTileGrid
-var glyphs = [] //36*ImageData
-var glyphsDirty = false
+var glyphs = [] //ASCII --> ImageData
+var glyphsDirty = true
 var textCanvas
 var textDirty = false
 
@@ -167,7 +245,9 @@ varUpdateHook = function(arrayName, index) {
 		textDirty = true
 	}
 	
-	if ((index == "CHARGEN" || index == "TEXTCOLOR") && !arrayName) {
+	if ((index == "CHARGEN" || index == "TEXTCOLOR" || 
+			index == "TEXTCOLOR2") && !arrayName) {
+		
 		glyphsDirty = true
 	}
 }
@@ -227,10 +307,10 @@ pageLoadHooks.push(function() {
 				if (i in arrays.SPRDGN) { //not the default design
 					if (typeof arrays.SPRDGN[i] == "number") { //user-designed
 						var designIdx = Math.floor(arrays.SPRDGN[i]/288)
+
 						arrays.SPRDGN[i] = 288*designIdx //correct the alignment
 						
 						cacheDesign(designIdx)
-
 						if ("dirty" in sprites[i].dataset) {
 							var ctx = sprites[i].firstChild.getContext('2d')
 							ctx.putImageData(designs[designIdx], 0, 0)
@@ -283,59 +363,56 @@ pageLoadHooks.push(function() {
 			tilesDirty = false
 		}
 
-		if (variables.CHARGEN in memory) {
-			if (glyphsDirty) {
-				var startAddress = variables.CHARGEN
+		if (glyphsDirty) {
+			var startAddress = variables.CHARGEN
+			var tup1 = colorToBytes(variables.TEXTCOLOR)
+			var tup2 = colorToBytes(variables.TEXTCOLOR2)
 
-				for (var gi = 0; gi < 36; gi++) {
-					var ba = new Uint8ClampedArray(4*8*8)
-					
-					for (var ro = 0; ro < 8; ro++) {
-						var by = memory[startAddress + gi*8 + ro]
-
-						for (var co = 0; co < 8; co++) {
-							var bit = ((by>>(7 - co))&1)
-							
-							var tup = colorToBytes(variables.TEXTCOLOR)
-							tup[3] = (bit ? 255 : 0)
-							
-							for (var k = 0; k < 4; k++) {
-								ba[k + 4*(8*ro + co)] = tup[k]
-							}
-						}
-					}
-					
-					glyphs[gi] = new ImageData(ba, 8, 8)
+			for (var ascii in builtInCharGen) {
+				var gi = null
+				var tup = ((ascii & 0x20) ? tup2 : tup1) 
+				
+				if (startAddress in memory) {
+					if (ascii >= 48 && ascii < 58) gi = ascii - 48
+					if (ascii > 64 && ascii <= 90) gi = ascii - 55
+					if (ascii > 96 && ascii <= 122) gi = ascii - 87
 				}
 				
-				glyphs.push(new ImageData(new Uint8ClampedArray(4*8*8), 8, 8))
-				
-				textDirty = true
-				glyphsDirty = false
-			}
-			
-			if (textDirty) {
-				var txCtx = textCanvas.getContext("2d")
-
-				for (var lineNum in arrays.TEXTLINES) {
-					var str = "" + arrays.TEXTLINES[lineNum]
-					
-					for (var x = 0; x < 49; x++) {
-						var ascii = str.charCodeAt(x)
-						var gi = 36
-						if (ascii >= 48 && ascii < 58) gi = ascii - 48
-						if (ascii > 64 && ascii <= 90) gi = ascii - 55
-						
-						txCtx.putImageData(glyphs[gi], 8*x, 8*lineNum)
-					}
+				if (gi !== null) {
+					glyphs[ascii] = genChar(memory, startAddress + gi*8, tup)
+				} else {
+					glyphs[ascii] = genChar(builtInCharGen[ascii], 0, tup)
 				}
-				
-				textDirty = false
 			}
 			
-			textCanvas.style.left = variables.TEXTX + "px"
-			textCanvas.style.top = variables.TEXTY + "px"
+			textDirty = true
+			glyphsDirty = false
 		}
+			
+		if (textDirty)	{
+			var txCtx = textCanvas.getContext("2d")
+
+			for (var lineNum in arrays.TEXTLINES) {
+				var str = "" + arrays.TEXTLINES[lineNum]
+				var inputLine = (typeof arrays.TEXTLINES[lineNum] == "object")
+
+				for (var x = 0; x < 49; x++) {
+					var ascii = str.charCodeAt(x)
+					if (!(ascii in glyphs)) ascii = 32
+					txCtx.putImageData(glyphs[ascii], 8*x, 8*lineNum)
+				}
+
+				if (inputLine) {
+					txCtx.fillStyle = colorToCSS(variables.TEXTCOLOR)
+					txCtx.fillRect(0, 8*lineNum + 7, str.length*8, 1)
+				}
+			}
+			
+			textDirty = false
+		}
+		
+		textCanvas.style.left = variables.TEXTX + "px"
+		textCanvas.style.top = variables.TEXTY + "px"
 	}, 40)
 })
 
@@ -354,4 +431,24 @@ function cacheDesign(designIdx) {
 		
 		designs[designIdx] = new ImageData(pixels, 24, 24)
 	}
+}
+
+function genChar(ary, offset, tup) {
+	var ba = new Uint8ClampedArray(4*8*8)
+
+	for (var ro = 0; ro < 8; ro++) {
+		var by = ary[offset + ro]
+
+		for (var co = 0; co < 8; co++) {
+			var bit = ((by>>(7 - co))&1)
+			
+			tup[3] = (bit ? 255 : 0)
+			
+			for (var k = 0; k < 4; k++) {
+				ba[k + 4*(8*ro + co)] = tup[k]
+			}
+		}
+	}
+	
+	return new ImageData(ba, 8, 8)
 }

@@ -25,7 +25,7 @@
 				dataLookup = JSON.parse(document.scripts.namedItem("dataLookupJson").text)
 				elseBranches = JSON.parse(document.scripts.namedItem("elseBranchesJson").text)
 				memory = JSON.parse(document.scripts.namedItem("memoryJson").text)
-				var interact = runProgram
+				var interact = function() { setTimeout(runProgram, 500) }
 				var inputAction = interact
 				function outputTab() {}
 				function updateDownloadBlob() {}
@@ -1099,8 +1099,10 @@
 			</table>
 		</div>
     	<div class="dark" id="tabMisc" style="display:none">
-			<p><b>Credits:</b> kekcsi - imeight creator <br/>
-			Background music made with <a href="https://sb.bitsnbites.eu/" target="_blank">SoundBox</a></p>
+			<p><b>Credits:</b> kekcsi - imeight creator :
+			Background music made with <a href="https://sb.bitsnbites.eu/" target="_blank">SoundBox</a> :
+			FX Matrix font (C) Robin Eckert under <a href="http://scripts.sil.org/OFL" target="_blank">SIL 1.1</a> :
+			Thanks for Westminster font go to <a href="http://www.ffonts.net" target="_blank">ffonts.net</a></p>
 			<p><b>Forum:</b> 
 			<a href="https://im8.boards.net/" target="_blank">connect with 
 			imeight users, creators and friends</a></p>
@@ -1120,7 +1122,7 @@
 				</tr -->
 				<tr>
 					<td title="mp3 URL">Background Music</td>
-					<td><input id="inMusic" value="hammering_it_together.mp3"/></td>
+					<td><input id="inMusic" value="hammering_it_together.mp3" onchange="document.getElementById('auBackground').src=this.value"/></td>
 				</tr>
 				<!-- tr>
 					<td title="Downloaded program needs PRINTs displayed">Text Screen</td>

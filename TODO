@@ -1,13 +1,15 @@
 TODO
-* soundbox creditz
-* font editor
-* music
+* INPUT and PRINT on graphic screen
 * design touch/mouse control
+* user-defined punctuation font: 33-47, 58-64, 91-96, 123-126 (32 glyphs)
+		* editor mode
+		* video built-in variable
 * Look redesign
 		* graphics zoom 2 by 2
 		* dynamic screen size for editor
 		* Tutor button belongs outside list tab
-* Text layer
+* memory JSON copy/paste
+* music selection from program
 * Vector layer?
 * 8 Palettes? 0: light colors, 1-7: intensity scale of the selected RGB color in the high 8 indices
 * LOAD/SAVE memory/routines: https://restdb.io/ ?
