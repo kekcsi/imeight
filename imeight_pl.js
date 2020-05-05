@@ -149,7 +149,7 @@ var instructions = {
 				var message = popAndEvaluate("ENTER VALUE FOR " + name)
 				if (message === undefined) return
 				videoPrint(message)
-				outputTab()
+				cursorBlink = true
 				stopped = pc + 1
 								
 				return oldValue //for now
@@ -159,16 +159,16 @@ var instructions = {
 			
 			inputAction = function(response) {
 				inputAction = interact
+				cursorBlink = false
 
 				if (response === null) {
-					videoPrint("READY.")
-					outputTab()
+					readyPrompt()
 					argumentStack = saveStk
 					stopped = pc
 					return
 				}
 				
-				videoPrint(response.italics())
+				videoPrint(FmtStr("INPUT", response))
 				if (!isNaN(response)) {
 					response = +response
 				}

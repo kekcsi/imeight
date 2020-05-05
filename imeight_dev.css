@@ -1,4 +1,4 @@
-#inUserInput, #taList {
+#taList {
 	border: none;
 	background: transparent;
 	padding: 1px;
@@ -18,7 +18,7 @@
 	height:298px;
 }
 
-#inUserInput:focus, #taList:focus, div:focus {
+#taList:focus, div:focus {
 	outline: none;
 }
 
@@ -146,18 +146,6 @@ a:link, a:visited {
 	position: absolute;
 	right: 0px;
 	font-size: 8px;
-}
-
-#tabOutput {
-	position: relative;
-	height: 320px;
-	overflow-x: hidden;
-}
-
-#divOutput div {
-	white-space: pre;
-	line-height: 15px;
-	height: 15px;
 }
 
 #divTutor {

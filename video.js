@@ -1,4 +1,9 @@
 builtInVariables.BACKGROUND = 0 //color
+builtInVariables.CURSORX = 0
+builtInVariables.CURSORY = 0
+builtInVariables.CURSORPERIOD = 30
+builtInVariables.CURSORON = 20
+builtInVariables.READYPROMPT = "READY."
 
 builtInArrays.SPRX = [] //horizontal coordinate of each sprite (-24 to 384)
 builtInArrays.SPRY = [] //vertical coordinate of each sprite (-24 to 216)
@@ -11,8 +16,8 @@ builtInVariables.TILEY = 0 //Y offset of the tile layer for smooth scrolling
 builtInVariables.CHARGEN = -1 //pointer to font for the character generator
 builtInVariables.TEXTX = 0 //text layer X offset
 builtInVariables.TEXTY = 0 //text layer Y offset
-builtInVariables.TEXTCOLOR = 7
-builtInVariables.TEXTCOLOR2 = 15
+builtInVariables.TEXTCOLOR = 2
+builtInVariables.TEXTCOLOR2 = 10
 builtInArrays.TEXTLINES = [] //27+1 strings, 48+1 chars each
 
 var builtInDesigns = [
@@ -68,7 +73,7 @@ var builtInCharGen = {32: [0,0,0,0,0,0,0,0],
 46: [0,0,0,0,0,24,24,0],
 47: [2,4,8,16,32,64,128,0],
 
-48: [24,198,198,198,198,198,124,0],
+48: [124,198,198,198,198,198,124,0],
 49: [56,24,24,24,24,24,126,0],
 50: [252,6,6,124,192,192,254,0],
 51: [252,6,6,124,6,6,252,0],
@@ -139,6 +144,26 @@ var glyphs = [] //ASCII --> ImageData
 var glyphsDirty = true
 var textCanvas
 var textDirty = false
+
+var cursorBlink = false
+var cursorPhase = 0
+var userInputValue = ""
+
+videoPrint = function(message) {
+	if (variables.CURSORY === "") {
+		console.log(message)
+		return
+	}
+
+	arrays.TEXTLINES[variables.CURSORY++] = message
+	variables.CURSORX = 0
+	textDirty = true
+}
+
+readyPrompt = function() {
+	videoPrint(variables.READYPROMPT)
+	cursorBlink = true
+}
 
 if (typeof commands == "object") {
 	commands.DGNS = function() {
@@ -271,12 +296,31 @@ function colorToBytes(i) {
 
 pageLoadHooks.push(function() {
 	tabGraphic.addEventListener("keydown", function(event) {
-		event.preventDefault()
-
-		if (!(event.keyCode in pressedKeys)) { //ignore repeats
-			eventQueue.push(event.keyCode + 0.5*event.shiftKey + 0.25*event.ctrlKey)
-			eventHandler()
-			pressedKeys[event.keyCode] = Date.now()
+		if (!cursorBlink) {
+			event.preventDefault()
+			
+			if (!(event.keyCode in pressedKeys)) { //ignore repeats
+				eventQueue.push(event.keyCode + 0.5*event.shiftKey + 0.25*event.ctrlKey)
+				eventHandler()
+				pressedKeys[event.keyCode] = Date.now()
+			}
+		} else if (event.keyCode == 8 || event.keyCode == 46 || event.keyCode == 37) {
+			event.preventDefault()
+			
+			userInputValue = userInputValue.substring(0, userInputValue.length - 1)
+		} else if (event.keyCode >= 96 && event.keyCode < 106) { //numpad
+			event.preventDefault()
+			userInputValue += String.fromCharCode(event.keyCode - 48)
+		}
+	})
+	
+	tabGraphic.addEventListener("keypress", function(event) {
+		if (cursorBlink) {
+			if (event.charCode >= 32) {
+				event.preventDefault()
+				
+				userInputValue += String.fromCharCode(event.charCode)
+			}
 		}
 	})
 	
@@ -285,6 +329,15 @@ pageLoadHooks.push(function() {
 		eventQueue.push(-event.keyCode)
 		eventHandler()
 		delete pressedKeys[event.keyCode] 
+
+		if (cursorBlink) {
+			if (event.keyCode === 27) { //Esc
+				userBreak()
+			}
+			if (event.keyCode === 13) { //Enter
+				userInput()
+			}
+		}
 	})
 
 	setInterval(function() {
@@ -388,13 +441,36 @@ pageLoadHooks.push(function() {
 			textDirty = true
 			glyphsDirty = false
 		}
+
+		var textLines = arrays.TEXTLINES
+		var txCtx = textCanvas.getContext("2d")
+
+		if (variables.CURSORY > 26) {
+			if (variables.TEXTY > -7 && variables.CURSORY < 32) {
+				variables.TEXTY -= 1
+			} else {
+				console.log("scrolled out " + textLines.shift())
+				textLines.push("")
+				variables.CURSORY--
+				variables.TEXTY = 0
+			}
+			
+			textDirty = true
+		} 
+
+		if (cursorBlink) {
+			textDirty = (arrays.TEXTLINES[variables.CURSORY] == userInputValue)
+			arrays.TEXTLINES[variables.CURSORY] = userInputValue
+			variables.CURSORX = userInputValue.length
+		}
 			
 		if (textDirty)	{
-			var txCtx = textCanvas.getContext("2d")
-
-			for (var lineNum in arrays.TEXTLINES) {
-				var str = "" + arrays.TEXTLINES[lineNum]
-				var inputLine = (typeof arrays.TEXTLINES[lineNum] == "object")
+			for (var lineNum = 0; lineNum < 32 && (lineNum in textLines); lineNum++) {
+				var str = "" + textLines[lineNum]
+				var fmt = "NORMAL"
+				if (typeof textLines[lineNum] == "object") {
+					fmt = textLines[lineNum].fmt
+				}
 
 				for (var x = 0; x < 49; x++) {
 					var ascii = str.charCodeAt(x)
@@ -402,13 +478,31 @@ pageLoadHooks.push(function() {
 					txCtx.putImageData(glyphs[ascii], 8*x, 8*lineNum)
 				}
 
-				if (inputLine) {
+				if (fmt == "INPUT") {
 					txCtx.fillStyle = colorToCSS(variables.TEXTCOLOR)
+					txCtx.fillRect(0, 8*lineNum + 7, str.length*8, 1)
+				} else if (fmt == "PROGRAM") {
+					txCtx.fillStyle = colorToCSS(variables.TEXTCOLOR2)
 					txCtx.fillRect(0, 8*lineNum + 7, str.length*8, 1)
 				}
 			}
 			
 			textDirty = false
+		}
+
+		if (cursorBlink && tabGraphic == document.activeElement) {
+			cursorPhase++
+			if (cursorPhase < variables.CURSORON) {
+				txCtx.fillStyle = colorToCSS(variables.TEXTCOLOR)
+				txCtx.fillRect(8*variables.CURSORX, 8*variables.CURSORY, 8, 8)
+			} else if (cursorPhase == variables.CURSORON) {
+				txCtx.fillStyle = colorToCSS(variables.BACKGROUND)
+				txCtx.fillRect(8*variables.CURSORX, 8*variables.CURSORY, 8, 8)
+
+				textDirty = true
+			} else if (cursorPhase > variables.CURSORPERIOD) {
+				cursorPhase = 0
+			}
 		}
 		
 		textCanvas.style.left = variables.TEXTX + "px"
@@ -451,4 +545,8 @@ function genChar(ary, offset, tup) {
 	}
 	
 	return new ImageData(ba, 8, 8)
+}
+
+function FmtStr(fmt, str) {
+	return {fmt: fmt, str: str, toString: function() { return str }}
 }

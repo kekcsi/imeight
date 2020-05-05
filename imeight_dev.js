@@ -1,5 +1,3 @@
-//interactive
-
 var listClean = true //does the tokenized program match the text in the lising?
 var oldText = ""
 
@@ -20,7 +18,6 @@ function selectTab(selected) {
 }
 
 function programTab() { selectTab("Program") }
-function outputTab() { selectTab("Output") }
 function graphicTab() { selectTab("Graphic") }
 function designerTab() { selectTab("Designer") }
 function miscTab() { selectTab("Misc") }
@@ -49,7 +46,6 @@ function tutorBelow() {
 pageLoadHooks.push(function() {
 	tabs = {
 		Program: { btn: btnProgram, tab: tabProgram, focused: taList }, 
-		Output: { btn: btnOutput, tab: tabOutput, focused: inUserInput }, 
 		Graphic: { btn: btnGraphic, tab: tabGraphic, focused: tabGraphic }, 
 		Designer: { btn: btnDesigner, tab: tabDesigner, focused: tabDesigner },
 		Misc: { btn: btnMisc, tab: tabMisc, focused: tabMisc }
@@ -59,30 +55,8 @@ pageLoadHooks.push(function() {
 		btnTutorRight.style.display = "inline"
 		btnTutorBelow.style.display = "none"
 	})
-	
-	inUserInput.addEventListener("keydown", function(event) {
-		if (!(event.keyCode in pressedKeys)) { //ignore repeats
-			eventQueue.push(event.keyCode + 0.5*event.shiftKey + 0.25*event.ctrlKey)
-			eventHandler()
-			pressedKeys[event.keyCode] = Date.now()
-		}
-	})
 
-	inUserInput.addEventListener("keyup", function(event) {
-		if (event.keyCode === 13) { //Enter
-			event.preventDefault()
-			userInput()
-		}
-		
-		if (event.keyCode === 27) { //Esc
-			event.preventDefault()
-			userBreak()
-		}
-
-		eventQueue.push(-event.keyCode)
-		eventHandler()
-		delete pressedKeys[event.keyCode] 
-	})
+	cursorBlink = true
 	
 	taList.addEventListener("keyup", function(event) {
 		if (event.keyCode === 120) { //F9
@@ -143,21 +117,11 @@ function goLine(target, selectIt) {
 	}
 }
 
-videoPrint = function(message) {
-	while (divOutput.childElementCount >= 20) {
-		console.log("scrolled out " + divOutput.firstChild.innerText)
-		divOutput.removeChild(divOutput.firstChild)
-	}
-	divOutput.innerHTML = divOutput.innerHTML + "<div>" + message + "&nbsp;</div>"
-	
-	return divOutput.lastChild
-}
-
 //the default inputAction routine
 var interact = function(input) {
 	if (input === null) return
 	
-	var div = videoPrint(input)
+	videoPrint(input)
 	
 	if (input === "") return
 
@@ -172,14 +136,13 @@ var interact = function(input) {
 		var saveStopped = stopped
 		
 		var evalPC = program.length
+		bugLocator = false
+		stopped = evalPC //enable reporting errors (even after errors)
 
 		var rest = expressionArg(input.trim().substring(1))
 		if (rest !== "") {
 			parseError("EXTRA ARGUMENT")
 		} else {
-			bugLocator = false
-			stopped = evalPC //enable reporting errors (even after errors)
-			
 			while (evalPC in program) {
 				var token = program[evalPC]
 				evaluateToken(token)
@@ -187,8 +150,11 @@ var interact = function(input) {
 			}
 
 			var result = popAndEvaluate("")
-			if (result === undefined) result = "READY."
-			videoPrint(result)
+			if (result === undefined) {
+				readyPrompt()
+			} else {
+				videoPrint(result)
+			}
 		}
 		
 		program = saveProgram
@@ -212,27 +178,16 @@ var interact = function(input) {
 				divStatus.innerHTML = "[PROGRAM FORKED]"
 			}
 			
-			div.innerHTML = div.innerHTML.bold()
+			variables.CURSORY--
+			videoPrint(FmtStr("PROGRAM", input))
+
 			updateDownloadBlob()
 		} else {
-			inUserInput.value = input
+			userInputValue = input
 		}
 	}
 }
 var inputAction = interact
-
-function userBreak() {
-	inUserInput.focus()
-	inUserInput.value = ""
-	inputAction(null)
-}
-
-function userInput() {
-	inUserInput.focus()
-	var input = inUserInput.value
-	inUserInput.value = ""
-	inputAction(input)
-}
 
 var commands = {
 	RUN: runProgram,
@@ -278,10 +233,10 @@ parseErrorHook = function(message) {
 	}
 
 	text = ""
-	videoPrint("READY.")
+	readyPrompt()
 
 	if (fullTextParse) {
-		inUserInput.value = "LIST"
+		userInputValue = "LIST"
 		goLine(lineNumber, false)
 		taList.selectionStart = charsParsed
 		taList.selectionEnd = (taList.value + "\n").indexOf("\n", charsParsed)

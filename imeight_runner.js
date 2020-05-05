@@ -26,7 +26,10 @@ var bugLocator
 var runErrorHook = function(message) {} // only react in dev env - not in prod
 var videoPrint = function(message) {
 	console.log(message)
-} // print to Command Line in dev env - browser logs instead in prod
+} //video.js should override
+
+var readyPrompt = function() {}
+
 var pageLoadHooks = []
 var varUpdateHook = function() {}
 var memoryUpdateHooks = []
@@ -56,6 +59,17 @@ var builtInVariables = {
 }
  
 var builtInArrays = {}
+
+function userBreak() {
+	userInputValue = ""
+	inputAction(null)
+}
+
+function userInput() {
+	var input = userInputValue
+	userInputValue = ""
+	inputAction(input)
+}
 
 //runner routines
 function runError(message) {
@@ -120,6 +134,7 @@ function runProgram() {
 function contProgram() {
     var programCounter = stopped
 	stopped = 0
+	cursorBlink = false
 	var heat = 10*safetyWait + safetyWait*Math.random()
 
     while (programCounter < program.length && !stopped) {
@@ -160,8 +175,7 @@ function contProgram() {
     }
 
 	if (interact == inputAction) {
-		videoPrint("READY.")
-		outputTab()
+		readyPrompt()
 		updateDownloadBlob()
 		variables.STATUS = (stopped === true) ? -1 : ((stopped == 0) ? 0 : 1)
 	}
@@ -305,8 +319,7 @@ var onlyStop = function(input) {
 	//don't display READY prompt when program is stopped like this
 	if (input === null) {
 		//unless there was user break 
-		videoPrint("READY.")
-		outputTab()
+		readyPrompt()
 
 		//restore normal handlers
 		inputAction = interact

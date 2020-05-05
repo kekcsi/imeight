@@ -25,9 +25,13 @@
 				dataLookup = JSON.parse(document.scripts.namedItem("dataLookupJson").text)
 				elseBranches = JSON.parse(document.scripts.namedItem("elseBranchesJson").text)
 				memory = JSON.parse(document.scripts.namedItem("memoryJson").text)
-				var interact = function() { setTimeout(runProgram, 500) }
+				var interact = runProgram
 				var inputAction = interact
-				function outputTab() {}
+				readyPrompt = function() { setTimeout(contProgram, 1500) }
+				runErrorHook = function(m) { 
+					console.log(m)
+					setTimeout(runProgram, 1500) 
+				}
 				function updateDownloadBlob() {}
 				pageLoadHooks.push(runProgram)
 			</script>
@@ -55,8 +59,7 @@
 <body onload="pageLoad()">
 	<div class="win">
     	<button id="btnProgram" onclick="programTab()" class="tab" style="border-style:inset">Program Listing</button>
-    	<button id="btnOutput" onclick="outputTab()" class="tab" style="border-style:outset">Command Line</button>
-    	<button id="btnGraphic" onclick="graphicTab()" class="tab" style="border-style:outset">Graphic Screen</button>
+    	<button id="btnGraphic" onclick="graphicTab()" class="tab" style="border-style:outset">Runner Screen</button>
     	<button id="btnDesigner" onclick="designerTab()" class="tab" style="border-style:outset">Designer</button>
     	<button id="btnMisc" onclick="miscTab()" class="tab" style="border-style:outset">Misc.</button>
     	<div class="dark" id="tabProgram">
@@ -67,15 +70,6 @@
     		<button class="glow" id="btnTutorRight" onclick="tutorRight()" title="Show Tutorial (F1)">TUTOR &gt;</button>
     		<button class="glow" id="btnTutorBelow" style="display:none" onclick="tutorBelow()" title="Show Tutorial (F1)">TUTOR <small>\/</small></button>
 			<div id="divStatus">&nbsp;</div></div>
-    	</div>
-    	<div class="dark" id="tabOutput" style="display:none" tabindex="1" onkeydown="document.getElementById('inUserInput').focus()">
-    		<div class="dark" id="divOutput" style="font-family:Monospace" tabindex="2" onkeydown="document.getElementById('inUserInput').focus()">
-    		</div>
-    		<input size="64" id="inUserInput"/>
-    		<span id="inputButtons">
-    			<button class="glow" onclick="userInput()" id="btnGo" title="Enter">&#x2713;</button>
-    			<button class="glow" onclick="userBreak()" id="btnStop" title="Esc">&#x2715;</button>
-    		</span>
     	</div>
     	<div tabindex="0" class="dark" id="tabGraphic" onfocus="auBackground.play()" onblur="auBackground.pause()"></div>
     	<div id="tabDesigner" style="display:none; width:536px; position: relative">
