@@ -55,8 +55,7 @@ var safetyWait = 10000
 
 var builtInVariables = {
     PI: Math.PI,
-	TZO: -60000*new Date().getTimezoneOffset(),
-	TOUCH: 0
+	TZO: -60000*new Date().getTimezoneOffset()
 }
  
 var builtInArrays = {}

@@ -20,7 +20,7 @@ TODO
 
 * designer:
 		* punctuation font mode
-		* "all characters" link in font mode: show all, transform affect all
+		* "all" link in font mode: show all characters, transform affect all
 		* hex dump text area mode
 * Video reference
 		* CURSORX, CURSORY

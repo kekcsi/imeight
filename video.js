@@ -4,6 +4,7 @@ builtInVariables.CURSORY = 0
 builtInVariables.CURSORPERIOD = 30
 builtInVariables.CURSORON = 20
 builtInVariables.READYPROMPT = "READY."
+builtInVariables.TOUCH = 0
 
 builtInArrays.SPRX = [] //horizontal coordinate of each sprite (-24 to 384)
 builtInArrays.SPRY = [] //vertical coordinate of each sprite (-24 to 216)
