@@ -32,6 +32,7 @@ var builtInDesigns = [
     "dust",
     "gem",
     "hammer",
+	"heart",
     "key",
     "ladder",
     "man",
@@ -337,6 +338,22 @@ pageLoadHooks.push(function() {
 			if (event.keyCode === 13) { //Enter
 				userInput()
 			}
+		}
+	})
+	
+	tabGraphic.addEventListener("mousedown", function(event) {
+		if (variables.TOUCH) {
+			event.preventDefault()
+			eventQueue.push(event.offsetY + event.offsetX/384.0 + 256)
+			eventHandler()
+		}
+	})
+	
+	tabGraphic.addEventListener("mouseup", function(event) {
+		if (variables.TOUCH) {
+			event.preventDefault()
+			eventQueue.push(-(event.offsetY + event.offsetX/384.0 + 256))
+			eventHandler()
 		}
 	})
 
