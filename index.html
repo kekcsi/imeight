@@ -34,20 +34,38 @@
 				}
 				function updateDownloadBlob() {}
 				pageLoadHooks.push(runProgram)
+				
+				var dragMute = false
+				
+				function move(ev) {
+					if (dragMute) {
+						ev.preventDefault()
+						imMute.style.left = ev.clientX - 8 + "px"
+						imMute.style.right = ""
+						imMute.style.top = ev.clientY - 8 + "px"
+					}
+				}
 			</script>
 			<style type="text/css">
 				#tabGraphic {
-					width:384px;
-					height:216px;
-					position:relative;
-					overflow:hidden;
-					background:black;
+					width: 384px;
+					height: 216px;
+					position: relative;
+					overflow: hidden;
+					background: black;
+				}
+				
+				#immute {
+					position: absolute;
+					right: 4px;
+					top: 4px;
 				}
 			</style>
 		</head>
-		<body onload="pageLoad()" topmargin="0" leftmargin="0">
+		<body onload="pageLoad()" topmargin="0" leftmargin="0" onmousemove="move(event)">
 			<div tabindex="0" id="tabGraphic" onfocus="auBackground.play()" onblur="auBackground.pause()"></div>
 			<audio id="auBackground" loop="loop" src="<?=music?>"></audio>
+			<img id="imMute" src="mute.png" onclick="auBackground.muted = !auBackground.muted" onmousedown="dragMute = true" onmouseup="dragMute = false">
 		</body>
 		</html>
 	--></script>
