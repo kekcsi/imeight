@@ -80,6 +80,7 @@ pageLoadHooks.push(function() {
 	instructions.CLR.run(0)
 	
 	//Edge will fill the form automatically by default
+	listClean = false
 	if (window.navigator.userAgent.indexOf("Edge/") >= 0) return
 	taList.value = localStorage.getItem("proglist")
 })

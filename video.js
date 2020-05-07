@@ -4,7 +4,6 @@ builtInVariables.CURSORY = 0
 builtInVariables.CURSORPERIOD = 30
 builtInVariables.CURSORON = 20
 builtInVariables.READYPROMPT = "READY."
-builtInVariables.TOUCH = 0
 
 builtInArrays.SPRX = [] //horizontal coordinate of each sprite (-24 to 384)
 builtInArrays.SPRY = [] //vertical coordinate of each sprite (-24 to 216)
@@ -20,6 +19,26 @@ builtInVariables.TEXTY = 0 //text layer Y offset
 builtInVariables.TEXTCOLOR = 2
 builtInVariables.TEXTCOLOR2 = 10
 builtInArrays.TEXTLINES = [] //27+1 strings, 48+1 chars each
+
+builtInFunctions.TOUCHX = { 
+	apply: function(eventCode) {
+		if (eventCode in ongoingTouches) {
+			return ongoingTouches[eventCode].pageX
+		} else {
+			return -1
+		}
+	}
+}
+
+builtInFunctions.TOUCHY = { 
+	apply: function(eventCode) {
+		if (eventCode in ongoingTouches) {
+			return ongoingTouches[eventCode].pageY
+		} else {
+			return -1
+		}
+	}
+}
 
 var builtInDesigns = [
     "ball24",
@@ -151,6 +170,8 @@ var cursorBlink = false
 var cursorPhase = 0
 var userInputValue = ""
 
+var ongoingTouches = {}
+
 videoPrint = function(message) {
 	if (variables.CURSORY === "") {
 		console.log(message)
@@ -206,18 +227,20 @@ memoryUpdateHooks.push(function(addr) {
 })
 
 varUpdateHook = function(arrayName, index) {
-	if (index == null) {
+	if (arrayName == null && index == null) {
 		//CLR
 		sprites = []
 		tabGraphic.innerHTML = ""
 		
 		divTileGrid = document.createElement('div')
+		divTileGrid.style.pointerEvents = "none"
 		divTileGrid.style.width = 24*17 + "px"
 		divTileGrid.style.height = 24*10 + "px"
 		divTileGrid.style.position = "absolute"
 		tabGraphic.appendChild(divTileGrid)
 		
 		tileCanvas = document.createElement('canvas')
+		tileCanvas.style.pointerEvents = "none"
 		tileCanvas.width = 24*17
 		tileCanvas.height = 24*10
 		tileCanvas.style.position = "absolute"
@@ -229,6 +252,7 @@ varUpdateHook = function(arrayName, index) {
 			for (var col = 0; col <= 16; col++) {
 				i = [row, col]
 				tiles[i] = document.createElement('div')
+				tiles[i].style.pointerEvents = "none"
 				tiles[i].style.width = 24 + "px"
 				tiles[i].style.height = 24 + "px"
 				tiles[i].style.position = "absolute"
@@ -241,12 +265,29 @@ varUpdateHook = function(arrayName, index) {
 		tilesDirty = true
 		
 		textCanvas = document.createElement('canvas')
+		textCanvas.style.pointerEvents = "none"
 		textCanvas.width = 8*49
 		textCanvas.height = 8*28
 		textCanvas.style.position = "absolute"
 		textCanvas.style.top = "0px"
 		textCanvas.style.left = "0px"
 		tabGraphic.appendChild(textCanvas)
+
+		var touchLayer = document.createElement('canvas')
+		touchLayer.width = "384"
+		touchLayer.height = "216"
+		touchLayer.style.position = "absolute"
+		touchLayer.style.top = "0px"
+		touchLayer.style.left = "0px"
+		tabGraphic.appendChild(touchLayer)
+		touchLayer.addEventListener("touchstart", touchStart, false)
+		touchLayer.addEventListener("touchend", touchEnd, false)
+		touchLayer.addEventListener("touchcancel", touchCancel, false)
+		touchLayer.addEventListener("touchmove", touchMove, false)
+		touchLayer.addEventListener("mousedown", mouseDown, false)
+		touchLayer.addEventListener("mouseup", mouseUp, false)
+		touchLayer.addEventListener("mouseout", mouseOut, false)
+		touchLayer.addEventListener("mousemove", mouseMove, false)
 	}
 	
 	if (arrayName == "SPRDGN") {
@@ -262,6 +303,17 @@ varUpdateHook = function(arrayName, index) {
 				}
 			}
 		}
+	}
+	
+	// DIM SPR...()
+	if (index == null && (arrayName == "SPRDGN" ||
+			arrayName == "SPRX" || arrayName == "SPRY")) {
+
+		for (i in sprites) {
+			sprites[i].remove()
+		}
+
+		sprites = []
 	}
 	
 	if (arrayName == "TILE") {
@@ -296,6 +348,78 @@ function colorToBytes(i) {
 	return [red, green, blue, opacity]
 }
 
+function copyTouch({ identifier, pageX, pageY }) {
+	return { identifier, pageX, pageY }
+}
+
+function mouseDown(evt) {
+	evt.preventDefault()
+	ongoingTouches[1] = {identifier: 1, pageX: evt.offsetX, pageY: evt.offsetY}
+	eventQueue.push(1 + 0.5*evt.shiftKey + 0.25*evt.ctrlKey)
+	eventHandler()
+}
+
+function mouseMove(evt) {
+	evt.preventDefault()
+	ongoingTouches[1] = {identifier: 1, pageX: evt.offsetX, pageY: evt.offsetY}
+}
+
+function mouseUp(evt) {
+	eventQueue.push(-1)
+	delete ongoingTouches[1]
+	eventHandler()
+}
+
+function mouseOut(evt) {
+	delete ongoingTouches[1]
+}
+
+function touchStart(evt) {
+	evt.preventDefault()
+	var numTouches = evt.changedTouches.length
+
+	for (var i = 0; i < numTouches; i++) {
+		var touch = evt.changedTouches[i]
+		eventQueue.push(256 + (touch.identifier%0xff00&0xffff))
+		ongoingTouches[256 + (touch.identifier%0xff00&0xffff)] = copyTouch(touch)
+	}
+
+	eventHandler()
+}
+
+function touchMove(evt) {
+	evt.preventDefault()
+	var numTouches = evt.changedTouches.length
+
+	for (var i = 0; i < numTouches; i++) {
+		var touch = evt.changedTouches[i]
+		ongoingTouches[256 + (touch.identifier%0xff00&0xffff)] = copyTouch(touch)
+	}
+}
+
+function touchEnd(evt) {
+	evt.preventDefault()
+	var numTouches = evt.changedTouches.length
+
+	for (var i = 0; i < numTouches; i++) {
+		var touch = evt.changedTouches[i]
+		eventQueue.push(-256 - (touch.identifier%0xff00&0xffff))
+		delete ongoingTouches[256 + (touch.identifier%0xff00&0xffff)]
+	}
+
+	eventHandler()
+}
+
+function touchCancel(evt) {
+	evt.preventDefault();
+	var numTouches = evt.changedTouches.length
+
+	for (var i = 0; i < numTouches; i++) {
+		var touch = evt.changedTouches[i]
+		delete ongoingTouches[256 + (touch.identifier%0xff00&0xffff)]
+	}
+}
+
 pageLoadHooks.push(function() {
 	tabGraphic.addEventListener("keydown", function(event) {
 		if (!cursorBlink) {
@@ -314,6 +438,10 @@ pageLoadHooks.push(function() {
 			event.preventDefault()
 			userInputValue += String.fromCharCode(event.keyCode - 48)
 		}
+
+		if (event.keyCode == 27 && pressedKeys[event.keyCode] < Date.now() - 2000) { //force break
+			userBreak()
+		}
 	})
 	
 	tabGraphic.addEventListener("keypress", function(event) {
@@ -328,34 +456,20 @@ pageLoadHooks.push(function() {
 	
 	tabGraphic.addEventListener("keyup", function(event) {
 		event.preventDefault()
-		eventQueue.push(-event.keyCode)
-		eventHandler()
-		delete pressedKeys[event.keyCode] 
-
+		
 		if (cursorBlink) {
-			if (event.keyCode === 27) { //Esc
+			if (event.keyCode == 27) { //Esc
 				userBreak()
 			}
-			if (event.keyCode === 13) { //Enter
+			if (event.keyCode == 13) { //Enter
 				userInput()
 			}
+		} else {
+			eventQueue.push(-event.keyCode)
 		}
-	})
-	
-	tabGraphic.addEventListener("mousedown", function(event) {
-		if (variables.TOUCH) {
-			event.preventDefault()
-			eventQueue.push(event.offsetY + event.offsetX/384.0 + 256)
-			eventHandler()
-		}
-	})
-	
-	tabGraphic.addEventListener("mouseup", function(event) {
-		if (variables.TOUCH) {
-			event.preventDefault()
-			eventQueue.push(-(event.offsetY + event.offsetX/384.0 + 256))
-			eventHandler()
-		}
+
+		eventHandler()
+		delete pressedKeys[event.keyCode]
 	})
 
 	setInterval(function() {
@@ -366,6 +480,7 @@ pageLoadHooks.push(function() {
 			if (i in arrays.SPRX) {
 				if (!(i in sprites)) {
 					sprites[i] = document.createElement("div")
+					sprites[i].style.pointerEvents = "none"
 					sprites[i].style.width = "24px"
 					sprites[i].style.height = "24px"
 					sprites[i].style.position = "absolute"
@@ -392,6 +507,7 @@ pageLoadHooks.push(function() {
 							var canvas = document.createElement('canvas')
 							canvas.width = 24
 							canvas.height = 24
+							canvas.style.pointerEvents = "none"
 							var ctx = canvas.getContext('2d')
 							ctx.putImageData(designs[designIdx], 0, 0)
 							sprites[i].appendChild(canvas)
@@ -419,13 +535,16 @@ pageLoadHooks.push(function() {
 			for (var row = 0; row <= 9; row++) {
 				for (var col = 0; col <= 16; col++) {
 					i = [row, col]
-					if (typeof arrays.TILE[i] === "number") {
+					if (typeof arrays.TILE[i] == "number") {
 						designIdx = Math.floor(arrays.TILE[i]/288)
 						cacheDesign(designIdx)
 						ctx.putImageData(designs[designIdx], col*24, row*24)
 						tiles[i].style.backgroundImage = ""
-					} else {
+					} else if (typeof arrays.TILE[i] == "string") {
 						tiles[i].style.backgroundImage = arrays.TILE[i]
+						ctx.clearRect(col*24, row*24, 24, 24)
+					} else {
+						tiles[i].style.backgroundImage = ""
 						ctx.clearRect(col*24, row*24, 24, 24)
 					}
 				}
@@ -483,9 +602,16 @@ pageLoadHooks.push(function() {
 		}
 			
 		if (textDirty)	{
-			for (var lineNum = 0; lineNum < 32 && (lineNum in textLines); lineNum++) {
-				var str = "" + textLines[lineNum]
+			for (var lineNum = 0; lineNum < 32; lineNum++) {
 				var fmt = "NORMAL"
+				var str
+
+				if (lineNum in textLines) {
+					str = "" + textLines[lineNum]
+				} else {
+					str = ""
+				}
+
 				if (typeof textLines[lineNum] == "object") {
 					fmt = textLines[lineNum].fmt
 				}

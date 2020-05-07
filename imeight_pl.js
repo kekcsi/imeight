@@ -200,6 +200,10 @@ var instructions = {
 			}
 
 			arrays[name] = []
+
+			if (name in builtInArrays) {
+				varUpdateHook(name, null)
+			}
 			
 			return pc + 1
 		}

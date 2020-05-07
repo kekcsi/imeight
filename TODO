@@ -1,5 +1,5 @@
 TODO
-* design touch/mouse control
+* test touch control
 * fix list scrolling
 * prios: SPRPRIO(), TEXTPRIO, TILEPRIO
 * hollow color code for tiles and sprites: HOLLOW variable
@@ -26,4 +26,3 @@ TODO
 		* CURSORX, CURSORY
 		* CURSORPERIOD, CURSORON
 		* READYPROMPT
-		* TEXTCOLOR2
