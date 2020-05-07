@@ -4,7 +4,7 @@ TODO
 * prios: SPRPRIO(), TEXTPRIO, TILEPRIO
 * hollow color code for tiles and sprites: HOLLOW variable
 * user-defined punctuation font: 33-47, 58-64, 91-96, 123-126 (32 glyphs)
-		* video built-in variable
+		* video built-in variable CHARGEN2
 * Look redesign
 		* graphics zoom 2 by 2
 		* dynamic screen size for editor
@@ -22,7 +22,3 @@ TODO
 		* punctuation font mode
 		* "all" link in font mode: show all characters, transform affect all
 		* hex dump text area mode
-* Video reference
-		* CURSORX, CURSORY
-		* CURSORPERIOD, CURSORON
-		* READYPROMPT
