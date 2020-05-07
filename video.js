@@ -8,16 +8,19 @@ builtInVariables.READYPROMPT = "READY."
 builtInArrays.SPRX = [] //horizontal coordinate of each sprite (-24 to 384)
 builtInArrays.SPRY = [] //vertical coordinate of each sprite (-24 to 216)
 builtInArrays.SPRDGN = [] //design pointer of each sprite (0 to 226*288)
+builtInArrays.SPRPRIO = [] //z-index of each sprite
 
 builtInArrays.TILE = [] //16+1 by 9+1 design pointers (-1 for full transparent)
 builtInVariables.TILEX = 0 //X offset of the tile layer for smooth scrolling
 builtInVariables.TILEY = 0 //Y offset of the tile layer for smooth scrolling
+builtInVariables.TILEPRIO = "" //z-index of the tile layer
 
 builtInVariables.CHARGEN = -1 //pointer to font for the character generator
 builtInVariables.TEXTX = 0 //text layer X offset
 builtInVariables.TEXTY = 0 //text layer Y offset
 builtInVariables.TEXTCOLOR = 2
 builtInVariables.TEXTCOLOR2 = 10
+builtInVariables.TEXTPRIO = "" //z-index of the text layer
 builtInArrays.TEXTLINES = [] //27+1 strings, 48+1 chars each
 
 builtInFunctions.TOUCHX = { 
@@ -306,8 +309,8 @@ varUpdateHook = function(arrayName, index) {
 	}
 	
 	// DIM SPR...()
-	if (index == null && (arrayName == "SPRDGN" ||
-			arrayName == "SPRX" || arrayName == "SPRY")) {
+	if (index == null && (arrayName == "SPRDGN" || arrayName == "SPRX" || 
+			arrayName == "SPRY")) {
 
 		for (i in sprites) {
 			sprites[i].remove()
@@ -489,6 +492,9 @@ pageLoadHooks.push(function() {
 
 				sprites[i].style.left = arrays.SPRX[i] + "px"
 				sprites[i].style.top = arrays.SPRY[i] + "px"
+				if (i in arrays.SPRPRIO) {
+					sprites[i].style.zIndex = arrays.SPRPRIO[i]
+				}
 				
 				if (i in arrays.SPRDGN) { //not the default design
 					if (typeof arrays.SPRDGN[i] == "number") { //user-designed
@@ -530,6 +536,7 @@ pageLoadHooks.push(function() {
 		//tiles
 		divTileGrid.style.left = variables.TILEX + "px"
 		divTileGrid.style.top = variables.TILEY + "px"
+		divTileGrid.style.zIndex = variables.TILEPRIO
 		if (tilesDirty) {
 			ctx = tileCanvas.getContext('2d')
 			for (var row = 0; row <= 9; row++) {
@@ -651,6 +658,7 @@ pageLoadHooks.push(function() {
 		
 		textCanvas.style.left = variables.TEXTX + "px"
 		textCanvas.style.top = variables.TEXTY + "px"
+		textCanvas.style.zIndex = variables.TEXTPRIO
 	}, 40)
 })
 

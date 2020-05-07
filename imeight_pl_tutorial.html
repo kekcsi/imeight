@@ -1607,18 +1607,39 @@ SPRY(1) = TOUCHY(1) - GRABY
 R.</div>
 
 <h2><a name="2009">Assorted Tricks</a></h2>
-<p>Okay, with that you get the concepts. Here are some more built-in variables
-that I didn't bother mentioning so far. I thought, these play no role in 
-understanding the big picture.</p><ul>
+<p>Okay, with that you get the concepts. Now here are some details that I have 
+not mentioned so far.</p>
+
+<h3>Built-in variables</h3>
+<ul>
 		<li>CURSORY &ndash; on which line will the next PRINT/INPUT print</li>
 		<li>CURSORX &ndash; it's normally 0, only changes during INPUT (when program can't get its value)</li>
 		<li>CURSORPERIOD, CURSORON &ndash; cursor blink timing (in 20-millisecond units; cursor is on for CURSORON, then off for the rest of the CURSORPERIOD)</li>
 		<li>READYPROMPT &ndash; the text you want to see when commands are expected</li>
 </ul>
+
+<h3>Re-DIM to erase</h3>
 <p>Quickly erase all sprites, tiles, text:</p>
 <div class="code">DIM SPRX()
 DIM TILE()
 DIM TEXTLINES():CURSORY=0</div>
+
+<h3>Priorities</h3>
+<p>Objects of the higher priority value will cover the other.
+Negative priorities are invisible (covered by the background color fill.)</p>
+<div class="code">TILE(1,1)=DGNWALL()
+TILEPRIO=2 '<i>PRIORITY OF THE TILE LAYER</i>
+SPRDGN(0)=DGNBOMB()
+SPRX(0)=16
+SPRY(0)=16
+TEXTLINES(3)="TEXT123"
+TEXTCOLOR2=$D
+
+FOR I=0 TO 1 STEP 0
+SPRPRIO(0)=INT(.5+SIN(TIME()/300)*4) '<i>PRIORITY OF EACH SPRITE</i>
+TEXTPRIO=INT(.5+SIN(TIME()/256)*4) '<i>PRIORITY OF THE TEXT LAYER</i>
+WAIT
+NEXT</div>
 
 <p>That's all. I hope you enjoyed this tutorial. Have fun programming!</p>
 </body>
