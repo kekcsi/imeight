@@ -603,13 +603,15 @@ pageLoadHooks.push(function() {
 		} 
 
 		if (cursorBlink) {
-			textDirty = (arrays.TEXTLINES[variables.CURSORY] == userInputValue)
-			arrays.TEXTLINES[variables.CURSORY] = userInputValue
-			variables.CURSORX = userInputValue.length
+			if (arrays.TEXTLINES[variables.CURSORY] != userInputValue) {
+				arrays.TEXTLINES[variables.CURSORY] = userInputValue
+				variables.CURSORX = userInputValue.length
+				textDirty = true
+			}
 		}
 			
 		if (textDirty)	{
-			for (var lineNum = 0; lineNum < 32; lineNum++) {
+			for (var lineNum = 0; lineNum < 27; lineNum++) {
 				var fmt = "NORMAL"
 				var str
 
