@@ -1627,18 +1627,24 @@ DIM TEXTLINES():CURSORY=0</div>
 <h3>Priorities</h3>
 <p>Objects of the higher priority value will cover the other.
 Negative priorities are invisible (covered by the background color fill.)</p>
-<div class="code">TILE(1,1)=DGNWALL()
-TILEPRIO=2 '<i>PRIORITY OF THE TILE LAYER</i>
-SPRDGN(0)=DGNBOMB()
-SPRX(0)=16
-SPRY(0)=16
-TEXTLINES(3)="TEXT123"
+<div class="code">TEXTX=4:TEXTY=0
 TEXTCOLOR2=$D
-
-FOR I=0 TO 1 STEP 0
-SPRPRIO(0)=INT(.5+SIN(TIME()/300)*4) '<i>PRIORITY OF EACH SPRITE</i>
-TEXTPRIO=INT(.5+SIN(TIME()/256)*4) '<i>PRIORITY OF THE TEXT LAYER</i>
-WAIT
+TEXTPRIO=4 '<i>PRIORITY OF THE TEXT LAYER</i>
+TILEX=12:TILEY=0
+TILE(4,7)=DGNBALL24()
+TILEPRIO=3 '<i>PRIORITY OF THE TILE LAYER</i>
+SPRDGN("P")=DGNBALL10():SPRDGN("M")=DGNBALL4()
+T=0:U=0
+FOR V=0 TO 3*PI STEP .003
+T=T+.05:U=U+.02:A=COS(V)
+TEXTLINES(13)="                       " + INT(V)
+SPRX("P")=187+60*COS(U)
+SPRY("P")=103+A*60*SIN(U)
+SPRPRIO("P")=3+2*SGN(A*SIN(U)) '<i>PRIORITY OF SPRITE "P"</i>
+SPRX("M")=SPRX("P")+15*COS(T)+3
+SPRY("M")=SPRY("P")-A*15*SIN(T)+3
+SPRPRIO("M")=SPRPRIO("P")-SGN(A*SIN(T)) '<i>PRIORITY OF SPRITE "M"</i>
+WAIT:WAIT
 NEXT</div>
 
 <p>That's all. I hope you enjoyed this tutorial. Have fun programming!</p>
