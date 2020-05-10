@@ -64,8 +64,36 @@ function updateDesignMode() {
 }
 
 function updateFont() {
-	var tbl = document.getElementById("tblDesignerGlyph")
-	var cells = tbl.getElementsByTagName("td")
+	if (selGlyph == 36) {
+		tblDesignerGlyph.style.display = "none"
+		fontOverviewCanvas.style.display = "block"
+
+		var wt = 48
+		var arr = new Uint8ClampedArray(4*wt*48)
+		var glyph = 0
+		for (var y = 0; y < 48; y+=8) {
+			for (var x = 0; x < 48; x+=8) {
+				for (var ro = 0; ro < 8; ro++) {
+					for (var co = 0; co < 8; co++) {
+						var bit = fontData[co + 8*ro][glyph]
+						var tup = [(bit ? 255 : 0), 0, 0, (bit ? 255 : 0)]
+					
+						for (var k = 0; k < 4; k++) {
+							arr[k + 4*(wt*(ro + y) + co + x)] = tup[k]
+						}
+					}
+				}
+				glyph++
+			}
+		}
+		var imd = new ImageData(arr, 48, 48)
+		var ctx = fontOverviewCanvas.getContext('2d')
+		ctx.putImageData(imd, 0, 0)
+
+		return
+	}
+	
+	var cells = tblDesignerGlyph.getElementsByTagName("td")
 	
 	for (var i = 0; i < 64; i++) {
 		cells[i].style.backgroundColor = (fontData[i] ? colorToCSS(7) : "black")
@@ -87,6 +115,14 @@ function goFont(glyphIdx) {
 	if (cbGetDesign.checked) {
 		fontFromMemory()
 	}
+	
+	if (glyphIdx == 36) {
+		tblDesignerGlyph.style.display = "none"
+		fontOverviewCanvas.style.display = "block"
+	} else {
+		tblDesignerGlyph.style.display = "table"
+		fontOverviewCanvas.style.display = "none"
+	}
 }
 
 function fontEdit(ev) {
@@ -95,7 +131,7 @@ function fontEdit(ev) {
 	var i = ev.target.dataset.idx
 
 	if (!mouseButtons && ev.buttons > 0) {
-		drawingIdx = !fontData[i]
+		drawingIdx = (fontData[i]?0:1)
 		drawingColor = colorToCSS(7*drawingIdx)
 	}
 
@@ -154,18 +190,6 @@ pageLoadHooks.push(function() {
 	clearDesignModes()
 
 	if (window.navigator.userAgent.indexOf("Edge/") < 0 || window.location.protocol != "file:") {
-		var designDataJson = localStorage.getItem("designdata")
-		if (designDataJson) {
-			designData = JSON.parse(designDataJson)
-			updateDesign()
-		}
-
-		var fontDataJson = localStorage.getItem("fontdata")
-		if (fontDataJson) {
-			fontData = JSON.parse(fontDataJson)
-			updateFont()
-		}
-
 		selSlot = localStorage.getItem("selslot")
 		if (selSlot == null) selSlot = 0
 		inPointer.value = 288*selSlot					
@@ -176,6 +200,18 @@ pageLoadHooks.push(function() {
 		designModeMapJson = localStorage.getItem("designmodemap")
 		if (designModeMapJson) {
 			designModeMap = JSON.parse(designModeMapJson)
+		}
+
+		var designDataJson = localStorage.getItem("designdata")
+		if (designDataJson) {
+			designData = JSON.parse(designDataJson)
+			updateDesign()
+		}
+
+		var fontDataJson = localStorage.getItem("fontdata")
+		if (fontDataJson) {
+			fontData = JSON.parse(fontDataJson)
+			updateFont()
 		}
 
 		var memoryJson = localStorage.getItem("memory")
@@ -208,6 +244,15 @@ pageLoadHooks.push(function() {
 		bitCells[i].addEventListener("mouseover", fontEdit);
 		bitCells[i].addEventListener("mouseup", function() { designerDirty = true })
 	}
+	
+	fontOverviewCanvas.addEventListener("mousemove", function(ev) {
+		var i = Math.floor(ev.offsetX/8) + 6*Math.floor(ev.offsetY/8)
+		if (i > 9) {
+			divDgnStatus.innerHTML = String.fromCharCode(i + 55)
+		} else {
+			divDgnStatus.innerHTML = "" + i
+		}
+	})
 	
 	var cells = tblColors.getElementsByTagName("td")
 	for(var i = 0; i < 16; ++i) {
@@ -300,13 +345,25 @@ function fontToMemory(designIdx, glyph) {
 	}
 	
 	for (var ro = 0; ro < 8; ++ro) {
-		by = 0
+		if (glyph < 36) {
+			by = 0
 
-		for (var co = 0; co < 8; ++co) {
-			by = (fontData[8*ro + co] | (by<<1))
+			for (var co = 0; co < 8; ++co) {
+				by = (fontData[8*ro + co] | (by<<1))
+			}
+
+			memory[288*designIdx + 8*glyph + ro] = by
+		} else {
+			for (var g = 0; g < 36; g++) {
+				by = 0
+
+				for (var co = 0; co < 8; ++co) {
+					by = (fontData[8*ro + co][g] | (by<<1))
+				}
+
+				memory[288*designIdx + 8*g + ro] = by
+			}
 		}
-
-		memory[288*designIdx + 8*glyph + ro] = by
 	}
 }
 
@@ -328,10 +385,22 @@ function sprFromMemory() {
 
 function fontFromMemory() {
 	for (var ro = 0; ro < 8; ro++) {
-		var by = memory[selSlot*288 + selGlyph*8 + ro]
 
-		for (var co = 0; co < 8; co++) {
-			fontData[8*ro + co] = ((by>>(7 - co))&1)
+		if (selGlyph < 36) {
+			var by = memory[selSlot*288 + selGlyph*8 + ro]
+
+			for (var co = 0; co < 8; co++) {
+				fontData[8*ro + co] = ((by>>(7 - co))&1)
+			}
+		} else {
+			for (var co = 0; co < 8; co++) {
+				fontData[8*ro + co] = []
+
+				for (var g = 0; g < 36; g++) {
+					var by = memory[selSlot*288 + g*8 + ro]
+					fontData[8*ro + co][g] = ((by>>(7 - co))&1)
+				}
+			}
 		}
 	}
 
@@ -392,23 +461,36 @@ function fontThumb(designIndex, thumb) {
 	var glyphs = [0, 1, 10, 11]
 	var xoffs = [0, 8, 0, 8]
 	var yoffs = [0, 0, 8, 8]
-
+	
 	for (var gi in glyphs) {
 		var glyph = glyphs[gi]
 		var xoff = xoffs[gi]
 		var yoff = yoffs[gi]
-		
-		for (var ro = 0; ro < 8; ro++) {
-			var by = memory[designIndex*288 + glyph*8 + ro]
+		charGen(designIndex, thumb, glyph, xoff, yoff, 16)
+	}
+}
 
-			for (var co = 0; co < 8; co++) {
-				var bit = ((by>>(7 - co))&1)
+function fontOverview(designIndex, arr) {
+	var glyph = 0
+	for (var y = 0; y < 48; y+=8) {
+		for (var x = 0; x < 48; x+=8) {
+			charGen(designIndex, arr, glyph, x, y, 48)
+			glyph++
+		}
+	}
+}
 
-				var tup = [(bit ? 255 : 0), 0, 0, (bit ? 255 : 0)]
-				
-				for (var k = 0; k < 4; k++) {
-					thumb[k + 4*(16*(ro + yoff) + co + xoff)] = tup[k]
-				}
+function charGen(designIndex, thumb, glyph, xoff, yoff, wt) {
+	for (var ro = 0; ro < 8; ro++) {
+		var by = memory[designIndex*288 + glyph*8 + ro]
+
+		for (var co = 0; co < 8; co++) {
+			var bit = ((by>>(7 - co))&1)
+
+			var tup = [(bit ? 255 : 0), 0, 0, (bit ? 255 : 0)]
+			
+			for (var k = 0; k < 4; k++) {
+				thumb[k + 4*(wt*(ro + yoff) + co + xoff)] = tup[k]
 			}
 		}
 	}

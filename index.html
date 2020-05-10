@@ -91,8 +91,8 @@
     	</div>
     	<div tabindex="0" class="dark" id="tabGraphic" onfocus="auBackground.play()" onblur="auBackground.pause()"></div>
     	<div id="tabDesigner" style="display:none; width:536px; position: relative">
-			<div id="tabFont" style="display:none; width: 216px; text-align: center">
-				<div id="divGlyph" style="font-family: monospace; margin-left: auto; margin-right: auto">
+			<div id="tabFont" style="display:none; width: 216px; height: 232px; text-align: center">
+				<div id="divGlyph" style="font-family: monospace; margin-left: auto; margin-right: auto; text-align: center">
 						<a href="javascript:goFont(0)">0</a><a href="javascript:goFont(1)">1</a><a href="javascript:goFont(2)">2</a> <a href="javascript:goFont(3)">3</a><a href="javascript:goFont(4)">4</a><a href="javascript:goFont(5)">5</a>
 						<a href="javascript:goFont(6)">6</a><a href="javascript:goFont(7)">7</a><a href="javascript:goFont(8)">8</a> <a href="javascript:goFont(9)">9</a><a href="javascript:goFont('A')">A</a><a href="javascript:goFont('B')">B</a>
 						<a href="javascript:goFont('C')">C</a><a href="javascript:goFont('D')">D</a><a href="javascript:goFont('E')">E</a> <a href="javascript:goFont('F')">F</a><a href="javascript:goFont('G')">G</a><a href="javascript:goFont('H')">H</a>
@@ -100,9 +100,10 @@
 						<a href="javascript:goFont('I')">I</a><a href="javascript:goFont('J')">J</a><a href="javascript:goFont('K')">K</a> <a href="javascript:goFont('L')">L</a><a href="javascript:goFont('M')">M</a><a href="javascript:goFont('N')">N</a>
 						<a href="javascript:goFont('O')">O</a><a href="javascript:goFont('P')">P</a><a href="javascript:goFont('Q')">Q</a> <a href="javascript:goFont('R')">R</a><a href="javascript:goFont('S')">S</a><a href="javascript:goFont('T')">T</a>
 						<a href="javascript:goFont('U')">U</a><a href="javascript:goFont('V')">V</a><a href="javascript:goFont('W')">W</a> <a href="javascript:goFont('X')">X</a><a href="javascript:goFont('Y')">Y</a><a href="javascript:goFont('Z')">Z</a>
-					</tr>
+						<br/>                                                                                                              
+						<a href="javascript:goFont(36)">ALL</a>
 				</div>
-				<table style="margin-left: auto; margin-right: auto" class="pixel" id="tblDesignerGlyph">
+				<table id="tblDesignerGlyph" style="margin-left: auto; margin-right: auto" class="pixel">
 					<tr>
 						<td data-idx="0"></td>
 						<td data-idx="1"></td>
@@ -184,6 +185,7 @@
 						<td data-idx="63"></td>
 					</tr>
 				</table>
+				<canvas id="fontOverviewCanvas" style="display: none; margin: 12px auto 0 auto; background: black" width="48" height="48"></canvas>
 			</div>
 			<div id="tabSprTile">
 				<table id="tblColors">

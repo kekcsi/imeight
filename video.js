@@ -16,10 +16,11 @@ builtInVariables.TILEY = 0 //Y offset of the tile layer for smooth scrolling
 builtInVariables.TILEPRIO = "" //z-index of the tile layer
 
 builtInVariables.CHARGEN = -1 //pointer to font for the character generator
+builtInVariables.CHARGEN2 = -1 //pointer to font pad 2 (non-alphanumerics)
 builtInVariables.TEXTX = 0 //text layer X offset
 builtInVariables.TEXTY = 0 //text layer Y offset
-builtInVariables.TEXTCOLOR = 2
-builtInVariables.TEXTCOLOR2 = 10
+builtInVariables.TEXTCOLOR = 2 //applies to capital letters (ASCII and 32 = 0)
+builtInVariables.TEXTCOLOR2 = 13 //applies to digits, punctuation etc.
 builtInVariables.TEXTPRIO = "" //z-index of the text layer
 builtInArrays.TEXTLINES = [] //27+1 strings, 48+1 chars each
 
@@ -156,6 +157,9 @@ var builtInCharGen = {32: [0,0,0,0,0,0,0,0],
 126: [112,214,28,0,0,0,0,0]}
 for (var alpha = 1; alpha <= 26; alpha++) {
 	builtInCharGen[96 + alpha] = builtInCharGen[64 + alpha]
+}
+for (var n = 32; n < 57; n++) {
+	builtInCharGen[n - 32] = builtInCharGen[n]
 }
 
 var designs = [] //ImageData
@@ -327,8 +331,8 @@ varUpdateHook = function(arrayName, index) {
 		textDirty = true
 	}
 	
-	if ((index == "CHARGEN" || index == "TEXTCOLOR" || 
-			index == "TEXTCOLOR2") && !arrayName) {
+	if ((index == "CHARGEN" || index == "CHARGEN2" || 
+			index == "TEXTCOLOR" || index == "TEXTCOLOR2") && !arrayName) {
 		
 		glyphsDirty = true
 	}
@@ -561,21 +565,43 @@ pageLoadHooks.push(function() {
 		}
 
 		if (glyphsDirty) {
-			var startAddress = variables.CHARGEN
+			var pad1 = Math.max(Math.floor(variables.CHARGEN/288)*288, -1)
+			var pad2 = Math.max(Math.floor(variables.CHARGEN2/288)*288, -1)
 			var tup1 = colorToBytes(variables.TEXTCOLOR)
 			var tup2 = colorToBytes(variables.TEXTCOLOR2)
 
 			for (var ascii in builtInCharGen) {
 				var gi = null
 				var tup = ((ascii & 0x20) ? tup2 : tup1) 
+				var startAddress = -2
 				
-				if (startAddress in memory) {
-					if (ascii >= 48 && ascii < 58) gi = ascii - 48
-					if (ascii > 64 && ascii <= 90) gi = ascii - 55
-					if (ascii > 96 && ascii <= 122) gi = ascii - 87
+				var upscii = (ascii & 0xdf)
+
+				if (upscii >= 16 && upscii < 25) {
+					gi = upscii - 16
+					startAddress = pad1
+				}
+
+				if (upscii > 64 && upscii <= 90) {
+					gi = upscii - 55
+					startAddress = pad1
 				}
 				
-				if (gi !== null) {
+				if (startAddress < -1 && (pad2 in memory)) {
+					if (ascii < 64) {
+						gi = (ascii & 31) //0-15, 26-31
+					} else if (ascii == 64) {
+						gi = 32
+					} else if (ascii == 96) {
+						gi = 33
+					} else { //16-25
+						gi = 16 + ((ascii - 27)&31) + ((ascii & 0x20)?5:0)
+					}
+
+					startAddress = pad2
+				}
+				
+				if (startAddress >= 0) {
 					glyphs[ascii] = genChar(memory, startAddress + gi*8, tup)
 				} else {
 					glyphs[ascii] = genChar(builtInCharGen[ascii], 0, tup)
@@ -611,7 +637,7 @@ pageLoadHooks.push(function() {
 		}
 			
 		if (textDirty)	{
-			for (var lineNum = 0; lineNum < 27; lineNum++) {
+			for (var lineNum = 0; lineNum < 28; lineNum++) {
 				var fmt = "NORMAL"
 				var str
 

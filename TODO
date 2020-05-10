@@ -1,8 +1,7 @@
 TODO
+* builtInCharGen in pad/glyphindex order rather than ASCII
 * test touch control
 * fix list scrolling
-* prios: SPRPRIO(), TEXTPRIO, TILEPRIO
-* hollow color code for tiles and sprites: HOLLOW variable
 * user-defined punctuation font: 33-47, 58-64, 91-96, 123-126 (32 glyphs)
 		* video built-in variable CHARGEN2
 * Look redesign
@@ -10,14 +9,10 @@ TODO
 		* dynamic screen size for editor
 		* Tutor button belongs outside list tab
 * music selection from program
+* hollow color code for tiles and sprites: HOLLOW variable
 * Vector layer?
-* 8 Palettes? 0: light colors, 1-7: intensity scale of the selected RGB color in the high 8 indices
 * LOAD/SAVE memory/routines: https://restdb.io/ ?
 * deploy script that creates im8runner.zip
-* to forum:
-		* routines: collisions, physics
-		* memory dump: chess set and letters
-
 * designer:
 		* punctuation font mode
 		* "all" link in font mode: show all characters, transform affect all
