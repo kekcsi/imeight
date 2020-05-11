@@ -1,9 +1,6 @@
 TODO
-* builtInCharGen in pad/glyphindex order rather than ASCII
 * test touch control
 * fix list scrolling
-* user-defined punctuation font: 33-47, 58-64, 91-96, 123-126 (32 glyphs)
-		* video built-in variable CHARGEN2
 * Look redesign
 		* graphics zoom 2 by 2
 		* dynamic screen size for editor
@@ -15,5 +12,4 @@ TODO
 * deploy script that creates im8runner.zip
 * designer:
 		* punctuation font mode
-		* "all" link in font mode: show all characters, transform affect all
 		* hex dump text area mode

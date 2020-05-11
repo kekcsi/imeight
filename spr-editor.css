@@ -103,3 +103,8 @@ table.pixel td, #tblColors td {
 	text-align-last: center;
 	width: 24px;
 }
+
+.fontPad a {
+	text-decoration: none;
+	font-size: 11px;
+}

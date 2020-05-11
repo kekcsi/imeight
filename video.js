@@ -15,12 +15,12 @@ builtInVariables.TILEX = 0 //X offset of the tile layer for smooth scrolling
 builtInVariables.TILEY = 0 //Y offset of the tile layer for smooth scrolling
 builtInVariables.TILEPRIO = "" //z-index of the tile layer
 
-builtInVariables.CHARGEN = -1 //pointer to font for the character generator
-builtInVariables.CHARGEN2 = -1 //pointer to font pad 2 (non-alphanumerics)
+builtInVariables.FONTALNUM = -1 //pointer to font for the character generator
+builtInVariables.FONTSIGNS = -1 //pointer to font pad 2 (non-alphanumerics)
 builtInVariables.TEXTX = 0 //text layer X offset
 builtInVariables.TEXTY = 0 //text layer Y offset
-builtInVariables.TEXTCOLOR = 2 //applies to capital letters (ASCII and 32 = 0)
-builtInVariables.TEXTCOLOR2 = 13 //applies to digits, punctuation etc.
+builtInVariables.TEXTCOLORUC = 2 //applies to capital letters (ASCII and 32 = 0)
+builtInVariables.TEXTCOLORLC = 13 //applies to digits, punctuation etc.
 builtInVariables.TEXTPRIO = "" //z-index of the text layer
 builtInArrays.TEXTLINES = [] //27+1 strings, 48+1 chars each
 
@@ -231,6 +231,12 @@ memoryUpdateHooks.push(function(addr) {
 	}
 	
 	tilesDirty = true
+
+	if (addr >= variables.FONTALNUM && addr < variables.FONTALNUM + 288 || 
+			addr >= variables.FONTSIGNS && addr < variables.FONTSIGNS + 272) {
+				
+		glyphsDirty = true
+	}
 })
 
 varUpdateHook = function(arrayName, index) {
@@ -295,6 +301,8 @@ varUpdateHook = function(arrayName, index) {
 		touchLayer.addEventListener("mouseup", mouseUp, false)
 		touchLayer.addEventListener("mouseout", mouseOut, false)
 		touchLayer.addEventListener("mousemove", mouseMove, false)
+		
+		glyphsDirty = true
 	}
 	
 	if (arrayName == "SPRDGN") {
@@ -331,8 +339,8 @@ varUpdateHook = function(arrayName, index) {
 		textDirty = true
 	}
 	
-	if ((index == "CHARGEN" || index == "CHARGEN2" || 
-			index == "TEXTCOLOR" || index == "TEXTCOLOR2") && !arrayName) {
+	if ((index == "FONTALNUM" || index == "FONTSIGNS" || 
+			index == "TEXTCOLORUC" || index == "TEXTCOLORLC") && !arrayName) {
 		
 		glyphsDirty = true
 	}
@@ -565,10 +573,10 @@ pageLoadHooks.push(function() {
 		}
 
 		if (glyphsDirty) {
-			var pad1 = Math.max(Math.floor(variables.CHARGEN/288)*288, -1)
-			var pad2 = Math.max(Math.floor(variables.CHARGEN2/288)*288, -1)
-			var tup1 = colorToBytes(variables.TEXTCOLOR)
-			var tup2 = colorToBytes(variables.TEXTCOLOR2)
+			var pad1 = Math.max(Math.floor(variables.FONTALNUM/288)*288, -1)
+			var pad2 = Math.max(Math.floor(variables.FONTSIGNS/288)*288, -1)
+			var tup1 = colorToBytes(variables.TEXTCOLORUC)
+			var tup2 = colorToBytes(variables.TEXTCOLORLC)
 
 			for (var ascii in builtInCharGen) {
 				var gi = null
@@ -589,7 +597,7 @@ pageLoadHooks.push(function() {
 				
 				if (startAddress < -1 && (pad2 in memory)) {
 					if (ascii < 64) {
-						gi = (ascii & 31) //0-15, 26-31
+						gi = (upscii & 31) //0-15, 26-31
 					} else if (ascii == 64) {
 						gi = 32
 					} else if (ascii == 96) {
@@ -658,10 +666,10 @@ pageLoadHooks.push(function() {
 				}
 
 				if (fmt == "INPUT") {
-					txCtx.fillStyle = colorToCSS(variables.TEXTCOLOR)
+					txCtx.fillStyle = colorToCSS(variables.TEXTCOLORUC)
 					txCtx.fillRect(0, 8*lineNum + 7, str.length*8, 1)
 				} else if (fmt == "PROGRAM") {
-					txCtx.fillStyle = colorToCSS(variables.TEXTCOLOR2)
+					txCtx.fillStyle = colorToCSS(variables.TEXTCOLORLC)
 					txCtx.fillRect(0, 8*lineNum + 7, str.length*8, 1)
 				}
 			}
@@ -672,7 +680,7 @@ pageLoadHooks.push(function() {
 		if (cursorBlink && tabGraphic == document.activeElement) {
 			cursorPhase++
 			if (cursorPhase < variables.CURSORON) {
-				txCtx.fillStyle = colorToCSS(variables.TEXTCOLOR)
+				txCtx.fillStyle = colorToCSS(variables.TEXTCOLORUC)
 				txCtx.fillRect(8*variables.CURSORX, 8*variables.CURSORY, 8, 8)
 			} else if (cursorPhase == variables.CURSORON) {
 				txCtx.fillStyle = colorToCSS(variables.BACKGROUND)

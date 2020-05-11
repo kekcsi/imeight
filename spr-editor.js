@@ -9,6 +9,7 @@ var designModeMap = []
 
 var fontData = []
 var selGlyph = 0
+var activePad
 
 var designerDirty = false
 var thumbsDirty = true
@@ -55,12 +56,14 @@ function changeDesignMode() {
 }
 
 function updateDesignMode() {
-	var m = designModeMap[selSlot]
+	var m = designModes[designModeMap[selSlot]]
+	var tSel = m.tab
 	for (var i in designModes) {
-		designModes[i].tab.style.display = ((m == i)?"block":"none")
+		var t = designModes[i].tab
+		designModes[i].tab.style.display = ((tSel == t)?"block":"none")
 	}
 	
-	setDrawingIndex(7)
+	m.init()
 }
 
 function updateFont() {
@@ -105,7 +108,7 @@ function goFont(glyphIdx) {
 		fontToMemory(selSlot, selGlyph)
 	}
 
-	var anchs = divGlyph.getElementsByTagName("a")
+	var anchs = activePad.getElementsByTagName("a")
 	anchs[selGlyph].style.backgroundColor = "gray"
 	
 	selGlyph = isNaN(glyphIdx) ? glyphIdx.charCodeAt(0) - 55 : glyphIdx
@@ -172,6 +175,10 @@ function clearDesigner() {
 		fontData[j] = 0
 		bitCells[j].style.backgroundColor = "black"
 	}
+	
+	var ctx = fontOverviewCanvas.getContext("2d")
+	ctx.fillStyle = "black"
+	ctx.fillRect(0, 0, 48, 48)
 }
 
 function clearDesignModes() {
@@ -183,8 +190,32 @@ function clearDesignModes() {
 }
 
 pageLoadHooks.push(function() {
-	designModes = [{ tab: tabSprTile, put: sprToMemory, get: sprFromMemory, data: "designData", thumb: sprThumb }, 
-			{ tab: tabFont, put: fontToMemory, get: fontFromMemory, data: "fontData", thumb: fontThumb }]
+	designModes = [
+		{ 
+			tab: tabSprTile, 
+			init: function() { setDrawingIndex(7) }, 
+			put: sprToMemory, get: sprFromMemory, 
+			data: "designData", thumb: sprThumb 
+		}, 
+		{ 
+			tab: tabFont, 
+			init: function() { divPad1.style.display = "block"; divPad2.style.display = "none"; activePad = divPad1 },
+			put: fontToMemory, get: fontFromMemory, 
+			data: "fontData", thumb: fontThumb 
+		},
+		{ 
+			tab: tabFont, 
+			init: function() { divPad1.style.display = "none"; divPad2.style.display = "block"; activePad = divPad2 },
+			put: fontToMemory, get: fontFromMemory, 
+			data: "fontData", thumb: fontThumb 
+		},
+		{ 
+			tab: tabHex, 
+			init: function() {},
+			put: hexToMemory, get: hexFromMemory, 
+			data: "designData", thumb: sprThumb 
+		}
+	]
 	
 	clearDesigner()
 	clearDesignModes()
@@ -219,9 +250,6 @@ pageLoadHooks.push(function() {
 			memory = JSON.parse(memoryJson)
 		}
 	}
-
-	var anchs = divGlyph.getElementsByTagName("a")
-	anchs[selGlyph].style.backgroundColor = "white"
 
 	document.body.addEventListener("mousedown", function(ev) {
 		mouseButtons = 1
@@ -264,6 +292,9 @@ pageLoadHooks.push(function() {
 	}
 	
 	updateDesignMode()
+
+	var anchs = activePad.getElementsByTagName("a")
+	anchs[selGlyph].style.backgroundColor = "white"
 	
 	cells = tblMemory.getElementsByTagName("td")
 	for(var j = 0; j < 227; ++j) {
@@ -332,6 +363,19 @@ function designToMemory(designIdx) {
 	designerDirty = true
 }
 
+function hexToMemory(designIdx) {
+	var hex = taHex.value.replace(/[^0-9A-Fa-f]/g, "")
+
+	if (hex.length != 2*288) {
+		divDgnStatus.innerHTML = "BAD FORMAT"
+		return
+	}
+
+	for (var b = 0; b < 288; b++) {
+		memory[designIdx*288 + b] = parseInt(hex.substring(2*b, 2*b + 2), 16)
+	}
+}
+
 function sprToMemory(designIdx) {
 	for (var i = 0; i < 288; ++i) {
 		var octet = ((designData[2*i]<<4)|designData[2*i + 1])
@@ -370,6 +414,22 @@ function fontToMemory(designIdx, glyph) {
 function designFromMemory() {
 	var getFn = designModes[designModeMap[selSlot]].get
 	getFn()
+}
+
+function hexFromMemory() {
+	taHex.value = ""
+	var sep = ""
+	
+	for (var lin = 0; lin < 288; lin+=16) {
+		taHex.value += sep
+		sep = "\n"
+
+		for (var b = 0; b < 16; b++) {
+			var by = memory[selSlot*288 + b + lin]
+			taHex.value += (by>>4).toString(16)
+			taHex.value += (by&15).toString(16)
+		}
+	}
 }
 
 function sprFromMemory() {
@@ -439,6 +499,12 @@ function updateThumb(designIndex) {
 
 function genThumb(designIndex, thumb) {
 	designModes[designModeMap[designIndex]].thumb(designIndex, thumb)
+}
+
+function hexThumb(designIndex, thumb) {
+	for (var b in thumb) {
+		thumb[b] = 255
+	}
 }
 
 function sprThumb(designIndex, thumb) {

@@ -1540,14 +1540,14 @@ TILEY. Smooth scrolling means to change the TILEX or TILEY in small steps.</p>
 
 <h2><a name="2007">Text Layer</a></h2>
 <p>Try pressing the MODE link in the Designer. It changes the purpose of the
-selected memory slot. Set CHARGEN variable to the address of the slot and
+selected memory slot. Set FONTALNUM variable to the address of the slot and
 see the letters and numbers appear in your design.</p>
 <p>Font can be embedded in the program text using DATA instructions.
 Demo below with smooth scroll:</p>
 <div class="code">FOR I=0 TO 287:READ B:POKE I,B:NEXT
-CHARGEN=0 '<i>USER-DEFINED ALPHANUMERIC FONT</i>
-TEXTCOLOR=7 '<i>APPLIES TO UPPERCASE LETTERS</i>
-TEXTCOLOR2=15 '<i>APPLIES TO CHARACTERS C$ WHERE ASC(C$) AND $20 = 1</i>
+FONTALNUM=0 '<i>USER-DEFINED ALPHANUMERIC FONT</i>
+TEXTCOLORUC=7 '<i>APPLIES TO UPPERCASE LETTERS</i>
+TEXTCOLORLC=15 '<i>APPLIES TO CHARACTERS C$ WHERE ASC(C$) AND $20 = 1</i>
 TEXTX=0
 TEXTY=0
 TEXTLINES(13)="                                                 HELL0"
@@ -1628,7 +1628,7 @@ DIM TEXTLINES():CURSORY=0</div>
 <p>Objects of the higher priority value will cover the other.
 Negative priorities are invisible (covered by the background color fill.)</p>
 <div class="code">TEXTX=4:TEXTY=0
-TEXTCOLOR2=$D
+TEXTCOLORLC=$D
 TEXTPRIO=4 '<i>PRIORITY OF THE TEXT LAYER</i>
 TILEX=12:TILEY=0
 TILE(4,7)=DGNBALL24()
