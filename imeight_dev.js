@@ -134,11 +134,10 @@ var interact = function(input) {
 	} else if (command.startsWith("?")) {
 		//direct expression
 		var saveProgram = program.slice()
-		var saveStopped = stopped
 		
 		var evalPC = program.length
 		bugLocator = false
-		stopped = evalPC //enable reporting errors (even after errors)
+		parseSuccess = true //enable reporting errors (even after errors)
 
 		var rest = expressionArg(input.trim().substring(1))
 		if (rest !== "") {
@@ -159,7 +158,6 @@ var interact = function(input) {
 		}
 		
 		program = saveProgram
-		stopped = saveStopped
 	} else {
 		//try adding it as a line to the end of the program text
 		parseSuccess = true

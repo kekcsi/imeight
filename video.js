@@ -22,7 +22,7 @@ builtInVariables.TEXTY = 0 //text layer Y offset
 builtInVariables.TEXTCOLORUC = 2 //applies to capital letters (ASCII and 32 = 0)
 builtInVariables.TEXTCOLORLC = 13 //applies to digits, punctuation etc.
 builtInVariables.TEXTPRIO = "" //z-index of the text layer
-builtInArrays.TEXTLINES = [] //27+1 strings, 48+1 chars each
+builtInArrays.TEXTLINE$ = [] //27+1 strings, 48+1 chars each
 
 builtInFunctions.TOUCHX = { 
 	apply: function(eventCode) {
@@ -185,7 +185,7 @@ videoPrint = function(message) {
 		return
 	}
 
-	arrays.TEXTLINES[variables.CURSORY++] = message
+	arrays.TEXTLINE$[variables.CURSORY++] = message
 	variables.CURSORX = 0
 	textDirty = true
 }
@@ -335,7 +335,7 @@ varUpdateHook = function(arrayName, index) {
 		tilesDirty = true
 	}
 	
-	if (arrayName == "TEXTLINES") {
+	if (arrayName == "TEXTLINE$") {
 		textDirty = true
 	}
 	
@@ -454,8 +454,17 @@ pageLoadHooks.push(function() {
 			userInputValue += String.fromCharCode(event.keyCode - 48)
 		}
 
-		if (event.keyCode == 27 && pressedKeys[event.keyCode] < Date.now() - 2000) { //force break
-			userBreak()
+		if (event.keyCode == 27) {
+			event.preventDefault()
+				
+			if (pressedKeys[event.keyCode] < Date.now() - 2000) { //force break
+				userBreak()
+				instructions.CLR.run(0)
+			}
+
+			if (!(27 in pressedKeys)) {
+				pressedKeys[27] = Date.now()
+			}
 		}
 	})
 	
@@ -620,25 +629,24 @@ pageLoadHooks.push(function() {
 			glyphsDirty = false
 		}
 
-		var textLines = arrays.TEXTLINES
+		var TEXTLINE$ = arrays.TEXTLINE$
 		var txCtx = textCanvas.getContext("2d")
 
 		if (variables.CURSORY > 26) {
 			if (variables.TEXTY > -7 && variables.CURSORY < 32) {
 				variables.TEXTY -= 1
 			} else {
-				console.log("scrolled out " + textLines.shift())
-				textLines.push("")
+				console.log("scrolled out " + TEXTLINE$.shift())
+				TEXTLINE$.push("")
 				variables.CURSORY--
 				variables.TEXTY = 0
+				textDirty = true
 			}
-			
-			textDirty = true
 		} 
 
 		if (cursorBlink) {
-			if (arrays.TEXTLINES[variables.CURSORY] != userInputValue) {
-				arrays.TEXTLINES[variables.CURSORY] = userInputValue
+			if (arrays.TEXTLINE$[variables.CURSORY] != userInputValue) {
+				arrays.TEXTLINE$[variables.CURSORY] = userInputValue
 				variables.CURSORX = userInputValue.length
 				textDirty = true
 			}
@@ -649,19 +657,20 @@ pageLoadHooks.push(function() {
 				var fmt = "NORMAL"
 				var str
 
-				if (lineNum in textLines) {
-					str = "" + textLines[lineNum]
+				if (lineNum in TEXTLINE$) {
+					str = "" + TEXTLINE$[lineNum]
 				} else {
 					str = ""
 				}
 
-				if (typeof textLines[lineNum] == "object") {
-					fmt = textLines[lineNum].fmt
+				if (typeof TEXTLINE$[lineNum] == "object") {
+					fmt = TEXTLINE$[lineNum].fmt
 				}
 
-				for (var x = 0; x < 49; x++) {
+				txCtx.clearRect(0, 8*lineNum, 392, 8)
+				for (var x = 0; x < 49 && x < str.length; x++) {
 					var ascii = str.charCodeAt(x)
-					if (!(ascii in glyphs)) ascii = 32
+					if (!(ascii in glyphs)) continue
 					txCtx.putImageData(glyphs[ascii], 8*x, 8*lineNum)
 				}
 

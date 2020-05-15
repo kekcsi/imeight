@@ -293,8 +293,10 @@ pageLoadHooks.push(function() {
 	
 	updateDesignMode()
 
-	var anchs = activePad.getElementsByTagName("a")
-	anchs[selGlyph].style.backgroundColor = "white"
+	if (activePad) {
+		var anchs = activePad.getElementsByTagName("a")
+		anchs[selGlyph].style.backgroundColor = "white"
+	}
 	
 	cells = tblMemory.getElementsByTagName("td")
 	for(var j = 0; j < 227; ++j) {
@@ -347,6 +349,14 @@ pageLoadHooks.push(function() {
 	})
 
 	inMove.value = "<>"
+	
+	tabSprTile.addEventListener("keypress", function(event) {
+		var idx = parseInt(String.fromCharCode(event.charCode), 16)
+		if (isNaN(idx)) return
+		
+		event.preventDefault()
+		setDrawingIndex(idx)
+	})
 })
 
 function designToMemory(designIdx) {
