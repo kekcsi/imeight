@@ -23,8 +23,8 @@ builtInVariables.TEXTX = 0 //text layer X offset
 builtInVariables.TEXTY = 0 //text layer Y offset
 builtInVariables.TEXTCOLORUC = 2 //applies to capital letters (ASCII and 32 = 0)
 builtInVariables.TEXTCOLORLC = 13 //applies to digits, punctuation etc.
-builtInVariables.TEXTPRIO = "" //z-index of the text layer
-builtInArrays.TEXTLINE$ = [] //27+1 strings, 48+1 chars each
+builtInVariables.TEXTPRIO = 65535 //z-index of the text layer
+builtInArrays["TEXTLINE$"] = [] //27+1 strings, 48+1 chars each
 
 builtInFunctions.TOUCHX = { 
 	apply: function(eventCode) {
@@ -187,7 +187,7 @@ videoPrint = function(message) {
 		return
 	}
 
-	arrays.TEXTLINE$[variables.CURSORY++] = message
+	arrays["TEXTLINE$"][variables.CURSORY++] = message
 	variables.CURSORX = 0
 	textDirty = true
 }
@@ -641,15 +641,14 @@ pageLoadHooks.push(function() {
 			glyphsDirty = false
 		}
 
-		var TEXTLINE$ = arrays.TEXTLINE$
 		var txCtx = textCanvas.getContext("2d")
 
 		if (variables.CURSORY > 26) {
 			if (variables.TEXTY > -7 && variables.CURSORY < 32) {
 				variables.TEXTY -= 1
 			} else {
-				console.log("scrolled out " + TEXTLINE$.shift())
-				TEXTLINE$.push("")
+				console.log("scrolled out " + arrays["TEXTLINE$"].shift())
+				arrays["TEXTLINE$"].push("")
 				variables.CURSORY--
 				variables.TEXTY = 0
 				textDirty = true
@@ -657,8 +656,8 @@ pageLoadHooks.push(function() {
 		} 
 
 		if (cursorBlink) {
-			if (arrays.TEXTLINE$[variables.CURSORY] != userInputValue) {
-				arrays.TEXTLINE$[variables.CURSORY] = userInputValue
+			if (arrays["TEXTLINE$"][variables.CURSORY] != userInputValue) {
+				arrays["TEXTLINE$"][variables.CURSORY] = userInputValue
 				variables.CURSORX = userInputValue.length
 				textDirty = true
 			}
@@ -669,14 +668,14 @@ pageLoadHooks.push(function() {
 				var fmt = "NORMAL"
 				var str
 
-				if (lineNum in TEXTLINE$) {
-					str = "" + TEXTLINE$[lineNum]
+				if (lineNum in arrays["TEXTLINE$"]) {
+					str = "" + arrays["TEXTLINE$"][lineNum]
 				} else {
 					str = ""
 				}
 
-				if (typeof TEXTLINE$[lineNum] == "object") {
-					fmt = TEXTLINE$[lineNum].fmt
+				if (typeof arrays["TEXTLINE$"][lineNum] == "object") {
+					fmt = arrays["TEXTLINE$"][lineNum].fmt
 				}
 
 				txCtx.clearRect(0, 8*lineNum*ZOOM, 392*ZOOM, 8*ZOOM)
