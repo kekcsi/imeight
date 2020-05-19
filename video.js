@@ -376,6 +376,7 @@ function copyTouch({ identifier, pageX, pageY }) {
 
 function mouseDown(evt) {
 	evt.preventDefault()
+	tabGraphic.focus()
 	ongoingTouches[1] = {identifier: 1, pageX: evt.offsetX/ZOOM, pageY: evt.offsetY/ZOOM}
 	eventQueue.push(1 + 0.5*evt.shiftKey + 0.25*evt.ctrlKey)
 	eventHandler()
@@ -398,6 +399,7 @@ function mouseOut(evt) {
 
 function touchStart(evt) {
 	evt.preventDefault()
+	tabGraphic.focus()
 	var numTouches = evt.changedTouches.length
 
 	for (var i = 0; i < numTouches; i++) {

@@ -163,13 +163,14 @@ var instructions = {
 
 				if (response === null) {
 					readyPrompt()
+					variables.STATUS = 1
 					argumentStack = saveStk
 					stopped = pc
 					return
 				}
 				
 				videoPrint(FmtStr("INPUT", response))
-				if (!isNaN(response)) {
+				if (!isNaN(response) && response.length > 0) {
 					response = +response
 				}
 				target.array[target.index] = response

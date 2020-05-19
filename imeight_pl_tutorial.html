@@ -272,11 +272,11 @@ But you can name them relatively freely. Let's see the exact rules for naming va
 </p><ol>
 <li> A variable name must start with a letter A through Z. It may have a longer name.
 <div class="code">INPUT NUM</div></li>
-<li> From the second position on, the name may contain digits 0 to 9 or more letters, or both, in any order.
+<li> From the second position on, the name may contain dots (.), digits 0 to 9 or more letters, in any order.
 <div class="code">INPUT NUMBER2STORE
 INPUT INCOME2020</div></li>
 <li> There is no length limit for the name.
-<div class="code">INPUT THEREISNODEFINEDLENGTHLIMITFORTHEVARIABLENAMES</div></li>
+<div class="code">INPUT THERE.IS.NO.DEFINED.LENGTH.LIMIT.FOR.THE.VARIABLE.NAMES</div></li>
 <li> The name optionally ends in one $ or one % sign.
 Convention is that the name ends in $ if it is supposed to have a text value rather than number.
 The % sign suggests integer number value.
@@ -704,10 +704,11 @@ GOTO OUTRO
 RETURN:REM<i> SUB IS OVER, GO BACK TO THE POINT AFTER GOSUB (THE RIGHT GOSUB)</i>
 @OUTRO: PRINT "OUTRO"</div>
 
-<p>Alternative RETURN syntax has a label argument, meaning return from that 
-specified subprogram. In case the program would run to such a RETURN instruction
-by accident, not because a GOSUB deliberately jumped there, it would stop
-the program with error rather than continuing the wrong flow.</p>
+<h3><a name="returnfrom">RETURN from...</a></h3>
+<p>Alternative RETURN syntax has a label argument. In case the program would 
+run to such a RETURN instruction by accident, not because a GOSUB deliberately 
+jumped there, it would stop the program with error rather than continuing the 
+wrong flow.</p>
 
 <div class="code">PRINT "VERSE 1"
 GOSUB CHORUS
@@ -1140,9 +1141,10 @@ More differences that are already mentioned:<div class="contents">
 &bull; <a href="#642">Abbreviations</a>
 &bull; <a href="#299">Concept of labels</a>
 &bull; <a href="#rtl">RESTORE to a label</a>
+&bull; <a href="#returnfrom">RETURN from...</a>
 &bull; <a href="#novalue">Unassigned variables: initialization enforced</a>
 &bull; <a href="#567">Built-in variables</a>
-&bull; <a href="#numop">FRAC function, MOD and XOR operators added</a>
+&bull; <a href="#numop">FRAC and INI functions, MOD and XOR operators added</a>
 &bull; <a href="#numlit">Hexadecimal, binary, 4-based number literals</a>
 &bull; <a href="#460">Distinguishing interactive commands from programming instructions</a>
 &bull; More sophisticated data structures internally to speed up execution

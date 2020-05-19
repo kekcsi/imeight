@@ -319,6 +319,7 @@ var onlyStop = function(input) {
 	if (input === null) {
 		//unless there was user break 
 		readyPrompt()
+		variables.STATUS = 1
 
 		//restore normal handlers
 		inputAction = interact
