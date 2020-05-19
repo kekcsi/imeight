@@ -1,3 +1,5 @@
+var ZOOM = 1
+
 builtInVariables.BACKGROUND = 0 //color
 builtInVariables.CURSORX = 0
 builtInVariables.CURSORY = 0
@@ -242,20 +244,24 @@ memoryUpdateHooks.push(function(addr) {
 varUpdateHook = function(arrayName, index) {
 	if (arrayName == null && index == null) {
 		//CLR
+		ZOOM = inZoom.checked ? 2 : 1
+		tabGraphic.style.width = 384*ZOOM + "px"
+		tabGraphic.style.height = 216*ZOOM + "px"
+		
 		sprites = []
 		tabGraphic.innerHTML = ""
 		
 		divTileGrid = document.createElement('div')
 		divTileGrid.style.pointerEvents = "none"
-		divTileGrid.style.width = 24*17 + "px"
-		divTileGrid.style.height = 24*10 + "px"
+		divTileGrid.style.width = 24*17*ZOOM + "px"
+		divTileGrid.style.height = 24*10*ZOOM + "px"
 		divTileGrid.style.position = "absolute"
 		tabGraphic.appendChild(divTileGrid)
 		
 		tileCanvas = document.createElement('canvas')
 		tileCanvas.style.pointerEvents = "none"
-		tileCanvas.width = 24*17
-		tileCanvas.height = 24*10
+		tileCanvas.width = 24*17*ZOOM
+		tileCanvas.height = 24*10*ZOOM
 		tileCanvas.style.position = "absolute"
 		tileCanvas.style.top = "0px"
 		tileCanvas.style.left = "0px"
@@ -266,11 +272,11 @@ varUpdateHook = function(arrayName, index) {
 				i = [row, col]
 				tiles[i] = document.createElement('div')
 				tiles[i].style.pointerEvents = "none"
-				tiles[i].style.width = 24 + "px"
-				tiles[i].style.height = 24 + "px"
+				tiles[i].style.width = 24*ZOOM + "px"
+				tiles[i].style.height = 24*ZOOM + "px"
 				tiles[i].style.position = "absolute"
-				tiles[i].style.left = 24*col + "px"
-				tiles[i].style.top = 24*row + "px"
+				tiles[i].style.left = 24*col*ZOOM + "px"
+				tiles[i].style.top = 24*row*ZOOM + "px"
 				divTileGrid.appendChild(tiles[i])
 			}
 		}
@@ -279,16 +285,16 @@ varUpdateHook = function(arrayName, index) {
 		
 		textCanvas = document.createElement('canvas')
 		textCanvas.style.pointerEvents = "none"
-		textCanvas.width = 8*49
-		textCanvas.height = 8*28
+		textCanvas.width = 8*49*ZOOM
+		textCanvas.height = 8*28*ZOOM
 		textCanvas.style.position = "absolute"
 		textCanvas.style.top = "0px"
 		textCanvas.style.left = "0px"
 		tabGraphic.appendChild(textCanvas)
 
 		var touchLayer = document.createElement('canvas')
-		touchLayer.width = "384"
-		touchLayer.height = "216"
+		touchLayer.width = 384*ZOOM
+		touchLayer.height = 216*ZOOM
 		touchLayer.style.position = "absolute"
 		touchLayer.style.top = "0px"
 		touchLayer.style.left = "0px"
@@ -303,6 +309,7 @@ varUpdateHook = function(arrayName, index) {
 		touchLayer.addEventListener("mousemove", mouseMove, false)
 		
 		glyphsDirty = true
+		designs = []
 	}
 	
 	if (arrayName == "SPRDGN") {
@@ -364,29 +371,29 @@ function colorToBytes(i) {
 }
 
 function copyTouch({ identifier, pageX, pageY }) {
-	return { identifier, pageX, pageY }
+	return { identifier:identifier, pageX:pageX/ZOOM, pageY:pageY/ZOOM }
 }
 
 function mouseDown(evt) {
 	evt.preventDefault()
-	ongoingTouches[1] = {identifier: 1, pageX: evt.offsetX, pageY: evt.offsetY}
+	ongoingTouches[1] = {identifier: 1, pageX: evt.offsetX/ZOOM, pageY: evt.offsetY/ZOOM}
 	eventQueue.push(1 + 0.5*evt.shiftKey + 0.25*evt.ctrlKey)
 	eventHandler()
 }
 
 function mouseMove(evt) {
 	evt.preventDefault()
-	ongoingTouches[1] = {identifier: 1, pageX: evt.offsetX, pageY: evt.offsetY}
+	ongoingTouches[1] = {identifier: 1, pageX: evt.offsetX/ZOOM, pageY: evt.offsetY/ZOOM}
 }
 
 function mouseUp(evt) {
 	eventQueue.push(-1)
-	delete ongoingTouches[1]
 	eventHandler()
 }
 
 function mouseOut(evt) {
 	delete ongoingTouches[1]
+	eventHandler()
 }
 
 function touchStart(evt) {
@@ -505,14 +512,14 @@ pageLoadHooks.push(function() {
 				if (!(i in sprites)) {
 					sprites[i] = document.createElement("div")
 					sprites[i].style.pointerEvents = "none"
-					sprites[i].style.width = "24px"
-					sprites[i].style.height = "24px"
+					sprites[i].style.width = 24*ZOOM + "px"
+					sprites[i].style.height = 24*ZOOM + "px"
 					sprites[i].style.position = "absolute"
 					tabGraphic.appendChild(sprites[i])
 				}
 
-				sprites[i].style.left = arrays.SPRX[i] + "px"
-				sprites[i].style.top = arrays.SPRY[i] + "px"
+				sprites[i].style.left = arrays.SPRX[i]*ZOOM + "px"
+				sprites[i].style.top = arrays.SPRY[i]*ZOOM + "px"
 				if (i in arrays.SPRPRIO) {
 					sprites[i].style.zIndex = arrays.SPRPRIO[i]
 				}
@@ -532,8 +539,8 @@ pageLoadHooks.push(function() {
 						if (sprites[i].childElementCount == 0) {
 							// created just now
 							var canvas = document.createElement('canvas')
-							canvas.width = 24
-							canvas.height = 24
+							canvas.width = 24*ZOOM
+							canvas.height = 24*ZOOM
 							canvas.style.pointerEvents = "none"
 							var ctx = canvas.getContext('2d')
 							ctx.putImageData(designs[designIdx], 0, 0)
@@ -542,12 +549,14 @@ pageLoadHooks.push(function() {
 						}
 					} else { // library design
 						sprites[i].style.background = arrays.SPRDGN[i] //url
+						sprites[i].style.backgroundSize = "cover"
 						sprites[i].innerHTML = ""
 						sprites[i].dataset.dgnurl = arrays.SPRDGN[i]
 					}
 				} else {
 					// default design
 					sprites[i].style.background = "url(ball24.gif)"
+					sprites[i].style.backgroundSize = "cover"
 					sprites[i].innerHTML = ""
 					sprites[i].dataset.dgnurl = "url(ball24.gif)"
 				}
@@ -555,8 +564,8 @@ pageLoadHooks.push(function() {
 		} //end of sprites
 		
 		//tiles
-		divTileGrid.style.left = variables.TILEX + "px"
-		divTileGrid.style.top = variables.TILEY + "px"
+		divTileGrid.style.left = variables.TILEX*ZOOM + "px"
+		divTileGrid.style.top = variables.TILEY*ZOOM + "px"
 		divTileGrid.style.zIndex = variables.TILEPRIO
 		if (tilesDirty) {
 			ctx = tileCanvas.getContext('2d')
@@ -566,14 +575,15 @@ pageLoadHooks.push(function() {
 					if (typeof arrays.TILE[i] == "number") {
 						designIdx = Math.floor(arrays.TILE[i]/288)
 						cacheDesign(designIdx)
-						ctx.putImageData(designs[designIdx], col*24, row*24)
+						ctx.putImageData(designs[designIdx], col*24*ZOOM, row*24*ZOOM)
 						tiles[i].style.backgroundImage = ""
 					} else if (typeof arrays.TILE[i] == "string") {
 						tiles[i].style.backgroundImage = arrays.TILE[i]
-						ctx.clearRect(col*24, row*24, 24, 24)
+						tiles[i].style.backgroundSize = "cover"
+						ctx.clearRect(col*24*ZOOM, row*24*ZOOM, 24*ZOOM, 24*ZOOM)
 					} else {
 						tiles[i].style.backgroundImage = ""
-						ctx.clearRect(col*24, row*24, 24, 24)
+						ctx.clearRect(col*24*ZOOM, row*24*ZOOM, 24*ZOOM, 24*ZOOM)
 					}
 				}
 			}
@@ -667,19 +677,19 @@ pageLoadHooks.push(function() {
 					fmt = TEXTLINE$[lineNum].fmt
 				}
 
-				txCtx.clearRect(0, 8*lineNum, 392, 8)
+				txCtx.clearRect(0, 8*lineNum*ZOOM, 392*ZOOM, 8*ZOOM)
 				for (var x = 0; x < 49 && x < str.length; x++) {
 					var ascii = str.charCodeAt(x)
 					if (!(ascii in glyphs)) continue
-					txCtx.putImageData(glyphs[ascii], 8*x, 8*lineNum)
+					txCtx.putImageData(glyphs[ascii], 8*x*ZOOM, 8*lineNum*ZOOM)
 				}
 
 				if (fmt == "INPUT") {
 					txCtx.fillStyle = colorToCSS(variables.TEXTCOLORUC)
-					txCtx.fillRect(0, 8*lineNum + 7, str.length*8, 1)
+					txCtx.fillRect(0, (8*lineNum + 7)*ZOOM, str.length*8*ZOOM, ZOOM)
 				} else if (fmt == "PROGRAM") {
 					txCtx.fillStyle = colorToCSS(variables.TEXTCOLORLC)
-					txCtx.fillRect(0, 8*lineNum + 7, str.length*8, 1)
+					txCtx.fillRect(0, (8*lineNum + 7)*ZOOM, str.length*8*ZOOM, ZOOM)
 				}
 			}
 			
@@ -690,10 +700,10 @@ pageLoadHooks.push(function() {
 			cursorPhase++
 			if (cursorPhase < variables.CURSORON) {
 				txCtx.fillStyle = colorToCSS(variables.TEXTCOLORUC)
-				txCtx.fillRect(8*variables.CURSORX, 8*variables.CURSORY, 8, 8)
+				txCtx.fillRect(8*ZOOM*variables.CURSORX, 8*ZOOM*variables.CURSORY, 8*ZOOM, 8*ZOOM)
 			} else if (cursorPhase == variables.CURSORON) {
 				txCtx.fillStyle = colorToCSS(variables.BACKGROUND)
-				txCtx.fillRect(8*variables.CURSORX, 8*variables.CURSORY, 8, 8)
+				txCtx.fillRect(8*ZOOM*variables.CURSORX, 8*ZOOM*variables.CURSORY, 8*ZOOM, 8*ZOOM)
 
 				textDirty = true
 			} else if (cursorPhase > variables.CURSORPERIOD) {
@@ -701,47 +711,86 @@ pageLoadHooks.push(function() {
 			}
 		}
 		
-		textCanvas.style.left = variables.TEXTX + "px"
-		textCanvas.style.top = variables.TEXTY + "px"
+		textCanvas.style.left = variables.TEXTX*ZOOM + "px"
+		textCanvas.style.top = variables.TEXTY*ZOOM + "px"
 		textCanvas.style.zIndex = variables.TEXTPRIO
 	}, 40)
 })
 
 function cacheDesign(designIdx) {
 	if (!(designIdx in designs)) {
-		var pixels = new Uint8ClampedArray(4*24*24)
+		var pixels = new Uint8ClampedArray(4*24*ZOOM*24*ZOOM)
 		
-		for (var j = 0; j < 288; ++j) {
-			var addr = 288*designIdx + j
-			var bytes = colorToBytes(memory[addr] >> 4)
-			bytes = bytes.concat(colorToBytes(memory[addr] & 15))
-			for (var k = 0; k < 8; ++k) {
-				pixels[8*j + k] = bytes[k]
+		var j = 0 //indexing pixel data array
+		for (var ro = 0; ro < 24; ++ro) { //row of imaginary pixels
+			for (var ib = 0; ib < 12; ++ib) { //memory byte index in row
+				var addr = 288*designIdx + 12*ro + ib //memory address
+
+				var hi = colorToBytes(memory[addr] >> 4) //pixel from high...
+				var lo = colorToBytes(memory[addr] & 15) //...low nibble
+				
+				if (ZOOM == 2) {
+					for (var component = 0; component < 4; ++component) {
+						pixels[j + component] = hi[component]
+						pixels[j + component + 4] = hi[component]
+						pixels[j + component + 192] = hi[component]
+						pixels[j + component + 196] = hi[component]
+
+						pixels[j + component + 8] = lo[component]
+						pixels[j + component + 12] = lo[component]
+						pixels[j + component + 200] = lo[component]
+						pixels[j + component + 204] = lo[component]
+					}
+				} else {
+					for (var component = 0; component < 4; ++component) {
+						pixels[j + component] = hi[component]
+						pixels[j + component + 4] = lo[component]
+					}
+				}
+				
+				j += 8*ZOOM //next memory byte goes 2 imaginary pixels ahead
+			}
+			
+			if (ZOOM == 2) {
+				//skip a line of real pixels, i.e. 48*4 pixel data bytes
+				j += 192
 			}
 		}
 		
-		designs[designIdx] = new ImageData(pixels, 24, 24)
+		designs[designIdx] = new ImageData(pixels, 24*ZOOM, 24*ZOOM)
 	}
 }
 
 function genChar(ary, offset, tup) {
-	var ba = new Uint8ClampedArray(4*8*8)
+	var ba = new Uint8ClampedArray(4*8*ZOOM*8*ZOOM)
 
+	var a = 0
 	for (var ro = 0; ro < 8; ro++) {
 		var by = ary[offset + ro]
 
 		for (var co = 0; co < 8; co++) {
 			var bit = ((by>>(7 - co))&1)
-			
 			tup[3] = (bit ? 255 : 0)
-			
+
 			for (var k = 0; k < 4; k++) {
-				ba[k + 4*(8*ro + co)] = tup[k]
+				ba[k + a] = tup[k]
+
+				if (ZOOM == 2) {
+					ba[k + a + 4] = tup[k]
+					ba[k + a + 64] = tup[k]
+					ba[k + a + 68] = tup[k]
+				}
 			}
+			
+			a += 4*ZOOM //next bit goes 1 imaginary pixel ahead
+		}
+		
+		if (ZOOM == 2) {
+			a += 64 //skip a line of real pixels, i.e. 16*4 pixel data bytes
 		}
 	}
 	
-	return new ImageData(ba, 8, 8)
+	return new ImageData(ba, 8*ZOOM, 8*ZOOM)
 }
 
 function FmtStr(fmt, str) {

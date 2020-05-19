@@ -176,7 +176,6 @@ function contProgram() {
 
 	if (interact == inputAction) {
 		readyPrompt()
-		updateDownloadBlob()
 		variables.STATUS = (stopped === true) ? -1 : ((stopped == 0) ? 0 : 1)
 	}
 }

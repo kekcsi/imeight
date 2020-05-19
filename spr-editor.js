@@ -369,7 +369,6 @@ function designToMemory(designIdx) {
 	
 	updateThumb(designIdx)
 	memoryUpdateHook(288*designIdx)
-	updateDownloadBlob()
 	designerDirty = true
 }
 

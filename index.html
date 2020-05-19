@@ -25,6 +25,7 @@
 				dataLookup = JSON.parse(document.scripts.namedItem("dataLookupJson").text)
 				elseBranches = JSON.parse(document.scripts.namedItem("elseBranchesJson").text)
 				memory = JSON.parse(document.scripts.namedItem("memoryJson").text)
+				var inZoom = { checked: <?=zoom?> }
 				var interact = runProgram
 				var inputAction = interact
 				readyPrompt = function() { setTimeout(contProgram, 1500) }
@@ -32,7 +33,6 @@
 					console.log(m)
 					setTimeout(runProgram, 1500) 
 				}
-				function updateDownloadBlob() {}
 				pageLoadHooks.push(runProgram)
 				
 				var dragMute = false
@@ -79,7 +79,7 @@
     	<button id="btnProgram" onclick="programTab()" class="tab" style="border-style:inset">Program Listing</button>
     	<button id="btnGraphic" onclick="graphicTab()" class="tab" style="border-style:outset">Runner Screen</button>
     	<button id="btnDesigner" onclick="designerTab()" class="tab" style="border-style:outset">Designer</button>
-    	<button id="btnMisc" onclick="miscTab()" class="tab" style="border-style:outset">Misc.</button>
+    	<button id="btnMisc" onclick="miscTab(); updateDownloadBlob()" class="tab" style="border-style:outset">Misc.</button>
     	<div class="dark" id="tabProgram">
     		<textarea id="taList"></textarea><div>
     		<input id="inLine" size="5" type="text" onchange="goLine(this.value)"/>
@@ -1151,27 +1151,19 @@
 			<table cellspacing="0" border="0">
 				<tr>
 					<td title="Runner external scripts downloaded from... (leave blank for local)">Base URL</td>
-					<td><input id="inBaseUrl"/></td>
+					<td><input id="inBaseUrl" onblur="updateDownloadBlob()"/></td>
 				</tr>
-				<!-- tr>
+				<tr>
 					<td>Graphics zoom</td>
-					<td><label class="toggle"><input class="toggle" type="checkbox" id="inZoom"/><span class="toggle">&nbsp;</span></label></td>
-				</tr -->
-				<!-- tr>
-					<td>Palette</td>
-					<td><input id="inPalette"/></td>
-				</tr -->
+					<td><label class="toggle"><input class="toggle" type="checkbox" id="inZoom" onblur="updateDownloadBlob()"/><span class="toggle">&nbsp;</span></label></td>
+				</tr>
 				<tr>
 					<td title="mp3 URL">Background Music</td>
-					<td><input id="inMusic" value="hammering_it_together.mp3" onchange="document.getElementById('auBackground').src=this.value"/></td>
+					<td><input id="inMusic" value="hammering_it_together.mp3" onchange="document.getElementById('auBackground').src=this.value" onblur="updateDownloadBlob()"/></td>
 				</tr>
-				<!-- tr>
-					<td title="Downloaded program needs PRINTs displayed">Text Screen</td>
-					<td><label class="toggle"><input class="toggle" type="checkbox" id="inTextScreen"/><span class="toggle">&nbsp;</span></label></td>
-				</tr -->
 			</table>
 			<p>
-				<a id="download_link" download="index.html" href="javascript:alert('First write a program.')" title="The tokenized program with the current memory content, for publishing as a static web page.">Download Program</a>
+				<a id="download_link" download="index.html" href="javascript:alert('No program in runner.')" title="The tokenized program with the current memory content, for publishing as a static web page.">Download Program</a>
 				<a href="im8runner.zip" title="The built-in designs and runner code in a zip.">Download Environment</a>
 				<a href="https://im8.boards.net/post/7/thread" target="_blank">Help</a>
 			</p>

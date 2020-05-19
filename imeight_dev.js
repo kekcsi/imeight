@@ -179,8 +179,6 @@ var interact = function(input) {
 			
 			variables.CURSORY--
 			videoPrint(FmtStr("PROGRAM", input))
-
-			updateDownloadBlob()
 		} else {
 			userInputValue = input
 		}
