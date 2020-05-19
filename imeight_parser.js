@@ -26,17 +26,25 @@ function parseError(message) {
 	parseSuccess = false
 }
 
-function nameArg() {
-    text = text.trim()
-    var name = getRegexPrefix(NAME_RE, text)
- 
-    if (name === false) {
-        parseError("REFERENCE EXPECTED")
+function nameArg(fragment) {
+    if (fragment === undefined) {
+        text = nameArg(text)
+		if (text === undefined) {
+			text = ""
+		}
 		return
-    }
+	}
 
-    program.push(name)
-    text = text.substring(name.length)
+	fragment = fragment.trim()
+	var name = getRegexPrefix(NAME_RE, fragment)
+ 
+	if (name === false) {
+		parseError("REFERENCE EXPECTED")
+		return
+	}
+
+	program.push(name)
+	return fragment.substring(name.length)
 }
 
 function namesArg() {
@@ -67,19 +75,29 @@ function namesArg() {
 }
 
 //parse an argument that refers to either a variable by name or an array member by index
-function assignableArg() {
-	text = text.trim()
-	var prefix = getRegexPrefix(INDEXED_RE, text)
+function assignableArg(fragment) {
+    if (fragment === undefined) {
+        text = assignableArg(text)
+		if (text === undefined) {
+			text = ""
+		}
+		return
+	}
+
+	fragment = fragment.trim()
+	var prefix = getRegexPrefix(INDEXED_RE, fragment)
  
 	if (prefix === false) {
-		nameArg()
+		fragment = nameArg(fragment)
 	} else {
-		text = text.substring(prefix.length)
-		expressionArg()
-		expect(")")
-		  
+		fragment = fragment.substring(prefix.length)
+		fragment = expressionArg(fragment)
+        fragment = expect(")", fragment)
+
 		program.push(prefix)
 	}
+	
+	return fragment
 }
  
 function expectEnd(deStart) {
@@ -231,8 +249,21 @@ function extractExpression(fragment) {
  
         if (fragment.toUpperCase().startsWith(prefix)) {
             fragment = fragment.substring(prefix.length)
-            fragment = expressionArg(fragment)
-            fragment = expect(")", fragment)
+			
+			if ("assignableArg" in builtInFunctions[token]) {
+				fragment = nameArg(fragment)
+				program[program.length - 1] = '"' + program[program.length - 1] + '"'
+
+				if (fragment.startsWith("(")) {
+					fragment = expressionArg(fragment.substring(1))
+					fragment = expect(")", fragment)
+					program.push(",")
+				}
+			} else {
+				fragment = expressionArg(fragment)
+			}
+            
+			fragment = expect(")", fragment)
             
             program.push(token + "(")
                       
@@ -384,6 +415,7 @@ function updateDownloadBlob() {
 	spec = spec.replace(/[<][?]=\s*elseBranchesJson\s*[?][>]/g, JSON.stringify(elseBranches))
 	spec = spec.replace(/[<][?]=\s*memoryJson\s*[?][>]/g, JSON.stringify(shrunk))
 	spec = spec.replace(/[<][?]=\s*music\s*[?][>]/g, inMusic.value)
+	spec = spec.replace(/[<][?]=\s*zoom\s*[?][>]/g, inZoom.checked)
 	spec = spec.replace(/[<][?]=\s*readyPrompt\s*[?][>]/g, "")
 	var data = new Blob([spec], {type: 'text/html'})
 	var url = window.URL.createObjectURL(data)
@@ -427,8 +459,6 @@ function parseText() {
 		divStatus.innerHTML = "&nbsp;"
 		userBreak()
 		userInputValue = "RUN"
-
-		updateDownloadBlob()
 	}
 	
 	fullTextParse = false

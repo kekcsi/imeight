@@ -1,7 +1,7 @@
 //parser + runner shared constants
-var NAME_RE = /^[A-Z][A-Z0-9]*[%!$]?/
-var ASSIGN_RE = /^[A-Z][A-Z0-9]*[%!$]?([(][^:]*[)])?[ \t]*=/
-var INDEXED_RE = /^[A-Z][A-Z0-9]*[%!$]?[(]/
+var NAME_RE = /^[A-Z][A-Z0-9.]*[%!$]?/
+var ASSIGN_RE = /^[A-Z][A-Z0-9.]*[%!$]?([(][^:]*[)])?[ \t]*=/
+var INDEXED_RE = /^[A-Z][A-Z0-9.]*[%!$]?[(]/
 
 function getRegexPrefix(regex, fragment) {
     var m = fragment.match(regex)
@@ -367,7 +367,9 @@ var instructions = {
             var target = argumentStack.pop()
 			
 			if (target in labels) {
-				argumentStack.push(pc + 1)
+				argumentStack.push({ returnAddress: pc + 1, subName: target, 
+					toString: function() { return pc + 1 + "" } })
+
 				return labels[target]
 			}
 			
@@ -376,13 +378,26 @@ var instructions = {
 	},
 	
     RETURN: {
-		parse: function() { expectEnd() },
+		parse: function() { 
+            if (instructionEnds()) {
+                program.push("")
+            } else {
+                nameArg()
+				expectEnd()
+            }
+		},
 		
 		run: function(pc) {
+			var expectedName = argumentStack.pop()
 			var target = argumentStack.pop()
 
-			if (typeof target == "number" && target in program) {
-				return target
+			if (typeof target == "object" && "returnAddress" in target) {
+				if (expectedName != "" && expectedName != target.subName) {
+					runError("CALL MISMATCH")
+					return 
+				}
+
+				return target.returnAddress
 			}
 
 			runError("RETURN WITHOUT GOSUB")
@@ -728,6 +743,20 @@ var builtInFunctions = {
     "MID$": { apply: arg => ("" + arg[0]).substr(arg[1] - 1, arg[2]) },
     "TIME$": { apply: arg => new Date((Array.isArray(arg) && arg.length < 1)?Date.now():arg).toUTCString().replace(/ GMT$/, '').toUpperCase() },
 	TIME: { apply: function() { return Date.now() } },
+	INI: { 
+		apply: function(arg) { 
+			if ((arg[0] in arrays) && (arg[1] in arrays[arg[0]])) {
+				return 1
+			}
+
+			if ((arg[0] in variables) && arg.length == 1) {
+				return 1
+			}
+			
+			return 0
+		},
+		assignableArg: true
+	},
     _PAREN: {
         listAs: "(", //explicitly marked parentheses - omit keyword in listing 
         apply: arg => arg
