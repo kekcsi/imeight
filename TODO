@@ -1,5 +1,7 @@
 TODO
+* built-in design gifs: clean double size
 * test touch control
+* test Edge compatibility
 * fix list scrolling
 * Look redesign
 		* graphics zoom 2 by 2
@@ -13,14 +15,15 @@ TODO
 * failsafe mode (no run errors)
 		- ILLEGAL EXPRESSION: return ""
 		- NO VALUE: return default value ""
-		- INVALID REFERENCE: skip
-		- RETURN WITHOUT GOSUB: restart
 		- CALL MISMATCH: return without checking label
-		- NEXT WITHOUT FOR: skip
 		- LOOP MISMATCH: next without checking name
-		- OVERDEFINITION: drop old definition
+		- OVERDEFINITION: ignore old definition
 		- OUT OF DATA: assign ""
 		- LABEL DOES NOT EXIST: apply default label START
 		- NO DATA AT LABEL: RESTORE to the very beginning
 		- DIVIDE BY ZERO: return Number.MAX_VALUE
+
+		- INVALID REFERENCE: no recovery
+		- RETURN WITHOUT GOSUB: no recovery
+		- NEXT WITHOUT FOR: no recovery
  
