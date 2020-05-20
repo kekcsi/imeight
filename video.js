@@ -606,7 +606,7 @@ pageLoadHooks.push(function() {
 				
 				var upscii = (ascii & 0xdf)
 
-				if (upscii >= 16 && upscii < 25) {
+				if (upscii >= 16 && upscii <= 25) {
 					gi = upscii - 16
 					startAddress = pad1
 				}

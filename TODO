@@ -10,19 +10,17 @@ TODO
 * Vector layer?
 * LOAD/SAVE memory/routines: https://restdb.io/ ?
 * deploy script that creates im8runner.zip
-* error handling		
-		* INI function with assignable parameter (checks if initialized)
-		* failsafe mode (no run errors)
-				- ILLEGAL EXPRESSION: return ""
-				- NO VALUE: return default value ""
-				- INVALID REFERENCE: skip
-				- RETURN WITHOUT GOSUB: restart
-				- CALL MISMATCH: return without checking label
-				- NEXT WITHOUT FOR: skip
-				- LOOP MISMATCH: next without checking name
-				- OVERDEFINITION: drop old definition
-				- OUT OF DATA: assign ""
-				- LABEL DOES NOT EXIST: apply default label START
-				- NO DATA AT LABEL: RESTORE to the very beginning
-				- DIVIDE BY ZERO: return Number.MAX_VALUE
+* failsafe mode (no run errors)
+		- ILLEGAL EXPRESSION: return ""
+		- NO VALUE: return default value ""
+		- INVALID REFERENCE: skip
+		- RETURN WITHOUT GOSUB: restart
+		- CALL MISMATCH: return without checking label
+		- NEXT WITHOUT FOR: skip
+		- LOOP MISMATCH: next without checking name
+		- OVERDEFINITION: drop old definition
+		- OUT OF DATA: assign ""
+		- LABEL DOES NOT EXIST: apply default label START
+		- NO DATA AT LABEL: RESTORE to the very beginning
+		- DIVIDE BY ZERO: return Number.MAX_VALUE
  
