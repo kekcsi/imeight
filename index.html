@@ -25,13 +25,14 @@
 				dataLookup = JSON.parse(document.scripts.namedItem("dataLookupJson").text)
 				elseBranches = JSON.parse(document.scripts.namedItem("elseBranchesJson").text)
 				memory = JSON.parse(document.scripts.namedItem("memoryJson").text)
+				failSafe = true
 				var inZoom = { checked: <?=zoom?> }
 				var interact = runProgram
 				var inputAction = interact
 				readyPrompt = function() { setTimeout(contProgram, 1500) }
 				runErrorHook = function(m) { 
 					console.log(m)
-					setTimeout(runProgram, 1500) 
+					setTimeout(runProgram, 1500)
 				}
 				pageLoadHooks.push(runProgram)
 				

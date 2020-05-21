@@ -21,6 +21,7 @@ var eventQueue = []
 var pressedKeys = []
 var eventHandler = function() {}
 var bugLocator
+var failSafe = false
 
 //runner hooks
 var runErrorHook = function(message) {} // only react in dev env - not in prod
@@ -98,6 +99,10 @@ function preparePush(result) {
 	} else if (typeof result === "boolean") {
 		result = (result ? 1 : 0)
 	} else if (typeof result === "number" && isNaN(result)) {
+		if (failSafe) {
+			return ""
+		}
+		
 		runError("ILLEGAL EXPRESSION")
 		return
 	}
@@ -237,11 +242,19 @@ function getValue(arg) {
 			}
 		}
 
+		if (failSafe) {
+			return ""
+		}
+		
 		runError("NO VALUE")
 		return
 	} else if (getRegexPrefix(NAME_RE, arg) === arg) {
 		if (arg in variables) {
 			return variables[arg]
+		}
+
+		if (failSafe) {
+			return ""
 		}
 
 		runError("NO VALUE")
@@ -281,36 +294,36 @@ function popAndAssign(valueSupplier, defaultName) {
 		name = defaultName
 	}
 	
-	if (typeof name !== "string") {
-		runError("INVALID REFERENCE")
-		return
+	if (typeof name == "string") {
+		var arrayName = indexedReference(name, arrays)
+		if (arrayName !== false) {
+			var i = popAndEvaluate()
+			var a = arrays[arrayName]
+			a[i] = valueSupplier(name + i + ")", a[i])
+			if (stopped === true) return // valueSupplier had a runError
+
+			if (arrayName in builtInArrays) {
+				varUpdateHook(arrayName, i)
+			}
+			
+			return { array: a, index: i }
+		} else if (getRegexPrefix(NAME_RE, name) === name) {
+			variables[name] = valueSupplier(name, variables[name])
+			if (stopped === true) return // valueSupplier had a runError
+
+			if (name in builtInVariables) {
+				varUpdateHook(null, name)
+			}
+
+			return { array: variables, index: name }
+		} 
 	}
 	
-	var arrayName = indexedReference(name, arrays)
-	if (arrayName !== false) {
-		var i = popAndEvaluate()
-		var a = arrays[arrayName]
-		a[i] = valueSupplier(name + i + ")", a[i])
-		if (stopped === true) return // valueSupplier had a runError
-
-		if (arrayName in builtInArrays) {
-			varUpdateHook(arrayName, i)
-		}
-		
-		return { array: a, index: i }
-	} else if (getRegexPrefix(NAME_RE, name) === name) {
-		variables[name] = valueSupplier(name, variables[name])
-		if (stopped === true) return // valueSupplier had a runError
-
-		if (name in builtInVariables) {
-			varUpdateHook(null, name)
-		}
-
-		return { array: variables, index: name }
-	} else {
+	if (!failSafe) {
 		runError("INVALID REFERENCE")
-		return
 	}
+
+	return
 }
 
 //inputAction alternative for WAIT

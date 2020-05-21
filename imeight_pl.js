@@ -90,7 +90,7 @@ var instructions = {
 			var loop = loops[loops.length - 1]
             
 			popAndAssign(function(expectedName, oldValue) {
-				if (expectedName != "" && expectedName != loop.name) {
+				if (!failSafe && expectedName != "" && expectedName != loop.name) {
 					runError("LOOP MISMATCH")
 					return 
 				}
@@ -155,7 +155,13 @@ var instructions = {
 				return oldValue //for now
 			})
 			
-			if (target === undefined) return
+			if (target === undefined) {
+				if (failSafe) {
+					return pc + 1
+				}
+				
+				return
+			}
 			
 			inputAction = function(response) {
 				inputAction = interact
@@ -195,7 +201,7 @@ var instructions = {
 			var size = popAndEvaluate()
 			var name = argumentStack.pop()
 
-			if (name in functions) {
+			if (!failSafe && (name in functions)) {
 				runError("DIM OVERDEFINES DEF")
 				return
 			}
@@ -222,6 +228,11 @@ var instructions = {
 		run: function(pc) {
 			if (readDataBuffer.length == 0) {
 				if (readDataPointer >= dataLookup.length) {
+					if (failSafe) {
+						popAndAssign(function() { return "" })
+						return pc + 1
+					}
+
 					runError("OUT OF DATA")
 					return
 				}
@@ -232,7 +243,6 @@ var instructions = {
 			}
 
 			popAndAssign(function() { return readDataBuffer.shift() })
-			
 			return pc + 1
 		}
 	},
@@ -290,6 +300,10 @@ var instructions = {
 			if (target in labels) {
 				return labels[target]
 			}
+
+			if (failSafe) {
+				return labels.START
+			}
 			
 			runError("LABEL DOES NOT EXIST")
         }
@@ -344,12 +358,22 @@ var instructions = {
 				readDataPointer = 0
 			} else if (label in labels) {
 				readDataPointer = dataLookup.indexOf(labels[label] + 1 /* skip the _DEFER instruction */)
-
+				
 				if (readDataPointer < 0) {
+					if (failSafe) {
+						readDataPointer = 0
+						return pc + 1
+					}
+					
 					runError("NO DATA AT LABEL")
 					return
 				}
 			} else {
+				if (failSafe) {
+					readDataPointer = 0
+					return pc + 1
+				}
+				
 				runError("LABEL DOES NOT EXIST")
 				return
 			}
@@ -393,7 +417,7 @@ var instructions = {
 			var target = argumentStack.pop()
 
 			if (typeof target == "object" && "returnAddress" in target) {
-				if (expectedName != "" && expectedName != target.subName) {
+				if (!failSafe && expectedName != "" && expectedName != target.subName) {
 					runError("CALL MISMATCH")
 					return 
 				}
@@ -537,7 +561,7 @@ var instructions = {
 				}
 			}
 
-			if (name in arrays) {
+			if (!failSafe && (name in arrays)) {
 				runError("DEF OVERDEFINES DIM")
 				return
 			}
@@ -688,6 +712,10 @@ var operators = {
 		precedenceLevel: 2, 
 		evaluate: function(a, b) {
 			if (b == 0) {
+				if (failSafe) {
+					return Number.MAX_VALUE
+				}
+
 				runError("DIVIDE BY ZERO")
 				return
 			}
@@ -699,6 +727,10 @@ var operators = {
 		precedenceLevel: 2, 
 		evaluate: function(a, b) {
 			if (b == 0) {
+				if (failSafe) {
+					return ""
+				}
+
 				runError("DIVIDE BY ZERO")
 				return
 			}
