@@ -2,14 +2,24 @@ var listClean = true //does the tokenized program match the text in the lising?
 var oldText = ""
 
 var tabs
+var grabTutor = null
+
+function dragTutor(ev) {
+	if (ev.buttons == 0) grabTutor = null
+	if (grabTutor === null) return
+	
+	ev.preventDefault()
+	
+	divTutor.style.left = ev.clientX + grabTutor + "px"
+}
 
 function selectTab(selected) {
 	for (var i in tabs) {
 		if (i == selected) {
-			tabs[i].btn.style.borderStyle="inset"
+			tabs[i].btn.src = tabs[i].btn.src.replace("-ina", "-act")
 			tabs[i].tab.style.display="block"
 		} else {
-			tabs[i].btn.style.borderStyle="outset"
+			tabs[i].btn.src = tabs[i].btn.src.replace("-act", "-ina")
 			tabs[i].tab.style.display="none"
 		}
 	}
@@ -22,27 +32,6 @@ function graphicTab() { selectTab("Graphic") }
 function designerTab() { selectTab("Designer") }
 function miscTab() { selectTab("Misc") }
 
-function tutorRight() {
-	divTutor.style.display = "block"
-    divTutor.style.top = "8px"
-    divTutor.style.right = "4px"
-    divTutor.style.bottom = ""
-    divTutor.style.left = ""
-	btnTutorRight.style.display = "none"
-	btnTutorBelow.style.display = "inline"
-}
-
-function tutorBelow() {
-	document.body.height = "100%"
-	divTutor.style.display = "block"
-	divTutor.style.top = "384px"
-	divTutor.style.right = ""
-    divTutor.style.bottom = ""
-    divTutor.style.left = "8px"
-	btnTutorRight.style.display = "inline"
-	btnTutorBelow.style.display = "none"
-}
-
 pageLoadHooks.push(function() {
 	tabs = {
 		Program: { btn: btnProgram, tab: tabProgram, focused: taList }, 
@@ -50,11 +39,6 @@ pageLoadHooks.push(function() {
 		Designer: { btn: btnDesigner, tab: tabDesigner, focused: tabDesigner },
 		Misc: { btn: btnMisc, tab: tabMisc, focused: tabMisc }
 	}
-
-	btnTutorBelow.addEventListener("mouseout", function(event) {
-		btnTutorRight.style.display = "inline"
-		btnTutorBelow.style.display = "none"
-	})
 
 	cursorBlink = true
 	

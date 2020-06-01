@@ -213,7 +213,7 @@ pageLoadHooks.push(function() {
 			tab: tabHex, 
 			init: function() {},
 			put: hexToMemory, get: hexFromMemory, 
-			data: "designData", thumb: sprThumb 
+			data: "designData", thumb: hexThumb 
 		}
 	]
 	
@@ -487,17 +487,17 @@ function updateDesign() {
 
 function updateThumb(designIndex) {
 	cells = tblMemory.getElementsByTagName("td")
-	var thumb = new Uint8ClampedArray(4*16*16)
+	var thumb = new Uint8ClampedArray(4*24*24)
 	
 	if (designIndex > 226) return false
 	
 	genThumb(designIndex, thumb)
 
-	imd = new ImageData(thumb, 16, 16)
+	imd = new ImageData(thumb, 24, 24)
 	var canvas = document.createElement('canvas')
 	canvas.dataset.idx = designIndex
-	canvas.width = 16
-	canvas.height = 16
+	canvas.width = 24
+	canvas.height = 24
 	var ctx = canvas.getContext('2d')
 	ctx.putImageData(imd, 0, 0)
 	cells[designIndex].innerHTML = ""
@@ -517,31 +517,31 @@ function hexThumb(designIndex, thumb) {
 }
 
 function sprThumb(designIndex, thumb) {
-	for (var ro = 0; ro < 16; ++ro) {
-		for (var co = 0; co < 16; ++co) {
-			var i = 12*Math.floor(ro*3/2) + Math.floor(co*3/4)
+	for (var ro = 0; ro < 24; ++ro) {
+		for (var co = 0; co < 24; ++co) {
+			var i = 12*ro + Math.floor(co/2)
 			
 			octet = memory[i + 288*designIndex]
 			if (!octet) octet = 0
 			var bytes = ((co%2) ? colorToBytes(octet&15) : colorToBytes(octet>>4))
 
 			for (var k = 0; k < 4; ++k) {
-				thumb[4*co + 64*ro + k] = bytes[k]
+				thumb[4*(24*ro + co) + k] = bytes[k]
 			}
 		}
 	}
 }
 
 function fontThumb(designIndex, thumb) {
-	var glyphs = [0, 1, 10, 11]
-	var xoffs = [0, 8, 0, 8]
-	var yoffs = [0, 0, 8, 8]
+	var glyphs = [0, 1, 2, 10, 11, 12, 13, 14, 15]
+	var xoffs = [0, 8, 16, 0, 8, 16, 0, 8, 16]
+	var yoffs = [0, 0, 0, 8, 8, 8, 16, 16, 16]
 	
 	for (var gi in glyphs) {
 		var glyph = glyphs[gi]
 		var xoff = xoffs[gi]
 		var yoff = yoffs[gi]
-		charGen(designIndex, thumb, glyph, xoff, yoff, 16)
+		charGen(designIndex, thumb, glyph, xoff, yoff, 24)
 	}
 }
 

@@ -9,13 +9,19 @@ table.pixel td, #tblColors td {
 }
 
 #tblMemory td {
-	width: 16px;
-	height: 16px;
+	min-width: 24px;
+	line-height: 24px;
 	margin: 0;
-	padding: 1px;
+	padding: 4px;
 	background: black;
 	color: orange;
 	font-size: 12px;
+}
+
+#tblMemory td * {
+	height: 24px;
+	margin: 0;
+	padding: 0;
 }
 
 #tblMemory {
@@ -81,7 +87,7 @@ table.pixel td, #tblColors td {
 }
 
 #tblMemory th {
-	height: 16px;
+	line-height: 23px;
 	padding: 1px;
 	font-size: 13px;
 	font-weight: bold;

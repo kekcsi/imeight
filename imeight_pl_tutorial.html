@@ -41,6 +41,8 @@
 		body h1 {
 			font-size: 32px;
 			border-bottom: 8px solid white;
+			margin-top: 40px;
+			margin-bottom: 64px;
 		}
 		
 		body hr {
@@ -64,17 +66,9 @@
 		body a:visited {
 			color: white;
 		}
-		
-		.toccontainer {
-			margin: 20px 0 0 0;
-		}
-		
-		.toccontainer h3 {
-			float: left; 
-			margin: 0 20px 0 0;
-		}
 
 		body div.contents {
+			text-align: center;
 		}
 		
 		@font-face {
@@ -86,9 +80,28 @@
 		    font-family: Fxmatrix;
 		    src: url(FXMatrix105PropPicaItalic.woff);
 		}
+		
+		#btnContents, #btnContents:visited {
+			padding: 4px 16px; 
+			opacity: 70%; 
+			position: fixed; 
+			bottom: 8px; 
+			right: 8px; 
+			width: 99px; 
+			background: #183eaf; 
+			color: white;
+			text-align: center;
+			border-radius: 16px;
+
+			font-family: monospace;
+			font-size: 16px;
+			font-weight: bold;
+			text-decoration: none;
+		}
 	</style>
 </head>
 <body>
+<a id="btnContents" href="#contents">Contents</a>
 <h1>Programming Tutorials</h1>
 <p>This is the imeight programming language. One that resembles those 80s
 languages when programming was still fun to learn. Do you want to experience, too?</p>
@@ -106,8 +119,50 @@ Runner Screen, press Enter.</p>
 <p>Press Esc button for long to kill a running program.</p>
 
 <h2><a name="contents">Contents</a></h2>
-<div class="toccontainer">
-<h3>Programming Instruction by Instruction</h3><div class="contents">
+<div class="contents">
+        <a href="#part1">Programming Instruction by Instruction</a>
+<br/>&bull;<br/>	<a href="#part2">Details of the Language</a>
+<br/>&bull;<br/>	<a href="#game">Game Programming Tutorial</a>
+</div>
+
+<h3>Reference Sheet Index</h3><div class="contents">
+		<a href="#126">Names</a>
+&bull;	<a href="#201">Expressions</a>
+&bull;	<a href="#383">Operator Summary</a>
+&bull;	<a href="#460">Command Summary</a>
+<br/>	<a href="#642">Abbreviations</a>
+&bull;	<a href="#663">Run Time Errors</a>
+&bull;	<a href="#2004">Color Codes</a></div>
+<h3>Fun Projects</h3><div class="contents">
+		<a href="#fp1" title="PRINT * ASCII art">1</a>
+&bull; 	<a href="#fp2" title="Expressions * Zebra say">2</a>
+&bull; 	<a href="#fp3" title="IF and THEN * Text Adventure">3</a>
+&bull; 	<a href="#fp4" title="Sprites * Racer">4</a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1><a name="part1">Programming Instruction by Instruction</a></h1>
+<h2>Contents</h2>
+<div class="contents">
 	<a href="#72">PRINT</a>
 &bull;	<a href="#89">INPUT</a>
 &bull;	<a href="#126">Names</a>
@@ -122,74 +177,6 @@ Runner Screen, press Enter.</p>
 &bull;	<a href="#460">Command Summary</a>
 &bull;	<a href="#465">FOR and NEXT</a></div>
 </div>
-<div class="toccontainer">
-<h3>Details of the Language</h3><div class="contents">
-<a href="#496">DATA and READ</a>
-&bull;	<a href="#513">RESTORE</a>
-&bull;	<a href="#540">DIM</a>
-&bull;	<a href="#561">POKE</a>
-&bull;	<a href="#567">CLR</a>
-&bull;	<a href="#579">DEF</a>
-&bull;	<a href="#593">ON</a>
-&bull;	<a href="#613">Multidimensional Arrays</a>
-&bull;	<a href="#618">Non-Unary Functions</a>
-&bull;	<a href="#642">Abbreviations</a>
-&bull;  <a href="#653">PUSH and PULL</a>
-&bull;	<a href="#663">Run Time Errors</a>
-&bull;	<a href="#738">Contrasting C64</a></div>
-</div>
-<div class="toccontainer">
-<h3>Game Programming Tutorial</h3><div class="contents">
-	<a href="#2001">WAIT and GET</a>
-&bull;	<a href="#2002">TIME and TIME$</a>
-&bull;	<a href="#2003">Sprites!</a>
-&bull;	<a href="#2004">Colors!</a>
-&bull;	<a href="#2005">Pixel Data Animations</a>
-&bull;	<a href="#2006">Tiles</a>
-&bull;	<a href="#2007">Text Layer</a>
-&bull;	<a href="#2008">Mouse/Touch Control</a>
-&bull;	<a href="#2009">Assorted Tricks</a></div>
-</div>
-<div class="toccontainer">
-<h3>Reference Sheet Index</h3><div class="contents">
-		<a href="#126">Names</a>
-&bull;	<a href="#201">Expressions</a>
-&bull;	<a href="#383">Operator Summary</a>
-&bull;	<a href="#460">Command Summary</a>
-&bull;	<a href="#642">Abbreviations</a>
-&bull;	<a href="#663">Run Time Errors</a>
-&bull;	<a href="#2004">Color Codes</a></div>
-</div>
-<div class="toccontainer">
-<h3>Fun Projects</h3><div class="contents">
-		<a href="#fp1" title="PRINT * ASCII art">1</a>
-&bull; 	<a href="#fp2" title="Expressions * Zebra say">2</a>
-&bull; 	<a href="#fp3" title="IF and THEN * Text Adventure">3</a>
-&bull; 	<a href="#fp4" title="Sprites * Racer">4</a></div>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h1>Programming Instruction by Instruction</h1>
 
 <h2><a name="72">PRINT</a></h2>
 <div class="code">PRINT "HELLO WORLD"
@@ -793,11 +780,28 @@ Note]</span></li></ul></p>
 	<li>to jump over all the other NEXT instructions &ndash; GOTO OUT</li>
 </ol></p>
 </ul>
-<h1>Details of the Language</h1>
+<h1><a name="part2">Details of the Language</a></h1>
 <p>OK, the essentials are now done. You can jump to <a href="#game">Game 
 Programming Tutorial</a> if you are in a hurry. You'll be able to follow, but 
 some particular instructions you'll need to look up in this second part. There 
 are still some details about the language, so read on to learn them all.</p>
+
+<h2>Contents</h2>
+<div class="contents">
+<a href="#496">DATA and READ</a>
+&bull;	<a href="#513">RESTORE</a>
+&bull;	<a href="#540">DIM</a>
+&bull;	<a href="#561">POKE</a>
+&bull;	<a href="#567">CLR</a>
+&bull;	<a href="#579">DEF</a>
+&bull;	<a href="#593">ON</a>
+&bull;	<a href="#613">Multidimensional Arrays</a>
+&bull;	<a href="#618">Non-Unary Functions</a>
+&bull;	<a href="#642">Abbreviations</a>
+&bull;  <a href="#653">PUSH and PULL</a>
+&bull;	<a href="#663">Run Time Errors</a>
+&bull;	<a href="#738">Contrasting C64</a></div>
+
 
 <h2><a name="496">DATA and READ</a></h2>
 <div class="code">REM<i> * READ ASSIGNS THE NEXT VALUE FROM THE DATA LINE TO ITS ARGUMENT *</i>
@@ -843,6 +847,10 @@ DATA "MON", "TUE", "WED", "THU", "FRI"
 @WEEKEND: DATA "SAT", "SUN"</div>
 
 <h2><a name="540">DIM</a></h2>
+<p>Define an indexed array. An array is like a number of variables
+because it has elements that hold a value each. But unlike variables, you 
+can refer to the elements using an index. This enables e.g. traversing the array
+in a FOR loop, which you cannot do with individually named variables.</p>
 <div class="code">REM<i> * BUBBLE SORT *</i>
 DIM ARRAY(10)
 INPUT ARRAY(0)
@@ -882,6 +890,8 @@ CLR
 PRINT PEEK(5000):REM<i> 6</i></div>
 
 <h2><a name="579">DEF</a></h2>
+<p>Define a function. Code repetition is a source of errors.
+Here is a means of avoiding it.</p>
 <div class="code">LOG2 = LOG(2)
 DEF LOG2(X) = LOG(X)/LOG2
 X=10
@@ -1178,6 +1188,18 @@ More differences that are already mentioned:<div class="contents">
 <p>OK, that was boring. Fortunately this imaginary little machine has all the
 necessary stuff for action game programming, too. You'll need controls,
 timing and graphics. Let's go!</p>
+
+<h2>Contents</h2>
+<div class="contents">
+	<a href="#2001">WAIT and GET</a>
+&bull;	<a href="#2002">TIME and TIME$</a>
+&bull;	<a href="#2003">Sprites!</a>
+&bull;	<a href="#2004">Colors!</a>
+&bull;	<a href="#2005">Pixel Data Animations</a>
+&bull;	<a href="#2006">Tiles</a>
+&bull;	<a href="#2007">Text Layer</a>
+&bull;	<a href="#2008">Mouse/Touch Control</a>
+&bull;	<a href="#2009">Assorted Tricks</a></div>
 
 <h2><a name="2001">WAIT and GET</a></h2>
 <p>WAIT instruction halts execution of your program until one of the 

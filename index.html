@@ -63,10 +63,10 @@
 				}
 			</style>
 		</head>
-		<body onload="pageLoad()" topmargin="0" leftmargin="0" onmousemove="move(event)">
+		<body onload="pageLoad()" topmargin="0" leftmargin="0" onmousemove="move(event)" onmouseup="dragMute = false">
 			<div tabindex="0" id="tabGraphic" onfocus="auBackground.play()" onblur="auBackground.pause()"></div>
 			<audio id="auBackground" loop="loop" src="<?=music?>"></audio>
-			<img id="imMute" src="mute.png" onclick="auBackground.muted = !auBackground.muted" onmousedown="dragMute = true" onmouseup="dragMute = false">
+			<img id="imMute" src="mute.png" onclick="auBackground.muted = !auBackground.muted" onmousedown="dragMute = true">
 		</body>
 		</html>
 	--></script>
@@ -75,23 +75,25 @@
 	<link rel="stylesheet" type="text/css" href="spr-editor.css"/>
 </head>
 	
-<body onload="pageLoad()">
+<body onload="pageLoad()" onmouseup="grabTutor = null" onmousemove="dragTutor(event)">
 	<div class="win">
-    	<button id="btnProgram" onclick="programTab()" class="tab" style="border-style:inset">Program Listing</button>
-    	<button id="btnGraphic" onclick="graphicTab()" class="tab" style="border-style:outset">Runner Screen</button>
-    	<button id="btnDesigner" onclick="designerTab()" class="tab" style="border-style:outset">Designer</button>
-    	<button id="btnMisc" onclick="miscTab(); updateDownloadBlob()" class="tab" style="border-style:outset">Misc.</button>
-    	<div class="dark" id="tabProgram">
+		<div class="buttons">
+			<img id="btnProgram" onclick="programTab()" class="tab" src="tab-list-act.gif" title="Program Listing" />
+			<img id="btnGraphic" onclick="graphicTab()" class="tab" src="tab-runner-ina.gif" title="Runner Screen" />
+			<img id="btnDesigner" onclick="designerTab()" class="tab" src="tab-designer-ina.gif" title="Designer" />
+			<img id="btnMisc" onclick="miscTab(); updateDownloadBlob()" class="tab" src="tab-misc-ina.gif" title="Misc." />
+		</div>
+    	<div class="dark tabPanel" id="tabProgram">
     		<textarea id="taList"></textarea><div>
     		<input id="inLine" size="5" type="text" onchange="goLine(this.value)"/>
     		<button class="glow" onclick="parseText()" title="Tokenize and Inject Program to Runner for Testing or Downloading (F9)">&gt; RUNNER</button>
     		<button class="glow" onclick="commands.OLD()" title="Restore Program Text After NEW or OLD Command">OLD</button>
-    		<button class="glow" id="btnTutorRight" onclick="tutorRight()" title="Show Tutorial (F1)">TUTOR &gt;</button>
-    		<button class="glow" id="btnTutorBelow" style="display:none" onclick="tutorBelow()" title="Show Tutorial (F1)">TUTOR <small>\/</small></button>
+    		<!--button class="glow" id="btnTutorRight" onclick="tutorRight()" title="Show Tutorial (F1)">TUTOR &gt;</button>
+    		<button class="glow" id="btnTutorBelow" style="display:none" onclick="tutorBelow()" title="Show Tutorial (F1)">TUTOR <small>\/</small></button-->
 			<div id="divStatus">&nbsp;</div></div>
     	</div>
     	<div tabindex="0" class="dark" id="tabGraphic" onfocus="auBackground.play()" onblur="auBackground.pause()"></div>
-    	<div id="tabDesigner" style="display:none; width:536px; position: relative">
+    	<div id="tabDesigner">
 			<div id="tabHex" style="display:none; width: 216px; height: 232px; text-align: center">
 				<textarea style="font-size: 10px; color: white; background: black" id="taHex" cols="33" rows="18"></textarea>
 			</div>
@@ -1156,11 +1158,11 @@
 				</tr>
 				<tr>
 					<td>Graphics zoom</td>
-					<td><label class="toggle"><input class="toggle" type="checkbox" id="inZoom" onblur="updateDownloadBlob()"/><span class="toggle">&nbsp;</span></label></td>
+					<td><label class="toggle"><input class="toggle" type="checkbox" id="inZoom" onblur="updateDownloadBlob()" checked="checked"/><span class="toggle">&nbsp;</span></label></td>
 				</tr>
 				<tr>
 					<td title="mp3 URL">Background Music</td>
-					<td><input id="inMusic" value="hammering_it_together.mp3" onchange="document.getElementById('auBackground').src=this.value" onblur="updateDownloadBlob()"/></td>
+					<td><input id="inMusic" value="never_gonna_punkosdrozsa.mp3" onchange="document.getElementById('auBackground').src=this.value" onblur="updateDownloadBlob()"/></td>
 				</tr>
 			</table>
 			<p>
@@ -1169,20 +1171,17 @@
 				<a href="https://im8.boards.net/post/7/thread" target="_blank">Help</a>
 			</p>
 			<p><b>Copyright.</b> Use the software and derived works for anything, 
-			including - but not limited to - commercial, educational or 
+			including &ndash; but not limited to &ndash; commercial, educational or 
 			mean purposes (at your own risk); in modified or original form,
-			with correct or false attribution. Copyright text is allowed to be 
+			with correct, false or no attribution. Copyright text is allowed to be 
 			removed or replaced in copies and derived works. Absolutely no 
 			warranties and blah blah blah. No rights reserved.</p>
 		</div>
     </div>
-	<audio id="auBackground" loop="loop" src="hammering_it_together.mp3"></audio>
-    <div id="divTutor" style="display:none" class="win">
+	<audio id="auBackground" loop="loop" src="never_gonna_punkosdrozsa.mp3"></audio>
+    <div id="divTutor">
 		<iframe id="taTutor" src="imeight_pl_tutorial.html"></iframe>
-    	<div>
-    		<button onclick="divTutor.style.display='none'">Hide</button>
-    		<button onclick="taTutor.src='imeight_pl_tutorial.html#contents'">Contents</button>
-    	</div>
+		<img id="handleTutor" src="TUTOR.png" onmousedown="grabTutor = event.offsetX" onmouseup="grabTutor = null">
     </div>
 </body>		
 </html>

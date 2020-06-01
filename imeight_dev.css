@@ -1,21 +1,33 @@
-#taList {
-	border: none;
-	background: transparent;
-	padding: 1px;
-	margin: 0;
-	font-family: monospace;
+body {
+	background: #183eaf;
 	font-size: 13px;
-	line-height: 15px;
+}
+
+.win {
+	border: solid 2px #bb7800;
+	width: 768px;
+}
+
+.dark b {
+	font-weight: normal;
+	color: yellow;
 }
 
 #taList {
-	scrollbar-color: orange black;
-    scrollbar-width: thin;
+	border: none;
+	padding: 1px;
+	margin: 0;
+	font-family: monospace;
+	line-height: 15px;
+	resize: none;
 	white-space: pre;
 	overflow-wrap: normal;
 	overflow-x: scroll;
-	width:592px;
-	height:298px;
+	width: 762px;
+	height: 405px;
+
+	scrollbar-color: orange black;
+    scrollbar-width: thin;
 }
 
 #taList:focus, div:focus {
@@ -25,30 +37,18 @@
 div.dark, #taList, div.dark input {
 	background: black;
 	color: orange;
-	resize: none;
-}
-
-div.dark i {
-	font-style: normal;
-	font-weight: normal;
-	opacity: 0.75;
-}
-
-div.dark b {
-	font-style: normal;
-	font-weight: normal;
-	color: yellow;
 }
 
 #tabProgram {
-	position: relative
+	width: 768px;
+	height: 432px;
+	position: relative;
 }
 
 #divStatus {
 	position: absolute;
 	right: 0px;
 	bottom: 0px;
-	font-size: 13px;
 	opacity: 0.75;
 	height: 16px;
 	width: 200px;
@@ -62,7 +62,6 @@ div.dark b {
 	margin: 0;
 	outline: none;
 	height: 16px;
-	font-size: 13px;
 	font-family: monospace;
 }
 
@@ -97,31 +96,32 @@ button.glow, button.glow:focus {
 	height: 16px;
 }
 
-button.tab {
-	background: silver;
-	text-shadow: black;
-	padding: 4px 12px;
-	border-width: 2px 2px 0 2px;
-	border-color: lighter;
-	margin: 0 4px 0 0;
-	font-weight: normal;
-	font-family: sans-serif;
-	border-radius: 3px 3px 0 0;
+.buttons {
+	position: absolute;
+	width: 72px;
+	left: 778px;
+	top: 8px;
 }
 
-.win {
+img.tab {
+	padding: 0;
+	margin: 0;
+}
+
+#tabDesigner {
+	display: none;
+	width: 768px;
+	height: 432px;
+	padding: 0;
+	position: relative;
 	background: gray;
-	padding: 4px;
-	width: 600px;
-	height: 346px;
-	font-size: 13px;
 }
 
 #tabMisc {
 	font-family: monospace;
-	font-size: 13px;
-	height: 304px;
-	overflow-y: scroll;
+	width: 752px;
+	height: 416px;
+	overflow-y: hidden;
 	overflow-x: hidden;
 	padding: 8px;
 }
@@ -150,10 +150,12 @@ a:link, a:visited {
 
 #divTutor {
 	position: fixed;
+	border: solid 2px #bb7800;
+	padding: 0;
+	margin: 0;
 	top: 8px;
-	right: 4px;
-	width: 600px;
-	height: 346px;
+	left: 852px;
+	height: 432px;
 }
 
 iframe {
@@ -163,19 +165,18 @@ iframe {
 }
 
 #taTutor {
-	width: 600px;
-	height: 320px;
-	border: 0;
+	width: 705px;
+	height: 432px;
 	overflow-x: hidden;
 }
 
 #tabGraphic {
-	display:none;
-	width:384px;
-	height:216px;
-	margin:52px auto;
-	position:relative;
-	overflow:hidden;
+	display: none;
+	width: 384px;
+	height: 216px;
+	margin: 0;
+	position: relative;
+	overflow: hidden;
 }
 
 input.toggle {
@@ -210,4 +211,12 @@ span.toggle {
 
 input:checked + span.toggle {
 	background: orange;
+}
+
+#handleTutor {
+	position: absolute;
+	left: 0px;
+	bottom: 0px;
+	margin-left: -63px;
+	margin-bottom: -2px;
 }

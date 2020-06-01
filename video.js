@@ -1,4 +1,4 @@
-var ZOOM = 1
+var ZOOM = 2
 
 builtInVariables.BACKGROUND = 0 //color
 builtInVariables.CURSORX = 0
