@@ -1,29 +1,9 @@
 TODO
-* built-in design gifs: clean double size
 * test touch control
 * test Edge compatibility
 * fix list scrolling
-* Look redesign
-		* graphics zoom 2 by 2
-		* dynamic screen size for editor
-		* Tutor button belongs outside list tab
 * music selection from program
 * hollow color code for tiles and sprites: HOLLOW variable
 * Vector layer?
 * LOAD/SAVE memory/routines: https://restdb.io/ ?
 * deploy script that creates im8runner.zip
-* failsafe mode (no run errors)
-		- ILLEGAL EXPRESSION: return ""
-		- NO VALUE: return default value ""
-		- CALL MISMATCH: return without checking label
-		- LOOP MISMATCH: next without checking name
-		- OVERDEFINITION: ignore old definition
-		- OUT OF DATA: assign ""
-		- LABEL DOES NOT EXIST: apply default label START
-		- NO DATA AT LABEL: RESTORE to the very beginning
-		- DIVIDE BY ZERO: return Number.MAX_VALUE
-
-		- INVALID REFERENCE: no recovery
-		- RETURN WITHOUT GOSUB: no recovery
-		- NEXT WITHOUT FOR: no recovery
- 
