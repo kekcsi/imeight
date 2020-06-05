@@ -441,6 +441,7 @@ function parseLine() {
 function parseText() {
 	var lines = taList.value.split("\n")
 	fullTextParse = true
+	userBreak()
 	newProgram()
 
 	graphicTab() //allow showing parse errors
@@ -457,7 +458,6 @@ function parseText() {
 		listClean = true
 		videoPrint(FmtStr("PROGRAM", "PROGRAM UPDATED"))
 		divStatus.innerHTML = "&nbsp;"
-		userBreak()
 		userInputValue = "RUN"
 	}
 	

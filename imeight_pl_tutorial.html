@@ -108,7 +108,7 @@ languages when programming was still fun to learn. Do you want to experience, to
 <p>This emulated imaginary machine has these screen modes:</p><ul>
 <li>Program Listing: for writing and editing your program text.</li>
 <li>Runner Screen: for issuing interactive commands and reading output of your program as it runs.</li>
-<li>Designer: see <a href="#game">Game Programming Tutorial.</a></li>
+<li>Design Util: see <a href="#game">Game Programming Tutorial.</a></li>
 </ul>
 <p>You can use the usual Copy and Paste function in your browser to transfer
 example codes from the tutorial to the Program Listing panel.</p>
@@ -358,7 +358,7 @@ REM<i> * CONCATENATION OF STRING VARIABLES AND LITERALS ALSO WORKS *</i></div>
 <div class="code">PRINT LEN("HOW LONG AM I"):REM<i> PRINTS 13 (10 LETTERS + 3 SPACES)</i>
 PRINT "1" + "2":REM<i> DOES NOT PRINT 3 BUT A CONCATENATED STRING "12"</i>
 PRINT VAL("1") + VAL("2"):REM<i> PRINTS 3</i>
-PRINT ASC("A"):REM<i> PRINTS THE ASCII CODE 65</i>
+PRINT ASC("A"):REM<i> PRINTS THE <a href="http://www.asciitable.com/" target="_blank">ASCII CODE</a> 65</i>
 PRINT CHR$(65):REM<i> PRINTS "A" BEACUSE ITS ASCII CODE IS 65</i>
 PRINT LEFT$("HELLO", 3):REM<i> PRINTS "HEL" - 3 CHARACTERS FROM THE LEFT</i>
 PRINT RIGHT$("HELLO", 3):REM<i> PRINTS "LLO" - 3 CHARACTERS FROM THE RIGHT</i>
@@ -1250,7 +1250,7 @@ FOR I=0 TO 2600000:NEXT<hr/>FOR I=0 TO 50:WAIT:NEXT
 <div class="code">FOR I=1 TO 500:WAIT:N. '<i>WAIT 10 SECS: USER MAY HIT KEYS MEANWHILE</i>
 PRINT "HIT A BUTTON NOW:"
 @GETLOOP:WAIT:GET A '<i>PROGRAMMER MAY THINK THIS WAIT AND GET BELONG TOGETHER</i>
-IF A=0 T.G.LOOP
+IF A=0 T.G.GETLOOP
 PRINT A
 REM<i> * KEY CODE OF FIRST HIT SINCE PROGRAM START GETS PRINTED *</i>
 REM<i> *    NOT NECESSARILY ONE HIT WHILE WAITING AT GETLOOP    *</i>
@@ -1350,7 +1350,7 @@ designs for your sprites. Use them like this:</p>
 SPRDGN(1)=DGNWALL():SPRX(1)=0:SPRY(1)=24 '<i>SO IS WALL</i></div>
 
 <h3>How about some art?</h3>
-<p>Design your own sprites in the Designer screen mode. You will see 227 slots
+<p>Design your own sprites in the Design Util screen mode. You will see 227 slots
 for designs in the Memory Map. Just choose slots, colors, and paint using the
 mouse. Once done, copy the number from below the Memory Map, and set SPRDGN(K) 
 to that number in the program.</p>
@@ -1589,7 +1589,7 @@ the graphical screen, altogether offset by the values in variables TILEX and
 TILEY. Smooth scrolling means to change the TILEX or TILEY in small steps.</p>
 
 <h2><a name="2007">Text Layer</a></h2>
-<p>Try pressing the MODE link in the Designer. It changes the purpose of the
+<p>Try pressing the MODE link in the Design Util. It changes the purpose of the
 selected memory slot. Set FONTALNUM variable to the address of the slot and
 see the letters and numbers appear in your design.</p>
 <p>Font can be embedded in the program text using DATA instructions.
@@ -1666,6 +1666,7 @@ not mentioned so far.</p>
 		<li>CURSORX &ndash; it's normally 0, only changes during INPUT (when program can't get its value)</li>
 		<li>CURSORPERIOD, CURSORON &ndash; cursor blink timing (in 20-millisecond units; cursor is on for CURSORON, then off for the rest of the CURSORPERIOD)</li>
 		<li>READYPROMPT &ndash; the text you want to see when commands are expected</li>
+		<li>FONTSIGNS &ndash; pointer to user-defined non-alphanumeric characters' memory slot</li>
 </ul>
 
 <h3>Re-DIM to erase</h3>
