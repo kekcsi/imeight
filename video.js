@@ -247,9 +247,6 @@ varUpdateHook = function(arrayName, index) {
 		ZOOM = inZoom.checked ? 2 : 1
 		tabGraphic.style.width = 384*ZOOM + "px"
 		tabGraphic.style.height = 216*ZOOM + "px"
-		tabGraphic.style.marginLeft = tabGraphic.style.marginRight = 384 - 192*ZOOM + "px"
-		tabGraphic.style.marginTop = tabGraphic.style.marginBottom = 216 - 108*ZOOM + "px"
-		tabGraphic.style.backgroundColor = "gray"
 		
 		sprites = []
 		tabGraphic.innerHTML = ""
