@@ -5,6 +5,7 @@ body {
 
 .win {
 	border: solid 2px #bb7800;
+	background: gray;
 	width: 768px;
 }
 
