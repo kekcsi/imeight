@@ -1,4 +1,4 @@
-var listClean = true //does the tokenized program match the text in the lising?
+var listClean = true //does the tokenized program match the text in the listing?
 var oldText = ""
 
 var tabs
@@ -14,23 +14,31 @@ function dragTutor(ev) {
 }
 
 function selectTab(selected) {
+	var oldTab
+
 	for (var i in tabs) {
+		if (tabs[i].tab.style.display != "none") {
+			oldTab = i
+		}
+		
 		if (i == selected) {
 			tabs[i].btn.src = tabs[i].btn.src.replace("-ina", "-act")
-			tabs[i].tab.style.display="block"
+			tabs[i].tab.style.display = "block"
 		} else {
 			tabs[i].btn.src = tabs[i].btn.src.replace("-act", "-ina")
-			tabs[i].tab.style.display="none"
+			tabs[i].tab.style.display = "none"
 		}
 	}
 
 	tabs[selected].focused.focus()
+	
+	return oldTab
 }
 
-function programTab() { selectTab("Program") }
-function graphicTab() { selectTab("Graphic") }
-function designerTab() { selectTab("Designer") }
-function miscTab() { selectTab("Misc") }
+function programTab() { return selectTab("Program") }
+function graphicTab() { return selectTab("Graphic") }
+function designerTab() { return selectTab("Designer") }
+function miscTab() { return selectTab("Misc") }
 
 pageLoadHooks.push(function() {
 	tabs = {
@@ -79,8 +87,10 @@ function goLine(target, selectIt) {
 	var lines = taList.value.split("\n")
 	var target0based = parseInt(target) - 1
 	
+	var saveTab = programTab()
 	taList.scrollTop = Math.max(taList.scrollTop, (target0based - 16)*15)
 	taList.scrollTop = Math.min(taList.scrollTop, (target0based - 4)*15)
+	selectTab(saveTab)
 
 	if (selectIt !== false) {
 		for (var currLine in lines) {
@@ -194,14 +204,15 @@ var commands = {
 
 runErrorHook = function(message) {
 	if (bugLocator) {
-		videoPrint("?" + message + "  ERROR IN " + bugLocator.line + ":" 
-			+ bugLocator.colon + ", " + bugLocator.instruction)
-		
-		divStatus.innerHTML = message
 		goLine(bugLocator.line, false)
 		taList.selectionStart = bugLocator.chStart
 		taList.selectionEnd = bugLocator.chEnd
 		taList.focus()
+
+		videoPrint("?" + message + "  ERROR IN " + bugLocator.line + ":" 
+			+ bugLocator.colon + ", " + bugLocator.instruction)
+		
+		divStatus.innerHTML = message
 	} else {
 		videoPrint("?" + message + "  ERROR")
 	}

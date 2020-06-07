@@ -85,7 +85,7 @@
 		</div>
     	<div class="dark tabPanel" id="tabProgram">
     		<textarea id="taList"></textarea><div>
-    		<input id="inLine" size="5" type="text" onchange="goLine(this.value)"/>
+    		<input id="inLine" size="5" type="text" onchange="goLine(this.value)" onkeyup="event.keyCode == 13 && goLine(this.value)"/>
     		<button class="glow" onclick="parseText()" title="Tokenize and Inject Program to Runner for Testing or Downloading (F9)">&gt; RUNNER</button>
     		<button class="glow" onclick="commands.OLD()" title="Restore Program Text After NEW or OLD Command">OLD</button>
     		<!--button class="glow" id="btnTutorRight" onclick="tutorRight()" title="Show Tutorial (F1)">TUTOR &gt;</button>
@@ -93,11 +93,11 @@
 			<div id="divStatus">&nbsp;</div></div>
     	</div>
     	<div tabindex="0" class="dark" id="tabGraphic" onfocus="auBackground.play()" onblur="auBackground.pause()"></div>
-    	<div id="tabDesigner">
-			<div id="tabHex" style="display:none; width: 216px; height: 232px; text-align: center">
+    	<div id="tabDesigner" style="display: none">
+			<div id="tabHex" style="display: none; width: 216px; height: 232px; text-align: center">
 				<textarea style="font-size: 10px; color: white; background: black" id="taHex" cols="33" rows="18"></textarea>
 			</div>
-			<div id="tabFont" style="display:none; width: 216px; height: 232px; text-align: center">
+			<div id="tabFont" style="display: none; width: 216px; height: 232px; text-align: center">
 				<div style="height: 128px">
 					<table id="tblDesignerGlyph" style="margin-left: auto; margin-right: auto" class="pixel">
 						<tr>
@@ -1183,5 +1183,5 @@
 		<iframe id="taTutor" src="imeight_pl_tutorial.html"></iframe>
 		<img id="handleTutor" src="TUTOR.png" onmousedown="grabTutor = event.offsetX" onmouseup="grabTutor = null">
     </div>
-</body>		
+</body>
 </html>
