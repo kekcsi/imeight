@@ -84,20 +84,20 @@
 			<img id="btnMisc" onclick="miscTab(); updateDownloadBlob()" class="tab" src="tab-misc-ina.gif" title="Misc." />
 		</div>
     	<div class="dark tabPanel" id="tabProgram">
-    		<textarea id="taList"></textarea><div>
-    		<input id="inLine" size="5" type="text" onchange="goLine(this.value)" onkeyup="event.keyCode == 13 && goLine(this.value)"/>
-    		<button class="glow" onclick="parseText()" title="Tokenize and Inject Program to Runner for Testing or Downloading (F9)">&gt; RUNNER</button>
-    		<button class="glow" onclick="commands.OLD()" title="Restore Program Text After NEW or OLD Command">OLD</button>
-    		<!--button class="glow" id="btnTutorRight" onclick="tutorRight()" title="Show Tutorial (F1)">TUTOR &gt;</button>
-    		<button class="glow" id="btnTutorBelow" style="display:none" onclick="tutorBelow()" title="Show Tutorial (F1)">TUTOR <small>\/</small></button-->
-			<div id="divStatus">&nbsp;</div></div>
+    		<textarea id="taList"></textarea>
+			<div style="position: absolute; bottom: 0; width: 768px">
+				<input id="inLine" size="5" type="text" onchange="goLine(this.value)" onkeyup="event.keyCode == 13 && goLine(this.value)"/>
+				<button class="glow" onclick="parseText()" title="Tokenize and Inject Program to Runner for Testing or Downloading (F9)">&gt; RUNNER</button>
+				<button class="glow" onclick="commands.OLD()" title="Restore Program Text After NEW or OLD Command">OLD</button>
+				<div id="divStatus">&nbsp;</div>
+			</div>
     	</div>
     	<div tabindex="0" class="dark" id="tabGraphic" onfocus="auBackground.play()" onblur="auBackground.pause()"></div>
     	<div id="tabDesigner" style="display: none">
-			<div id="tabHex" style="display: none; width: 216px; height: 232px; text-align: center">
-				<textarea style="font-size: 10px; color: white; background: black" id="taHex" cols="33" rows="18"></textarea>
+			<div id="tabHex" style="display: none; width: 313px; height: 333px; text-align: center">
+				<textarea style="color: white; background: black" id="taHex" cols="33" rows="18"></textarea>
 			</div>
-			<div id="tabFont" style="display: none; width: 216px; height: 232px; text-align: center">
+			<div id="tabFont" style="display: none; width: 313px; height: 333px; text-align: center">
 				<div style="height: 128px">
 					<table id="tblDesignerGlyph" style="margin-left: auto; margin-right: auto" class="pixel">
 						<tr>
@@ -181,7 +181,7 @@
 							<td data-idx="63"></td>
 						</tr>
 					</table>
-					<canvas id="fontOverviewCanvas" style="display: none; margin: 0 auto; background: black" width="48" height="48"></canvas>
+					<canvas id="fontOverviewCanvas" style="display: none; margin: 1px auto; background: black" width="48" height="48"></canvas>
 				</div>
 				<div id="divGlyph" style="font-family: monospace; margin-left: auto; margin-right: auto; text-align: center">
 					<div id="divPad1" class="fontPad">
@@ -200,17 +200,17 @@
 						<a href="javascript:goFont(36)">ALL</a>
 					</div>
 					<div id="divPad2" class="fontPad" style="display: none">
-						<a href="javascript:goFont(0)" title="SPACE">S</a> <a href="javascript:goFont(1)">!</a> <a href="javascript:goFont(2)">"</a> <a href="javascript:goFont(3)">#</a> <a href="javascript:goFont(4)">$</a> <a href="javascript:goFont(5)">%</a>
+						<a href="javascript:goFont(0)" title="SPACE">S</a> <a href="javascript:goFont(1)" title="EXCLAMATION MARK">!</a> <a href="javascript:goFont(2)" title="QUOTATION MARK">"</a> <a href="javascript:goFont(3)" title="NUMBER SIGN">#</a> <a href="javascript:goFont(4)" title="DOLLAR SIGN">$</a> <a href="javascript:goFont(5)" title="PERCENT SIGN">%</a>
 						<br/>                                                                                                              
-						<a href="javascript:goFont(6)">&amp;</a> <a href="javascript:goFont(7)">'</a> <a href="javascript:goFont(8)">(</a> <a href="javascript:goFont(9)">)</a> <a href="javascript:goFont(10)">*</a> <a href="javascript:goFont(11)">+</a>
+						<a href="javascript:goFont(6)" title="AMPERSAND">&amp;</a> <a href="javascript:goFont(7)" title="APOSTROPHE">'</a> <a href="javascript:goFont(8)" title="LEFT PARENTHESIS">(</a> <a href="javascript:goFont(9)" title="RIGHT PARENTHESIS">)</a> <a href="javascript:goFont(10)" title="ASTERISK">*</a> <a href="javascript:goFont(11)" title="PLUS SIGN">+</a>
 						<br/>                                                                                                              
-						<a href="javascript:goFont(12)">,</a> <a href="javascript:goFont(13)">-</a> <a href="javascript:goFont(14)">.</a> <a href="javascript:goFont(15)">/</a> <a href="javascript:goFont(16)">[</a> <a href="javascript:goFont(17)">\</a>
+						<a href="javascript:goFont(12)" title="COMMA">,</a> <a href="javascript:goFont(13)" title="HYPHEN-MINUS">-</a> <a href="javascript:goFont(14)" title="FULL STOP">.</a> <a href="javascript:goFont(15)" title="SOLIDUS">/</a> <a href="javascript:goFont(16)" title="LEFT SQUARE BRACKET">[</a> <a href="javascript:goFont(17)" title="BACKSLASH">\</a>
 						<br/>                                                                                                              
-						<a href="javascript:goFont(18)">]</a> <a href="javascript:goFont(19)">^</a> <a href="javascript:goFont(20)">_</a> <a href="javascript:goFont(21)">{</a> <a href="javascript:goFont(22)">|</a> <a href="javascript:goFont(23)">}</a>
+						<a href="javascript:goFont(18)" title="RIGHT SQUARE BRACKET">]</a> <a href="javascript:goFont(19)" title="CIRCUMFLEX ACCENT">^</a> <a href="javascript:goFont(20)" title="SPACING UNDERSCORE">_</a> <a href="javascript:goFont(21)" title="LEFT BRACE">{</a> <a href="javascript:goFont(22)" title="VERTICAL LINE">|</a> <a href="javascript:goFont(23)" title="RIGHT BRACE">}</a>
 						<br/>                                                                                                              
-						<a href="javascript:goFont(24)">~</a> <a href="javascript:goFont(25)" title="DELETE">D</a> <a href="javascript:goFont(26)">:</a> <a href="javascript:goFont(27)">;</a> <a href="javascript:goFont(28)">&lt;</a> <a href="javascript:goFont(29)">=</a>
+						<a href="javascript:goFont(24)" title="TILDE">~</a> <a href="javascript:goFont(25)" title="DELETE">D</a> <a href="javascript:goFont(26)" title="COLON">:</a> <a href="javascript:goFont(27)" title="SEMICOLON">;</a> <a href="javascript:goFont(28)" title="LESS-THAN SIGN">&lt;</a> <a href="javascript:goFont(29)" title="EQUALS SIGN">=</a>
 						<br/>                                                                                                              
-						<a href="javascript:goFont(30)">&gt;</a> <a href="javascript:goFont(31)">?</a> <a href="javascript:goFont(32)">@</a> <a href="javascript:goFont(33)">`</a> <a href="javascript:goFont(34)" title="Unused Space">X</a> <a href="javascript:goFont(35)" title="Unused Space">Y</a>
+						<a href="javascript:goFont(30)" title="GREATER-THAN SIGN">&gt;</a> <a href="javascript:goFont(31)" title="QUESTION MARK">?</a> <a href="javascript:goFont(32)" title="COMMERCIAL AT">@</a> <a href="javascript:goFont(33)" title="GRAVE ACCENT">`</a> <a href="javascript:goFont(34)" title="Unused Space">X</a> <a href="javascript:goFont(35)" title="Unused Space">Y</a>
 						<br/>                                                                                                              
 						<a href="javascript:goFont(36)">ALL</a>
 					</div>
@@ -864,12 +864,13 @@
 					</tr>
 				</table>
 			</div>
-			<div id="divDgnStatus">&nbsp;</div>
 			<div id="divDesignerButtons">
+				<div id="divDgnStatus" style="margin: 1px; text-align: left; text-align-last: left;">&nbsp;</div>
 				<button id="btnDesignClear" onclick="clearDesigner()" title="Clear Designer">CLEAR</button>
 				<button id="btnDesignPut" onclick="designToMemory()" title="Update Memory from Designer">PUT</button>
 				<button id="btnDesignGet" onclick="designFromMemory()" title="Reset Designer from Memory">GET</button>
 				<label class="toggle-gray" title="Automatically PUT to keep design in original slot." id="lblGetDesign">Auto<input style="position: relative; top: 3px" type="checkbox" id="cbGetDesign" checked="true"/></label>
+				<br/>
 				<button id="btnHFlip" onclick="transformDesign(true, false, false, 0, 0)">H-FLIP</button>
 				<button id="btnVFlip" onclick="transformDesign(false, true, false, 0, 0)">V-FLIP</button>
 				<button id="btnRot" onclick="transformDesign(false, true, true, 0, 0)">ROT</button>

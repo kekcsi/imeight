@@ -160,7 +160,7 @@ var builtInCharGen = {32: [0,0,0,0,0,0,0,0],
 for (var alpha = 1; alpha <= 26; alpha++) {
 	builtInCharGen[96 + alpha] = builtInCharGen[64 + alpha]
 }
-for (var n = 32; n < 57; n++) {
+for (var n = 32; n < 64; n++) {
 	builtInCharGen[n - 32] = builtInCharGen[n]
 }
 

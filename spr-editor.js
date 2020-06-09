@@ -275,11 +275,9 @@ pageLoadHooks.push(function() {
 	
 	fontOverviewCanvas.addEventListener("mousemove", function(ev) {
 		var i = Math.floor(ev.offsetX/8) + 6*Math.floor(ev.offsetY/8)
-		if (i > 9) {
-			divDgnStatus.innerHTML = String.fromCharCode(i + 55)
-		} else {
-			divDgnStatus.innerHTML = "" + i
-		}
+		var anchs = activePad.getElementsByTagName("a")
+
+		divDgnStatus.innerHTML = anchs[i].innerHTML + " " + anchs[i].title
 	})
 	
 	var cells = tblColors.getElementsByTagName("td")
