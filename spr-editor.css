@@ -71,6 +71,7 @@ table.pixel td, #tblColors td {
 	border: none;
 	font-size: 13px;
 	font-weight: bold;
+	border-radius: 0;
 }
 
 #tblColors {
