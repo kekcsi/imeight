@@ -1,3 +1,7 @@
+table.pixel {
+	border-spacing: 1px;
+}
+
 table.pixel td {
 	background: black;
 	width: 12px;
@@ -115,5 +119,5 @@ table.pixel td, #tblColors td {
 
 .fontPad a {
 	text-decoration: none;
-	font-size: 11px;
+	font-size: 16px;
 }
