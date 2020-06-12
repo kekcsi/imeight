@@ -66,7 +66,7 @@
 		<body onload="pageLoad()" topmargin="0" leftmargin="0" onmousemove="move(event)" onmouseup="dragMute = false">
 			<div tabindex="0" id="tabGraphic" onfocus="auBackground.play()" onblur="auBackground.pause()"></div>
 			<audio id="auBackground" loop="loop" src="<?=music?>"></audio>
-			<img id="imMute" src="mute.png" onclick="auBackground.muted = !auBackground.muted" onmousedown="dragMute = true">
+			<img id="imMute" src="mute.png" onclick="auBackground.muted = !auBackground.muted; tabGraphic.focus()" onmousedown="dragMute = true">
 		</body>
 		</html>
 	--></script>
@@ -76,6 +76,7 @@
 </head>
 	
 <body onload="pageLoad()" onmouseup="grabTutor = null" onmousemove="dragTutor(event)">
+	<img id="imMute" src="mute.png" onclick="auBackground.muted = !auBackground.muted; tabGraphic.focus()" style="position: absolute; left: 800px; top: 150px">
 	<div class="win">
 		<div class="buttons">
 			<img id="btnProgram" onclick="programTab()" class="tab" src="tab-list-act.gif" title="Program Listing" />
@@ -1145,7 +1146,7 @@
 		</div>
     	<div class="dark" id="tabMisc" style="display:none">
 			<p><b>Credits:</b> kekcsi - imeight creator :
-			Background music made with <a href="https://sb.bitsnbites.eu/" target="_blank">SoundBox</a> :
+			Background music made with <a href="https://sb.bitsnbites.eu/" target="_blank">SoundBox</a> and <a href="https://beepbox.co/" target="_blank">BeepBox</a> :
 			FX Matrix font (C) Robin Eckert under <a href="http://scripts.sil.org/OFL" target="_blank">SIL 1.1</a> :
 			Thanks for Westminster font go to <a href="http://www.ffonts.net" target="_blank">ffonts.net</a></p>
 			<p><b>Forum:</b> 
@@ -1164,6 +1165,10 @@
 				<tr>
 					<td title="mp3 URL">Background Music</td>
 					<td><input id="inMusic" value="space_blues.mp3" onchange="document.getElementById('auBackground').src=this.value" onblur="updateDownloadBlob()"/></td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td>Built-in songs: <a href="#" onclick="auBackground.src=inMusic.value='space_blues.mp3'">1</a> <a href="#" onclick="auBackground.src=inMusic.value='beepbox-song.mp3'">2</a></td>
 				</tr>
 			</table>
 			<p>

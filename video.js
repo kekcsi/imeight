@@ -6,6 +6,7 @@ builtInVariables.CURSORY = 0
 builtInVariables.CURSORPERIOD = 30
 builtInVariables.CURSORON = 20
 builtInVariables.READYPROMPT = "READY."
+builtInVariables["MUSIC$"] = ""
 
 builtInArrays.SPRX = [] //horizontal coordinate of each sprite (-24 to 384)
 builtInArrays.SPRY = [] //vertical coordinate of each sprite (-24 to 216)
@@ -350,6 +351,16 @@ varUpdateHook = function(arrayName, index) {
 			index == "TEXTCOLORUC" || index == "TEXTCOLORLC") && !arrayName) {
 		
 		glyphsDirty = true
+	}
+	
+	if (index == "MUSIC$" && !arrayName) {
+		auBackground.src = variables["MUSIC$"]
+		auBackground.play()
+	}
+	
+	if (index == "MUSICTIME" && !arrayName) {
+		auBackground.currentTime = variables["MUSICTIME"]
+		auBackground.play()
 	}
 }
 
