@@ -1191,15 +1191,16 @@ timing and graphics. Let's go!</p>
 
 <h2>Contents</h2>
 <div class="contents">
-	<a href="#2001">WAIT and GET</a>
-&bull;	<a href="#2002">TIME and TIME$</a>
+	<a href="#2001">WAIT&nbsp;and&nbsp;GET</a>
+&bull;	<a href="#2002">TIME&nbsp;and&nbsp;TIME$</a>
 &bull;	<a href="#2003">Sprites!</a>
 &bull;	<a href="#2004">Colors!</a>
-&bull;	<a href="#2005">Pixel Data Animations</a>
+&bull;	<a href="#2005">Pixel&nbsp;Data&nbsp;Animations</a>
 &bull;	<a href="#2006">Tiles</a>
-&bull;	<a href="#2007">Text Layer</a>
-&bull;	<a href="#2008">Mouse/Touch Control</a>
-&bull;	<a href="#2009">Assorted Tricks</a></div>
+&bull;	<a href="#2007">Text&nbsp;Layer</a>
+&bull;	<a href="#2008">Mouse/Touch&nbsp;Control</a>
+&bull;	<a href="#2009">Music&nbsp;and&nbsp;Sound</a>
+&bull;	<a href="#2010">Assorted&nbsp;Tricks</a></div>
 
 <h2><a name="2001">WAIT and GET</a></h2>
 <p>WAIT instruction halts execution of your program until one of the 
@@ -1656,7 +1657,32 @@ SPRX(1) = TOUCHX(1) - GRABX
 SPRY(1) = TOUCHY(1) - GRABY
 R.</div>
 
-<h2><a name="2009">Assorted Tricks</a></h2>
+<h2><a name="2009">Music and Sound</a></h2>
+
+<h3>Changing the Background Music</h3>
+<div class="code">INPUT "SELECT SONG 1 OR 2:", SONG
+ON SONG GOTO A, B, C
+@A:MUSIC$="space_blues.mp3":GOTO START
+@B:MUSIC$="beepbox-song.mp3":GOTO START
+@C:MUSIC$="":GOTO START '<i>SILENCE</i></div>
+
+<h3>Sound Effects</h3>
+<div class="code">MUSIC$=""
+INPUT "SELECT EFFECT 0-5:", FX
+MUSIC$="sfx.wav" '<i>FACTORY SOUND EFFECT FILE</i>
+MUSICTIME=FX*2 '<i>EFFECTS BEGIN AT EVERY 2ND SECOND</i>
+FOR I=1 TO 100:W.:N. '<i>EFFECTS PLAY FOR 2 SECONDS EACH</i>
+GOTO START</div>
+
+<h3>Extending the Environment</h3>
+<p>These 2 songs and 6 effects are provided by the factory environment zip.</p>
+<p>After downloading the environment zip, you can add more mp3 or wav files to the zip and 
+refer to them in the MUSIC$ variable.</p>
+<p>You can specify a URL in the MUSIC$ value in case the mp3 file is available on a server.</p>
+<p>Be careful: if you specify the file name in uppercase 
+instead of lower or vice versa then Windows systems will play the song but Linux ones won't.</p>
+
+<h2><a name="2010">Assorted Tricks</a></h2>
 <p>Okay, with that you get the concepts. Now here are some details that I have 
 not mentioned so far.</p>
 
@@ -1667,8 +1693,6 @@ not mentioned so far.</p>
 		<li>CURSORPERIOD, CURSORON &ndash; cursor blink timing (in 20-millisecond units; cursor is on for CURSORON, then off for the rest of the CURSORPERIOD)</li>
 		<li>READYPROMPT &ndash; the text you want to see when commands are expected</li>
 		<li>FONTSIGNS &ndash; pointer to user-defined non-alphanumeric characters' memory slot</li>
-		<li>MUSIC$ &ndash; background music URL</li>
-		<li>MUSICTIME &ndash; background music playing position in seconds from start</li>
 </ul>
 
 <h3>Re-DIM to erase</h3>

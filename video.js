@@ -6,7 +6,8 @@ builtInVariables.CURSORY = 0
 builtInVariables.CURSORPERIOD = 30
 builtInVariables.CURSORON = 20
 builtInVariables.READYPROMPT = "READY."
-builtInVariables["MUSIC$"] = ""
+builtInVariables["MUSIC$"] = "space_blues.mp3"
+builtInVariables.MUSICTIME = 0
 
 builtInArrays.SPRX = [] //horizontal coordinate of each sprite (-24 to 384)
 builtInArrays.SPRY = [] //vertical coordinate of each sprite (-24 to 216)
@@ -355,12 +356,20 @@ varUpdateHook = function(arrayName, index) {
 	
 	if (index == "MUSIC$" && !arrayName) {
 		auBackground.src = variables["MUSIC$"]
-		auBackground.play()
+
+		if (variables["MUSIC$"].length) {
+			auBackground.play()
+		} else {
+			auBackground.pause()
+		}
 	}
 	
 	if (index == "MUSICTIME" && !arrayName) {
 		auBackground.currentTime = variables["MUSICTIME"]
-		auBackground.play()
+
+		if (auBackground.src.length) {
+			auBackground.play()
+		}
 	}
 }
 
@@ -726,6 +735,8 @@ pageLoadHooks.push(function() {
 		textCanvas.style.left = variables.TEXTX*ZOOM + "px"
 		textCanvas.style.top = variables.TEXTY*ZOOM + "px"
 		textCanvas.style.zIndex = variables.TEXTPRIO
+		
+		variables["MUSICTIME"] = auBackground.currentTime
 	}, 40)
 })
 
