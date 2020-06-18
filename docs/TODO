@@ -1,0 +1,8 @@
+TODO
+* mem save limit on dl
+* fix list scrolling
+* music selection from program
+* hollow color code for tiles and sprites: HOLLOW variable
+* Vector layer?
+* LOAD/SAVE memory/routines: https://restdb.io/ ?
+* deploy script that creates im8runner.zip
